@@ -1,0 +1,18 @@
+package Model;
+
+public class Technician extends User{
+    private String technicianID;
+
+    public Technician(String userID, String username, String password, String email, String contact, boolean isActive, String technicianID) {
+        super(userID, username, password, email, contact, isActive);
+        setTechnicianID(technicianID);
+    }
+
+    public String getTechnicianID() {
+        return technicianID;
+    }
+
+    public void setTechnicianID(String technicianID) {
+        this.technicianID = technicianID;
+    }
+}

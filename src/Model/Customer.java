@@ -1,5 +1,7 @@
 package Model;
 
+import UI.CustomerUI;
+
 public class Customer extends User {
     private String customerID;
 
@@ -14,5 +16,10 @@ public class Customer extends User {
 
     public void setCustomerID(String customerID) {
         this.customerID = customerID;
+    }
+
+    @Override
+    public void openMenu() {
+        new CustomerUI().showMenu();
     }
 }

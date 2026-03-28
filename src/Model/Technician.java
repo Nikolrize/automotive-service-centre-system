@@ -1,6 +1,8 @@
 package Model;
 
-public class Technician extends User{
+import UI.TechnicianUI;
+
+public class Technician extends User {
     private String technicianID;
 
     public Technician(String userID, String username, String password, String email, String contact, boolean isActive, String technicianID) {
@@ -14,5 +16,10 @@ public class Technician extends User{
 
     public void setTechnicianID(String technicianID) {
         this.technicianID = technicianID;
+    }
+
+    @Override
+    public void openMenu() {
+        new TechnicianUI().showMenu();
     }
 }

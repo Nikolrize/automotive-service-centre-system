@@ -1,5 +1,7 @@
 package Model;
 
+import UI.CounterStaffUI;
+
 public class CounterStaff extends User {
     private String counterStaffID;
 
@@ -14,5 +16,10 @@ public class CounterStaff extends User {
 
     public void setCounterStaffID(String counterStaffID) {
         this.counterStaffID = counterStaffID;
+    }
+
+    @Override
+    public void openMenu() {
+        new CounterStaffUI().showMenu();
     }
 }

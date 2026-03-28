@@ -64,4 +64,6 @@ public abstract class User {
     public void setIsActive(boolean isActive) {
         this.isActive = isActive;
     }
+
+    public abstract void openMenu();
 }

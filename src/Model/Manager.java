@@ -1,5 +1,7 @@
 package Model;
 
+import UI.ManagerUI;
+
 public class Manager extends User {
     private String managerID;
 
@@ -14,5 +16,10 @@ public class Manager extends User {
 
     public void setManagerID(String managerID) {
         this.managerID = managerID;
+    }
+
+    @Override
+    public void openMenu() {
+        new ManagerUI().showMenu();
     }
 }

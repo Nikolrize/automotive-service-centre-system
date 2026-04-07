@@ -17,56 +17,35 @@ public class LoginUI extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
 
-        // Main panel
+        // Main Panel
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         mainPanel.setBackground(Color.WHITE);
 
-        // Title
         JLabel titleLabel = new JLabel("Login", SwingConstants.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
         titleLabel.setForeground(new Color(50, 50, 50));
-        mainPanel.add(titleLabel, BorderLayout.NORTH);
 
         // Form Panel
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(Color.WHITE);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Username label and field
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        formPanel.add(new JLabel("Username:"), gbc);
-
-        gbc.gridx = 1;
+        JLabel usernameLabel = new JLabel("Username:");
         usernameField = new JTextField(15);
-        formPanel.add(usernameField, gbc);
 
-        // Password label and field
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        formPanel.add(new JLabel("Password:"), gbc);
-
-        gbc.gridx = 1;
+        JLabel passwordLabel = new JLabel("Password:");
         passwordField = new JPasswordField(15);
-        formPanel.add(passwordField, gbc);
 
-        mainPanel.add(formPanel, BorderLayout.CENTER);
-
-        // Login button panel
+        // Button Panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(Color.WHITE);
+
         JButton loginButton = new JButton("Login");
         loginButton.setBackground(new Color(70, 130, 180));
         loginButton.setForeground(Color.WHITE);
         loginButton.setFocusPainted(false);
         loginButton.setFont(new Font("SansSerif", Font.BOLD, 14));
         loginButton.setPreferredSize(new Dimension(100, 35));
-        buttonPanel.add(loginButton);
-
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         // Action listener
         loginButton.addActionListener(e -> {
@@ -82,6 +61,17 @@ public class LoginUI extends JFrame {
                 JOptionPane.showMessageDialog(this, "Invalid username or password", "Login Failed", JOptionPane.ERROR_MESSAGE);
             }
         });
+
+        formPanel.add(usernameLabel, UIHelper.createGbc(0, 0));
+        formPanel.add(usernameField, UIHelper.createGbc(1, 0));
+        formPanel.add(passwordLabel, UIHelper.createGbc(0, 1));
+        formPanel.add(passwordField, UIHelper.createGbc(1, 1));
+
+        buttonPanel.add(loginButton);
+
+        mainPanel.add(titleLabel, BorderLayout.NORTH);
+        mainPanel.add(formPanel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         add(mainPanel);
         setVisible(true);

@@ -12,42 +12,48 @@ public class LoginUI extends JFrame {
 
     public LoginUI() {
         setTitle("APU Automotive Service Centre (APU – ASC)");
-        setSize(400, 250);
+        setSize(1280, 720);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
+        ImageIcon appIcon = new ImageIcon("src/Resource/appIcon.png");
+        setIconImage(appIcon.getImage());
 
         // Main Panel
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         mainPanel.setBackground(Color.WHITE);
+
+        // Left Panel
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        leftPanel.setBorder(BorderFactory.createEmptyBorder(200, 50, 200, 50));
+        leftPanel.setBackground(Color.LIGHT_GRAY);
 
         JLabel titleLabel = new JLabel("Login", SwingConstants.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
-        titleLabel.setForeground(new Color(50, 50, 50));
 
         // Form Panel
         JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBackground(Color.WHITE);
+        formPanel.setBackground(Color.LIGHT_GRAY);
 
         JLabel usernameLabel = new JLabel("Username:");
-        usernameField = new JTextField(15);
+        usernameField = new JTextField(25);
+        usernameField.setPreferredSize(new Dimension(0, 35));
 
         JLabel passwordLabel = new JLabel("Password:");
-        passwordField = new JPasswordField(15);
+        passwordField = new JPasswordField(25);
+        passwordField.setPreferredSize(new Dimension(0, 35));
 
         // Button Panel
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setBackground(Color.LIGHT_GRAY);
 
         JButton loginButton = new JButton("Login");
-        loginButton.setBackground(new Color(70, 130, 180));
+        loginButton.setBackground(new Color(135, 90, 224));
         loginButton.setForeground(Color.WHITE);
         loginButton.setFocusPainted(false);
         loginButton.setFont(new Font("SansSerif", Font.BOLD, 14));
         loginButton.setPreferredSize(new Dimension(100, 35));
 
-        // Action listener
         loginButton.addActionListener(e -> {
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
@@ -62,16 +68,31 @@ public class LoginUI extends JFrame {
             }
         });
 
-        formPanel.add(usernameLabel, UIHelper.createGbc(0, 0));
-        formPanel.add(usernameField, UIHelper.createGbc(1, 0));
-        formPanel.add(passwordLabel, UIHelper.createGbc(0, 1));
-        formPanel.add(passwordField, UIHelper.createGbc(1, 1));
+        // Right Panel
+        JPanel rightPanel = new JPanel();
+        rightPanel.setBackground(Color.WHITE);
+        rightPanel.setLayout(new GridBagLayout());
+
+        ImageIcon loginIcon = new ImageIcon("src/Resource/login.png");
+        Image loginImg = loginIcon.getImage().getScaledInstance(400, 400, Image.SCALE_SMOOTH);
+        JLabel loginImgLabel = new JLabel(new ImageIcon(loginImg));
+
+        // Add to Panels
+        formPanel.add(usernameLabel, UIHelper.createGbc(0,1,5));
+        formPanel.add(usernameField, UIHelper.createGbc(0,2,5));
+        formPanel.add(passwordLabel, UIHelper.createGbc(0, 3,5));
+        formPanel.add(passwordField, UIHelper.createGbc(0,4,5));
 
         buttonPanel.add(loginButton);
 
-        mainPanel.add(titleLabel, BorderLayout.NORTH);
-        mainPanel.add(formPanel, BorderLayout.CENTER);
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        leftPanel.add(titleLabel, BorderLayout.NORTH);
+        leftPanel.add(formPanel, BorderLayout.CENTER);
+        leftPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        rightPanel.add(loginImgLabel);
+
+        mainPanel.add(leftPanel, BorderLayout.WEST);
+        mainPanel.add(rightPanel, BorderLayout.CENTER);
 
         add(mainPanel);
         setVisible(true);

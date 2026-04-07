@@ -78,10 +78,10 @@ public class LoginUI extends JFrame {
         JLabel loginImgLabel = new JLabel(new ImageIcon(loginImg));
 
         // Add to Panels
-        formPanel.add(usernameLabel, UIHelper.createGbc(0,1,5));
-        formPanel.add(usernameField, UIHelper.createGbc(0,2,5));
-        formPanel.add(passwordLabel, UIHelper.createGbc(0, 3,5));
-        formPanel.add(passwordField, UIHelper.createGbc(0,4,5));
+        formPanel.add(usernameLabel, UIHelper.createGbc(0,0,5));
+        formPanel.add(usernameField, UIHelper.createGbc(0,1,5));
+        formPanel.add(passwordLabel, UIHelper.createGbc(0, 2,5));
+        formPanel.add(passwordField, UIHelper.createGbc(0,3,5));
 
         buttonPanel.add(loginButton);
 

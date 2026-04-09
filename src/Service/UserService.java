@@ -127,4 +127,47 @@ public class UserService {
             FileHandler.appendToFile(FILE_NAME, data);
         }
     }
+
+    public void updateUserProfile(String userID, String newUsername, String newFirstName, String newLastName, String newPassword, String newEmail, String newContact) throws Exception {
+        List<String> users = FileHandler.readFile(FILE_NAME);
+        boolean updated = false;
+
+        // Check Username
+        for (String line : users) {
+            String[] data = line.split(",");
+            if (data.length < 9) continue;
+
+            String fileUserID = data[0];
+            String fileUsername = data[1];
+
+            if (!fileUserID.equals(userID) && fileUsername.equalsIgnoreCase(newUsername)) {
+                throw new Exception("Username " + newUsername + " already exists!");
+            }
+        }
+
+        // Update User
+        for (int i = 0; i < users.size(); i++) {
+            String[] data = users.get(i).split(",");
+            if (data.length < 9) continue;
+
+            if (data[0].equals(userID)) {
+                data[1] = newUsername;
+                data[2] = newFirstName;
+                data[3] = newLastName;
+                data[4] = newPassword;
+                data[5] = newEmail;
+                data[6] = newContact;
+
+                users.set(i, String.join(",", data));
+                updated = true;
+                break;
+            }
+        }
+
+        if (!updated) {
+            throw new Exception("User not found!");
+        }
+
+        FileHandler.writeFile(FILE_NAME, users);
+    }
 }

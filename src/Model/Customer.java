@@ -5,8 +5,8 @@ import UI.CustomerUI;
 public class Customer extends User {
     private String customerID;
 
-    public Customer(String userID, String username, String password, String email, String contact, boolean isActive, String customerID) {
-        super(userID, username, password, email, contact, isActive);
+    public Customer(String userID, String username, String firstName, String lastName, String password, String email, String contact, boolean isActive, String customerID) {
+        super(userID, username, firstName, lastName, password, email, contact, isActive);
         setCustomerID(customerID);
     }
 

@@ -3,14 +3,18 @@ package Model;
 public abstract class User {
     protected String userID;
     protected String username;
+    protected String firstName;
+    protected String lastName;
     protected String password;
     protected String email;
     protected String contact;
     protected boolean isActive;
 
-    public User(String userID, String username, String password, String email, String contact, boolean isActive) {
+    public User(String userID, String username, String firstName, String lastName, String password, String email, String contact, boolean isActive) {
         setUserID(userID);
         setUsername(username);
+        setFirstName(firstName);
+        setLastName(lastName);
         setPassword(password);
         setEmail(email);
         setContact(contact);
@@ -31,6 +35,22 @@ public abstract class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getPassword() {

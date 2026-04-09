@@ -5,8 +5,8 @@ import UI.CounterStaffUI;
 public class CounterStaff extends User {
     private String counterStaffID;
 
-    public CounterStaff(String userID, String username, String password, String email, String contact, boolean isActive, String counterStaffID) {
-        super(userID, username, password, email, contact, isActive);
+    public CounterStaff(String userID, String username, String firstName, String lastName, String password, String email, String contact, boolean isActive, String counterStaffID) {
+        super(userID, username, firstName, lastName, password, email, contact, isActive);
         setCounterStaffID(counterStaffID);
     }
 
@@ -20,6 +20,6 @@ public class CounterStaff extends User {
 
     @Override
     public void openMenu() {
-        new CounterStaffUI().showMenu();
+        new CounterStaffUI(this).showMenu();
     }
 }

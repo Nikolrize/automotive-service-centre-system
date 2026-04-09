@@ -14,28 +14,30 @@ public class UserService {
         for (String line : users) {
             String[] data = line.split(",");
 
-            if (data.length < 7) continue;
+            if (data.length < 9) continue;
 
             String userID = data[0];
             String fileUsername = data[1];
-            String filePassword = data[2];
-            String email = data[3];
-            String contact = data[4];
-            boolean isActive = Boolean.parseBoolean(data[5]);
-            String specificID = data[6];
+            String firstName = data[2];
+            String lastName = data[3];
+            String filePassword = data[4];
+            String email = data[5];
+            String contact = data[6];
+            boolean isActive = Boolean.parseBoolean(data[7]);
+            String specificID = data[8];
             char role = specificID.charAt(0);
 
 
             if (fileUsername.equals(username) && filePassword.equals(password)) {
                 switch (role) {
                     case 'M':
-                        return new Manager(userID, fileUsername, filePassword, email, contact, isActive, specificID);
+                        return new Manager(userID, fileUsername, firstName, lastName, filePassword, email, contact, isActive, specificID);
                     case 'C':
-                        return new Customer(userID, fileUsername, filePassword, email, contact, isActive, specificID);
+                        return new Customer(userID, fileUsername, firstName, lastName, filePassword, email, contact, isActive, specificID);
                     case 'T':
-                        return new Technician(userID, fileUsername, filePassword, email, contact, isActive, specificID);
+                        return new Technician(userID, fileUsername, firstName, lastName, filePassword, email, contact, isActive, specificID);
                     case 'S':
-                        return new CounterStaff(userID, fileUsername, filePassword, email, contact, isActive, specificID);
+                        return new CounterStaff(userID, fileUsername, firstName, lastName, filePassword, email, contact, isActive, specificID);
                 }
             }
         }
@@ -43,12 +45,25 @@ public class UserService {
         return null;
     }
 
-    public void registerUser(String username, String password, String email, String contact, String role) {
-        String userID = generateNewID("User");
-        String specificID = generateNewID(role);
-        String data = String.join(",", userID, username, password, email, contact, "true", specificID);
+    public void registerUser(String username, String firstName, String lastName, String password, String email, String contact, String role) throws Exception {
+        List<String> users = FileHandler.readFile(FILE_NAME);
 
-        FileHandler.appendToFile(FILE_NAME, data);
+        for (String line : users) {
+            String[] data = line.split(",");
+
+            if (data.length < 9) continue;
+
+            String fileUsername = data[1];
+
+            if (fileUsername.equals(username)) {
+                throw new Exception("Username " + username + " already exists!");
+            } else {
+                String userID = generateNewID("User");
+                String specificID = generateNewID(role);
+                String newData = String.join(",", userID, username, firstName, lastName, password, email, contact, "true", specificID);
+                FileHandler.appendToFile(FILE_NAME, newData);
+            }
+        }
     }
 
     private String generateNewID(String role) {
@@ -91,8 +106,8 @@ public class UserService {
 
         for (String line : users) {
             String[] data = line.split(",");
-            if (data.length >= 7) {
-                String specificID = data[6];
+            if (data.length >= 9) {
+                String specificID = data[8];
                 if ("M0001".equals(specificID)) {
                     hasDefaultManager = true;
                     break;
@@ -101,12 +116,14 @@ public class UserService {
         }
 
         if (!hasDefaultManager) {
-            String username = "manager";
-            String password = "manager123";
-            String email = "manager@gmail.com";
+            String username = "superuser";
+            String firstName = "Super";
+            String lastName = "User";
+            String password = "superuser123";
+            String email = "superuser@gmail.com";
             String contact = "0123456789";
             String userID = generateNewID("User");
-            String data = String.join(",", userID, username, password, email, contact, "true", "M0001");
+            String data = String.join(",", userID, username, firstName, lastName, password, email, contact, "true", "M0001");
             FileHandler.appendToFile(FILE_NAME, data);
         }
     }

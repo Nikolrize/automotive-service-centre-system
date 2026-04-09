@@ -42,6 +42,8 @@ public class LoginUI extends JFrame {
         JLabel passwordLabel = new JLabel("Password:");
         passwordField = new JPasswordField(25);
         passwordField.setPreferredSize(new Dimension(0, 35));
+        JCheckBox showPassword = UIHelper.showPassword(passwordField);
+        showPassword.setBackground(Color.LIGHT_GRAY);
 
         // Button Panel
         JPanel buttonPanel = new JPanel();
@@ -78,10 +80,11 @@ public class LoginUI extends JFrame {
         JLabel loginImgLabel = new JLabel(new ImageIcon(loginImg));
 
         // Add to Panels
-        formPanel.add(usernameLabel, UIHelper.createGbc(0,0,5));
-        formPanel.add(usernameField, UIHelper.createGbc(0,1,5));
-        formPanel.add(passwordLabel, UIHelper.createGbc(0, 2,5));
-        formPanel.add(passwordField, UIHelper.createGbc(0,3,5));
+        formPanel.add(usernameLabel, UIHelper.createGbc(0,0,5, 5, 5, 5));
+        formPanel.add(usernameField, UIHelper.createGbc(0,1,5, 5, 10, 5));
+        formPanel.add(passwordLabel, UIHelper.createGbc(0, 2,10, 5, 5, 5));
+        formPanel.add(passwordField, UIHelper.createGbc(0,3,5, 5, 5, 5));
+        formPanel.add(showPassword, UIHelper.createGbc(0,4,5, 5, 5, 5));
 
         buttonPanel.add(loginButton);
 

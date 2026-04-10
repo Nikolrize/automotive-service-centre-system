@@ -53,8 +53,13 @@ public abstract class DashboardUI extends JFrame {
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
         titleLabel.setForeground(Color.WHITE);
 
+        JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
+        separator.setForeground(Color.LIGHT_GRAY);
+
         leftPanel.add(titleLabel);
-        leftPanel.add(Box.createVerticalStrut(20));
+        leftPanel.add(Box.createVerticalStrut(10));
+        leftPanel.add(separator);
+        leftPanel.add(Box.createVerticalStrut(10));
 
         // Add menu buttons from GetMenuItems()
         for (String menuName : getMenuItems()) {

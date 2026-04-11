@@ -9,8 +9,9 @@ public abstract class User {
     protected String email;
     protected String contact;
     protected boolean isActive;
+    protected String roleID;
 
-    public User(String userID, String username, String firstName, String lastName, String password, String email, String contact, boolean isActive) {
+    public User(String userID, String username, String firstName, String lastName, String password, String email, String contact, boolean isActive, String roleID) {
         setUserID(userID);
         setUsername(username);
         setFirstName(firstName);
@@ -19,6 +20,7 @@ public abstract class User {
         setEmail(email);
         setContact(contact);
         setIsActive(isActive);
+        setRoleID(roleID);
     }
 
     public String getUserID() {
@@ -83,6 +85,14 @@ public abstract class User {
 
     public void setIsActive(boolean isActive) {
         this.isActive = isActive;
+    }
+
+    public String getRoleID() {
+        return roleID;
+    }
+
+    public void setRoleID(String roleID) {
+        this.roleID = roleID;
     }
 
     public abstract void openMenu();

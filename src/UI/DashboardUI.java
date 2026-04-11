@@ -84,7 +84,7 @@ public abstract class DashboardUI extends JFrame {
         logoutBtn.setBorderPainted(false);
         logoutBtn.setFont(new Font("SansSerif", Font.BOLD, 14));
         logoutBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
-        logoutBtn.addActionListener(e -> handleLogout());
+        logoutBtn.addActionListener(_ -> handleLogout());
 
         UIHelper.addHoverEffect(logoutBtn, new Color(135, 90, 224), new Color(159, 126, 224));
         leftPanel.add(logoutBtn);
@@ -100,7 +100,15 @@ public abstract class DashboardUI extends JFrame {
             rightPanel.add(entry.getValue(), entry.getKey());
             JButton btn = menuButtons.get(entry.getKey());
             if (btn != null) {
-                btn.addActionListener(e -> cardLayout.show(rightPanel, entry.getKey()));
+                btn.addActionListener(_ -> {
+                    JPanel panel = entry.getValue();
+
+                    if (panel instanceof ManageUserPanel managePanel) {
+                        managePanel.loadData();
+                    }
+
+                    cardLayout.show(rightPanel, entry.getKey());
+                });
             }
         }
     }

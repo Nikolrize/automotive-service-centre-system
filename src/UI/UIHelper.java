@@ -1,5 +1,6 @@
 package UI;
 
+import Enum.*;
 import Model.User;
 import Service.UserService;
 
@@ -24,9 +25,9 @@ public class UIHelper {
         JCheckBox showPassword = new JCheckBox("Show Password");
         char defaultEchoChar = passwordField.getEchoChar();
 
-        showPassword.addActionListener(e -> {
+        showPassword.addActionListener(_ -> {
             if (showPassword.isSelected()) {
-                passwordField.setEchoChar((char)0);
+                passwordField.setEchoChar((char) 0);
             } else {
                 passwordField.setEchoChar(defaultEchoChar);
             }
@@ -71,8 +72,9 @@ public class UIHelper {
         return panel;
     }
 
-    public static JPanel editProfilePanel(User user, UserService userService) {
-        JPanel mainPanel = createSectionPanel("Edit Profile");
+    public static JPanel userFormPanel(FormMode mode, User user, UserService userService, UserRole role) {
+        boolean isEdit = (mode == FormMode.EDIT);
+        JPanel mainPanel = createSectionPanel(isEdit ? "Edit " + user.getUsername() + "'s Profile" : "Create " + role.getDisplayName());
 
         // Form Panel
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -80,20 +82,20 @@ public class UIHelper {
         formPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel usernameLabel = new JLabel("Username:");
-        JTextField usernameField = new JTextField(user.getUsername());
-        usernameField.setPreferredSize(new Dimension(300, 35));
+        JTextField usernameField = new JTextField();
+        usernameField.setPreferredSize(new Dimension(400, 35));
 
         JLabel emailLabel = new JLabel("Email:");
-        JTextField emailField = new JTextField(user.getEmail());
-        emailField.setPreferredSize(new Dimension(300, 35));
+        JTextField emailField = new JTextField();
+        emailField.setPreferredSize(new Dimension(400, 35));
 
         JLabel contactLabel = new JLabel("Contact Number:");
-        JTextField contactField = new JTextField(user.getContact());
-        contactField.setPreferredSize(new Dimension(300, 35));
+        JTextField contactField = new JTextField();
+        contactField.setPreferredSize(new Dimension(400, 35));
 
         JLabel passwordLabel = new JLabel("Password:");
-        JPasswordField passwordField = new JPasswordField(user.getPassword());
-        passwordField.setPreferredSize(new Dimension(300, 35));
+        JPasswordField passwordField = new JPasswordField();
+        passwordField.setPreferredSize(new Dimension(400, 35));
         JCheckBox showPassword = UIHelper.showPassword(passwordField);
         showPassword.setBackground(Color.WHITE);
 
@@ -102,25 +104,39 @@ public class UIHelper {
         namePanel.setBackground(Color.WHITE);
 
         JLabel firstNameLabel = new JLabel("First Name:");
-        JTextField firstNameField = new JTextField(user.getFirstName());
-        firstNameField.setPreferredSize(new Dimension(150, 35));
+        JTextField firstNameField = new JTextField();
+        firstNameField.setPreferredSize(new Dimension(200, 35));
 
         JLabel lastNameLabel = new JLabel("Last Name:");
-        JTextField lastNameField = new JTextField(user.getLastName());
-        lastNameField.setPreferredSize(new Dimension(150, 35));
+        JTextField lastNameField = new JTextField();
+        lastNameField.setPreferredSize(new Dimension(200, 35));
+
+        if (isEdit) {
+            usernameField.setText(user.getUsername());
+            emailField.setText(user.getEmail());
+            contactField.setText(user.getContact());
+            firstNameField.setText(user.getFirstName());
+            lastNameField.setText(user.getLastName());
+            passwordField.setText(user.getPassword());
+        }
 
         // Save Button
-        JButton saveBtn = new JButton("Save Changes");
+        JButton saveBtn = new JButton(isEdit ? "Save Changes" : "Create " + role.getDisplayName());
         saveBtn.setBackground(new Color(135, 90, 224));
         saveBtn.setForeground(Color.WHITE);
         saveBtn.setFocusPainted(false);
         saveBtn.setFont(new Font("SansSerif", Font.BOLD, 14));
         saveBtn.setPreferredSize(new Dimension(100, 35));
 
-        saveBtn.addActionListener(e -> {
+        saveBtn.addActionListener(_ -> {
             try {
-                userService.updateUserProfile(user.getUserID(), usernameField.getText(), firstNameField.getText(), lastNameField.getText(), new String(passwordField.getPassword()), emailField.getText(), contactField.getText());
-                JOptionPane.showMessageDialog(null, "Profile updated successfully!");
+                if (isEdit) {
+                    userService.updateUserProfile(user.getUserID(), usernameField.getText(), firstNameField.getText(), lastNameField.getText(), new String(passwordField.getPassword()), emailField.getText(), contactField.getText());
+                    JOptionPane.showMessageDialog(null, "Profile updated successfully!");
+                } else {
+                    new UserService().registerUser(usernameField.getText(), firstNameField.getText(), lastNameField.getText(), new String(passwordField.getPassword()), emailField.getText(), contactField.getText(), role);
+                    JOptionPane.showMessageDialog(null, role.getDisplayName() + " created successfully!");
+                }
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -142,7 +158,7 @@ public class UIHelper {
         formPanel.add(passwordLabel, UIHelper.createGbc(0, 7, 10, 5, 5, 5));
         formPanel.add(passwordField, UIHelper.createGbc(0, 8, 5, 5, 5, 5));
         formPanel.add(showPassword, UIHelper.createGbc(0, 9, 5, 5, 10, 5));
-        formPanel.add(saveBtn, UIHelper.createGbc(0, 10, 10,5,10,5));
+        formPanel.add(saveBtn, UIHelper.createGbc(0, 10, 10, 5, 10, 5));
 
         mainPanel.add(formPanel);
 

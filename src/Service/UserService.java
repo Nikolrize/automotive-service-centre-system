@@ -1,56 +1,28 @@
 package Service;
 
+import Enum.UserRole;
 import Model.*;
 import Util.FileHandler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserService {
     private static final String FILE_NAME = "users.txt";
 
     public User loginUser(String username, String password) {
-        List<String> users = FileHandler.readFile(FILE_NAME);
-
-        for (String line : users) {
-            String[] data = line.split(",");
-
-            if (data.length < 9) continue;
-
-            String userID = data[0];
-            String fileUsername = data[1];
-            String firstName = data[2];
-            String lastName = data[3];
-            String filePassword = data[4];
-            String email = data[5];
-            String contact = data[6];
-            boolean isActive = Boolean.parseBoolean(data[7]);
-            String specificID = data[8];
-            char role = specificID.charAt(0);
-
-
-            if (fileUsername.equals(username) && filePassword.equals(password)) {
-                switch (role) {
-                    case 'M':
-                        return new Manager(userID, fileUsername, firstName, lastName, filePassword, email, contact, isActive, specificID);
-                    case 'C':
-                        return new Customer(userID, fileUsername, firstName, lastName, filePassword, email, contact, isActive, specificID);
-                    case 'T':
-                        return new Technician(userID, fileUsername, firstName, lastName, filePassword, email, contact, isActive, specificID);
-                    case 'S':
-                        return new CounterStaff(userID, fileUsername, firstName, lastName, filePassword, email, contact, isActive, specificID);
-                }
-            }
-        }
-
-        return null;
+        return getAllUsers().stream()
+                .filter(u -> u.getUsername().equals(username)
+                        && u.getPassword().equals(password))
+                .findFirst()
+                .orElse(null);
     }
 
-    public void registerUser(String username, String firstName, String lastName, String password, String email, String contact, String role) throws Exception {
+    public void registerUser(String username, String firstName, String lastName, String password, String email, String contact, UserRole role) throws Exception {
         List<String> users = FileHandler.readFile(FILE_NAME);
 
         for (String line : users) {
             String[] data = line.split(",");
-
             if (data.length < 9) continue;
 
             String fileUsername = data[1];
@@ -58,46 +30,13 @@ public class UserService {
             if (fileUsername.equals(username)) {
                 throw new Exception("Username " + username + " already exists!");
             } else {
-                String userID = generateNewID("User");
-                String specificID = generateNewID(role);
-                String newData = String.join(",", userID, username, firstName, lastName, password, email, contact, "true", specificID);
+                String userID = generateNewID(UserRole.USER);
+                String roleID = generateNewID(role);
+                String newData = String.join(",", userID, username, firstName, lastName, password, email, contact, "true", roleID);
                 FileHandler.appendToFile(FILE_NAME, newData);
+                break;
             }
         }
-    }
-
-    private String generateNewID(String role) {
-        List<String> users = FileHandler.readFile(FILE_NAME);
-        int maxUserID = 0;
-        int maxSpecificID = 0;
-
-        for (String line : users) {
-            String[] data = line.split(",");
-            if (data.length < 7) continue;
-
-            // General user ID: U0001
-            int userNum = Integer.parseInt(data[0].substring(1));
-            if (userNum > maxUserID) maxUserID = userNum;
-
-            // Role-specific ID: M0001, C0002, etc
-            String specificID = data[6];
-            if (specificID.startsWith(role.substring(0, 1))) {
-                int specNum = Integer.parseInt(specificID.substring(1));
-                if (specNum > maxSpecificID) maxSpecificID = specNum;
-            }
-        }
-
-        if (role.equals("User")) return String.format("U%04d", maxUserID + 1);
-
-        char prefix = switch (role) {
-            case "Manager" -> 'M';
-            case "Customer" -> 'C';
-            case "Technician" -> 'T';
-            case "CounterStaff" -> 'S';
-            default -> 'U';
-        };
-
-        return String.format("%c%04d", prefix, maxSpecificID + 1);
     }
 
     public void generateDefaultManager() {
@@ -107,8 +46,8 @@ public class UserService {
         for (String line : users) {
             String[] data = line.split(",");
             if (data.length >= 9) {
-                String specificID = data[8];
-                if ("M0001".equals(specificID)) {
+                String roleID = data[8];
+                if ("M0001".equals(roleID)) {
                     hasDefaultManager = true;
                     break;
                 }
@@ -122,7 +61,7 @@ public class UserService {
             String password = "superuser123";
             String email = "superuser@gmail.com";
             String contact = "0123456789";
-            String userID = generateNewID("User");
+            String userID = generateNewID(UserRole.USER);
             String data = String.join(",", userID, username, firstName, lastName, password, email, contact, "true", "M0001");
             FileHandler.appendToFile(FILE_NAME, data);
         }
@@ -169,5 +108,133 @@ public class UserService {
         }
 
         FileHandler.writeFile(FILE_NAME, users);
+    }
+
+    public List<User> getUsersByRole(UserRole role) {
+        return getAllUsers().stream()
+                .filter(User::getIsActive)
+                .filter(u -> {
+                    if (role.equals(UserRole.USER)) return true;
+
+                    return switch (role) {
+                        case UserRole.CUSTOMER -> u instanceof Customer;
+                        case UserRole.COUNTER_STAFF -> u instanceof CounterStaff;
+                        case UserRole.TECHNICIAN -> u instanceof Technician;
+                        case UserRole.MANAGER -> u instanceof Manager;
+                        default -> false;
+                    };
+                })
+                .toList();
+    }
+
+    public User getUserById(String userID) throws Exception {
+        return getAllUsers().stream()
+                .filter(u -> u.getUserID().equals(userID))
+                .findFirst()
+                .orElseThrow(() -> new Exception("User not found!"));
+    }
+
+    public void hardDeleteUser(String userID) throws Exception {
+        List<String> users = FileHandler.readFile(FILE_NAME);
+
+        boolean removed = users.removeIf(line -> {
+            String[] data = line.split(",");
+            if (data.length < 9) return false;
+
+            return data[0].trim().equals(userID.trim());
+        });
+
+        if (!removed) {
+            throw new Exception("User not found!");
+        }
+
+        FileHandler.writeFile(FILE_NAME, users);
+    }
+
+    public void softDeleteUser(String userID) throws Exception {
+        List<String> users = FileHandler.readFile(FILE_NAME);
+        boolean deactivated = false;
+
+        for (int i = 0; i < users.size(); i++) {
+            String[] data = users.get(i).split(",");
+            if (data.length < 9) continue;
+
+            if (data[0].trim().equals(userID.trim())) {
+                data[7] = "false";
+
+                users.set(i, String.join(",", data));
+                deactivated = true;
+                break;
+            }
+        }
+
+        if (!deactivated) {
+            throw new Exception("User not found!");
+        }
+
+        FileHandler.writeFile(FILE_NAME, users);
+    }
+
+    private User parseUser(String line) {
+        String[] data = line.split(",");
+        if (data.length < 9) return null;
+
+        String userID = data[0];
+        String username = data[1];
+        String firstName = data[2];
+        String lastName = data[3];
+        String password = data[4];
+        String email = data[5];
+        String contact = data[6];
+        boolean isActive = Boolean.parseBoolean(data[7]);
+        String roleID = data[8];
+
+        return switch (roleID.charAt(0)) {
+            case 'M' -> new Manager(userID, username, firstName, lastName, password, email, contact, isActive, roleID);
+            case 'S' ->
+                    new CounterStaff(userID, username, firstName, lastName, password, email, contact, isActive, roleID);
+            case 'T' ->
+                    new Technician(userID, username, firstName, lastName, password, email, contact, isActive, roleID);
+            case 'C' -> new Customer(userID, username, firstName, lastName, password, email, contact, isActive, roleID);
+            default -> null;
+        };
+    }
+
+    private List<User> getAllUsers() {
+        List<String> lines = FileHandler.readFile(FILE_NAME);
+        List<User> users = new ArrayList<>();
+
+        for (String line : lines) {
+            User u = parseUser(line);
+            if (u != null) users.add(u);
+        }
+
+        return users;
+    }
+
+    private String generateNewID(UserRole role) {
+        List<String> users = FileHandler.readFile(FILE_NAME);
+        int maxUserID = 0;
+        int maxRoleID = 0;
+
+        for (String line : users) {
+            String[] data = line.split(",");
+            if (data.length < 9) continue;
+
+            // General user ID: U0001
+            int userNum = Integer.parseInt(data[0].substring(1));
+            if (userNum > maxUserID) maxUserID = userNum;
+
+            // Role-specific ID: M0001, C0002, etc
+            String roleID = data[8];
+            if (roleID.charAt(0) == role.getPrefix()) {
+                int roleNum = Integer.parseInt(roleID.substring(1));
+                if (roleNum > maxRoleID) maxRoleID = roleNum;
+            }
+        }
+
+        if (role == UserRole.USER) return String.format("U%04d", maxUserID + 1);
+
+        return String.format("%c%04d", role.getPrefix(), maxRoleID + 1);
     }
 }

@@ -1,15 +1,17 @@
 package Model;
 
+import Interface.RolePermission;
+
 public abstract class User {
-    protected String userID;
-    protected String username;
-    protected String firstName;
-    protected String lastName;
-    protected String password;
-    protected String email;
-    protected String contact;
-    protected boolean isActive;
-    protected String roleID;
+    private String userID;
+    private String username;
+    private String firstName;
+    private String lastName;
+    private String password;
+    private String email;
+    private String contact;
+    private boolean isActive;
+    private String roleID;
 
     public User(String userID, String username, String firstName, String lastName, String password, String email, String contact, boolean isActive, String roleID) {
         setUserID(userID);
@@ -95,5 +97,9 @@ public abstract class User {
         this.roleID = roleID;
     }
 
-    public abstract void openMenu();
+    public abstract void openDashboard();
+
+    public abstract String getRoleName();
+
+    public abstract RolePermission getPermission();
 }

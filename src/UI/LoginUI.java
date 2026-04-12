@@ -49,26 +49,8 @@ public class LoginUI extends JFrame {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(Color.LIGHT_GRAY);
 
-        JButton loginButton = new JButton("Login");
-        loginButton.setBackground(new Color(135, 90, 224));
-        loginButton.setForeground(Color.WHITE);
-        loginButton.setFocusPainted(false);
-        loginButton.setFont(new Font("SansSerif", Font.BOLD, 14));
-        loginButton.setPreferredSize(new Dimension(100, 35));
-
-        loginButton.addActionListener(e -> {
-            String username = usernameField.getText();
-            String password = new String(passwordField.getPassword());
-
-            User user = new UserService().loginUser(username, password);
-            if (user != null) {
-                JOptionPane.showMessageDialog(this, "Successfully logged in as " + username, "Login Success", JOptionPane.INFORMATION_MESSAGE);
-                user.openMenu();
-                dispose();
-            } else {
-                JOptionPane.showMessageDialog(this, "Invalid username or password", "Login Failed", JOptionPane.ERROR_MESSAGE);
-            }
-        });
+        JButton loginButton = createLoginButton();
+        getRootPane().setDefaultButton(loginButton);
 
         // Right Panel
         JPanel rightPanel = new JPanel();
@@ -99,5 +81,29 @@ public class LoginUI extends JFrame {
 
         add(mainPanel);
         setVisible(true);
+    }
+
+    private JButton createLoginButton() {
+        JButton loginButton = new JButton("Login");
+        loginButton.setBackground(new Color(135, 90, 224));
+        loginButton.setForeground(Color.WHITE);
+        loginButton.setFocusPainted(false);
+        loginButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        loginButton.setPreferredSize(new Dimension(100, 35));
+
+        loginButton.addActionListener(e -> {
+            String username = usernameField.getText();
+            String password = new String(passwordField.getPassword());
+
+            User user = new UserService().loginUser(username, password);
+            if (user != null) {
+                JOptionPane.showMessageDialog(this, "Successfully logged in as " + username, "Login Success", JOptionPane.INFORMATION_MESSAGE);
+                user.openDashboard();
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid username or password", "Login Failed", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        return loginButton;
     }
 }

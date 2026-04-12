@@ -1,8 +1,6 @@
 package UI;
 
 import Enum.*;
-import Model.User;
-import Service.UserService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -68,100 +66,8 @@ public class UIHelper {
         panel.add(titleLabel);
         panel.add(Box.createVerticalStrut(10));
         panel.add(separator);
+        panel.add(Box.createVerticalStrut(10));
 
         return panel;
-    }
-
-    public static JPanel userFormPanel(FormMode mode, User user, UserService userService, UserRole role) {
-        boolean isEdit = (mode == FormMode.EDIT);
-        JPanel mainPanel = createSectionPanel(isEdit ? "Edit " + user.getUsername() + "'s Profile" : "Create " + role.getDisplayName());
-
-        // Form Panel
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBackground(Color.WHITE);
-        formPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JLabel usernameLabel = new JLabel("Username:");
-        JTextField usernameField = new JTextField();
-        usernameField.setPreferredSize(new Dimension(400, 35));
-
-        JLabel emailLabel = new JLabel("Email:");
-        JTextField emailField = new JTextField();
-        emailField.setPreferredSize(new Dimension(400, 35));
-
-        JLabel contactLabel = new JLabel("Contact Number:");
-        JTextField contactField = new JTextField();
-        contactField.setPreferredSize(new Dimension(400, 35));
-
-        JLabel passwordLabel = new JLabel("Password:");
-        JPasswordField passwordField = new JPasswordField();
-        passwordField.setPreferredSize(new Dimension(400, 35));
-        JCheckBox showPassword = UIHelper.showPassword(passwordField);
-        showPassword.setBackground(Color.WHITE);
-
-        // First Name + Last Name Panel
-        JPanel namePanel = new JPanel(new GridBagLayout());
-        namePanel.setBackground(Color.WHITE);
-
-        JLabel firstNameLabel = new JLabel("First Name:");
-        JTextField firstNameField = new JTextField();
-        firstNameField.setPreferredSize(new Dimension(200, 35));
-
-        JLabel lastNameLabel = new JLabel("Last Name:");
-        JTextField lastNameField = new JTextField();
-        lastNameField.setPreferredSize(new Dimension(200, 35));
-
-        if (isEdit) {
-            usernameField.setText(user.getUsername());
-            emailField.setText(user.getEmail());
-            contactField.setText(user.getContact());
-            firstNameField.setText(user.getFirstName());
-            lastNameField.setText(user.getLastName());
-            passwordField.setText(user.getPassword());
-        }
-
-        // Save Button
-        JButton saveBtn = new JButton(isEdit ? "Save Changes" : "Create " + role.getDisplayName());
-        saveBtn.setBackground(new Color(135, 90, 224));
-        saveBtn.setForeground(Color.WHITE);
-        saveBtn.setFocusPainted(false);
-        saveBtn.setFont(new Font("SansSerif", Font.BOLD, 14));
-        saveBtn.setPreferredSize(new Dimension(100, 35));
-
-        saveBtn.addActionListener(_ -> {
-            try {
-                if (isEdit) {
-                    userService.updateUserProfile(user.getUserID(), usernameField.getText(), firstNameField.getText(), lastNameField.getText(), new String(passwordField.getPassword()), emailField.getText(), contactField.getText());
-                    JOptionPane.showMessageDialog(null, "Profile updated successfully!");
-                } else {
-                    new UserService().registerUser(usernameField.getText(), firstNameField.getText(), lastNameField.getText(), new String(passwordField.getPassword()), emailField.getText(), contactField.getText(), role);
-                    JOptionPane.showMessageDialog(null, role.getDisplayName() + " created successfully!");
-                }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        // Add to Panel
-        namePanel.add(firstNameLabel, UIHelper.createGbc(0, 0, 10, 5, 5, 5));
-        namePanel.add(lastNameLabel, UIHelper.createGbc(1, 0, 10, 5, 5, 5));
-        namePanel.add(firstNameField, UIHelper.createGbc(0, 1, 5, 5, 10, 5));
-        namePanel.add(lastNameField, UIHelper.createGbc(1, 1, 5, 5, 10, 5));
-
-        formPanel.add(namePanel, UIHelper.createGbc(0, 0, 10, 0, 0, 0));
-        formPanel.add(usernameLabel, UIHelper.createGbc(0, 1, 10, 5, 5, 5));
-        formPanel.add(usernameField, UIHelper.createGbc(0, 2, 5, 5, 10, 5));
-        formPanel.add(emailLabel, UIHelper.createGbc(0, 3, 10, 5, 5, 5));
-        formPanel.add(emailField, UIHelper.createGbc(0, 4, 5, 5, 10, 5));
-        formPanel.add(contactLabel, UIHelper.createGbc(0, 5, 10, 5, 5, 5));
-        formPanel.add(contactField, UIHelper.createGbc(0, 6, 5, 5, 10, 5));
-        formPanel.add(passwordLabel, UIHelper.createGbc(0, 7, 10, 5, 5, 5));
-        formPanel.add(passwordField, UIHelper.createGbc(0, 8, 5, 5, 5, 5));
-        formPanel.add(showPassword, UIHelper.createGbc(0, 9, 5, 5, 10, 5));
-        formPanel.add(saveBtn, UIHelper.createGbc(0, 10, 10, 5, 10, 5));
-
-        mainPanel.add(formPanel);
-
-        return mainPanel;
     }
 }

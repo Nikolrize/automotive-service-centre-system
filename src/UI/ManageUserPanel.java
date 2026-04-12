@@ -1,7 +1,7 @@
 package UI;
 
 import Enum.*;
-import Model.User;
+import Model.*;
 import Service.UserService;
 
 import javax.swing.*;
@@ -92,23 +92,44 @@ public class ManageUserPanel extends JPanel {
     public void loadData() {
         model.setRowCount(0);
 
-        List<User> users = switch (role) {
-            case UserRole.MANAGER -> userService.getUsersByRole(UserRole.MANAGER);
-            case UserRole.COUNTER_STAFF -> userService.getUsersByRole(UserRole.COUNTER_STAFF);
-            case UserRole.TECHNICIAN -> userService.getUsersByRole(UserRole.TECHNICIAN);
-            case UserRole.CUSTOMER -> userService.getUsersByRole(UserRole.CUSTOMER );
-            default -> userService.getUsersByRole(UserRole.USER);
-        };
+        List<User> users = userService.getActiveUsers();
 
         for (User u : users) {
-            model.addRow(new Object[]{u.getUserID(), u.getRoleID(), u.getUsername(), u.getFirstName(), u.getLastName(), u.getEmail(), u.getContact()});
+            if (u instanceof Customer && role == UserRole.CUSTOMER) {
+                addRow(u);
+            }
+
+            if (u instanceof CounterStaff && role == UserRole.COUNTER_STAFF) {
+                addRow(u);
+            }
+
+            if (u instanceof Technician && role == UserRole.TECHNICIAN) {
+                addRow(u);
+            }
+
+            if (u instanceof Manager && role == UserRole.MANAGER) {
+                addRow(u);
+            }
         }
+    }
+
+    private void addRow(User u) {
+        model.addRow(new Object[]{u.getUserID(), u.getRoleID(), u.getUsername(), u.getFirstName(), u.getLastName(), u.getEmail(), u.getContact()});
     }
 
     private void handleCreate() {
         try {
-            JPanel createPanel = UIHelper.userFormPanel(FormMode.CREATE, null, userService, role);
-            rightPanel.add(createPanel, "Create User");
+            UserFormPanel panel = new UserFormPanel(
+                    FormMode.CREATE,
+                    null,
+                    userService,
+                    role,
+                    () -> {
+                        cardLayout.show(rightPanel, "Manage " + role.getDisplayName());
+                        loadData();
+                    }
+            );
+            rightPanel.add(panel, "Create User");
             cardLayout.show(rightPanel, "Create User");
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -126,22 +147,17 @@ public class ManageUserPanel extends JPanel {
 
         try {
             User selectedUser = userService.getUserById(userID);
-            JPanel editPanel = UIHelper.userFormPanel(FormMode.EDIT, selectedUser, userService, role);
-
-            JButton backBtn = new JButton("Back");
-            backBtn.setBackground(new Color(135, 90, 224));
-            backBtn.setForeground(Color.WHITE);
-            backBtn.setFocusPainted(false);
-            backBtn.setFont(new Font("SansSerif", Font.BOLD, 14));
-            backBtn.setPreferredSize(new Dimension(100, 35));
-
-            backBtn.addActionListener(_ -> {
-                cardLayout.show(rightPanel, "Manage " + role.getDisplayName());
-                loadData();
-            });
-
-            editPanel.add(backBtn);
-            rightPanel.add(editPanel, "Edit User");
+            UserFormPanel panel = new UserFormPanel(
+                    FormMode.EDIT,
+                    selectedUser,
+                    userService,
+                    role,
+                    () -> {
+                        cardLayout.show(rightPanel, "Manage " + role.getDisplayName());
+                        loadData();
+                    }
+            );
+            rightPanel.add(panel, "Edit User");
             cardLayout.show(rightPanel, "Edit User");
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

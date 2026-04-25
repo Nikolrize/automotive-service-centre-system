@@ -1,0 +1,140 @@
+package UI;
+
+import Service.ReportService;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class ReportPanel extends JPanel {
+    private final ReportService reportService;
+
+    private JLabel totalAppointmentsLabel;
+    private JLabel completedAppointmentsLabel;
+    private JLabel totalPaymentsLabel;
+    private JLabel normalServicesLabel;
+    private JLabel majorServicesLabel;
+    private JLabel averageRatingLabel;
+
+    private JTextArea noteArea;
+
+    public ReportPanel() {
+        this.reportService = new ReportService();
+
+        setLayout(new BorderLayout());
+        reportUI();
+        loadData();
+    }
+
+    private void reportUI() {
+        JPanel mainPanel = UIHelper.createSectionPanel("View Reports");
+
+        JPanel summaryWrapperPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        summaryWrapperPanel.setBackground(Color.WHITE);
+        summaryWrapperPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        //summary panel shows simple analyzed report values
+        JPanel summaryPanel = new JPanel(new GridLayout(3,2,20,20));
+        summaryPanel.setBackground(Color.WHITE);
+        summaryPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        summaryPanel.setPreferredSize(new Dimension(760, 240));
+
+        totalAppointmentsLabel = createSummaryLabel("Total Appointments: 0");
+        completedAppointmentsLabel = createSummaryLabel("Completed Appointments: 0");
+        totalPaymentsLabel = createSummaryLabel("Total Payments Collected: RM 0.00");
+        normalServicesLabel = createSummaryLabel("Normal Services: 0");
+        majorServicesLabel = createSummaryLabel("Major Services: 0");
+        averageRatingLabel = createSummaryLabel("Average Customer Rating: 0.00");
+
+        summaryPanel.add(totalAppointmentsLabel);
+        summaryPanel.add(completedAppointmentsLabel);
+        summaryPanel.add(totalPaymentsLabel);
+        summaryPanel.add(normalServicesLabel);
+        summaryPanel.add(majorServicesLabel);
+        summaryPanel.add(averageRatingLabel);
+
+        summaryWrapperPanel.add(summaryPanel);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JButton refreshBtn = new JButton("Refresh");
+        refreshBtn.setBackground(new Color(135,90,224));
+        refreshBtn.setForeground(Color.WHITE);
+        refreshBtn.addActionListener(_ -> loadData());
+
+        JButton editNotesBtn = new JButton("Edit Notes");
+        editNotesBtn.setBackground(new Color(66, 135, 245));
+        editNotesBtn.setForeground(Color.WHITE);
+        editNotesBtn.addActionListener(_ -> handleEditNotes());
+
+        buttonPanel.add(refreshBtn);
+        buttonPanel.add(editNotesBtn);
+
+        noteArea = new JTextArea();
+        noteArea.setEditable(false);
+        noteArea.setLineWrap(true);
+        noteArea.setWrapStyleWord(true);
+        noteArea.setBackground(new Color(248,248,248));
+        noteArea.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        noteArea.setText("""
+                This report gives a simple summary for manager use.
+                It reads data from appointments, payments, feedback, and services files.
+                The values update based on the current text-file records.
+                """);
+
+        JScrollPane noteScrollPane = new JScrollPane(noteArea);
+        noteScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
+        noteScrollPane.setBorder(BorderFactory.createTitledBorder("Report Notes"));
+        noteScrollPane.setPreferredSize(new Dimension(760, 120));
+        noteScrollPane.setMaximumSize(new Dimension(760, 120));
+
+        mainPanel.add(summaryWrapperPanel);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(buttonPanel);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(noteScrollPane);
+
+        add(mainPanel, BorderLayout.CENTER);
+    }
+
+    private JLabel createSummaryLabel(String text) {
+        JLabel label = new JLabel(text, SwingConstants.CENTER);
+        label.setOpaque(true);
+        label.setBackground(new Color(245, 245, 245));
+        label.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
+        label.setFont(new Font("SansSerif", Font.BOLD, 15));
+        label.setPreferredSize(new Dimension(360, 65));
+        return label;
+    }
+
+    public void loadData() {
+        totalAppointmentsLabel.setText("Total Appointments: " + reportService.getTotalAppointments());
+        completedAppointmentsLabel.setText("Completed Appointments: " + reportService.getCompletedAppointments());
+        totalPaymentsLabel.setText(String.format("Total Payments Collected: RM %.2f", reportService.getTotalPaymentsCollected()));
+        normalServicesLabel.setText("Normal Services: " + reportService.getNormalServiceCount());
+        majorServicesLabel.setText("Major Services: " + reportService.getMajorServiceCount());
+        averageRatingLabel.setText(String.format("Average Customer Rating: %.2f", reportService.getAverageCustomerRating()));
+    }
+
+    private void handleEditNotes() {
+        JTextArea editArea = new JTextArea(noteArea.getText(), 10, 35);
+        editArea.setLineWrap(true);
+        editArea.setWrapStyleWord(true);
+        editArea.setFont(new Font("SansSerif", Font.PLAIN, 13));
+
+        JScrollPane scrollPane = new JScrollPane(editArea);
+
+        int result = JOptionPane.showConfirmDialog(
+                this,
+                scrollPane,
+                "Edit Report Notes",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+        );
+
+        if (result == JOptionPane.OK_OPTION) {
+            noteArea.setText(editArea.getText().trim());
+        }
+    }
+}

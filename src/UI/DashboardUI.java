@@ -104,6 +104,10 @@ public class DashboardUI extends JFrame {
                         viewFeedbackPanel.loadData();
                     }
 
+                    if (panel instanceof ReportPanel reportPanel) {
+                        reportPanel.loadData();
+                    }
+
                     cardLayout.show(rightPanel, entry.getKey());
                 });
             }
@@ -146,6 +150,11 @@ public class DashboardUI extends JFrame {
         // ViewFeedback
         if (perm.canViewFeedback()) {
             panels.put("Feedback", new ViewFeedbackPanel());
+        }
+
+        //Report
+        if (perm.canViewReports()) {
+            panels.put("View Report", new ReportPanel());
         }
 
         return panels;

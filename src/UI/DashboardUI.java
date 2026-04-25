@@ -96,6 +96,10 @@ public class DashboardUI extends JFrame {
                         managePanel.loadData();
                     }
 
+                    if (panel instanceof ManageServicePanel manageServicePanel) {
+                        manageServicePanel.loadData();
+                    }
+
                     cardLayout.show(rightPanel, entry.getKey());
                 });
             }
@@ -128,6 +132,10 @@ public class DashboardUI extends JFrame {
         if (perm.canManageCustomer()) {
             panels.put("Manage Customer", new ManageUserPanel(userService, UserRole.CUSTOMER, rightPanel, cardLayout));
 
+        }
+        //Manage Service
+        if (perm.canSetServicePrice()) {
+            panels.put("Manage Service", new ManageServicePanel());
         }
 
         return panels;

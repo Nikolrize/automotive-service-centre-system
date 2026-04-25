@@ -1,4 +1,7 @@
 //Manager: view all feedbacks and comments
+//Technician: provide feedbacks
+//Customer: provide comments
+
 package Service;
 
 import Util.FileHandler;

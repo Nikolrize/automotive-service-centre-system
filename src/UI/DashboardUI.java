@@ -100,6 +100,10 @@ public class DashboardUI extends JFrame {
                         manageServicePanel.loadData();
                     }
 
+                    if (panel instanceof  ViewFeedbackPanel viewFeedbackPanel) {
+                        viewFeedbackPanel.loadData();
+                    }
+
                     cardLayout.show(rightPanel, entry.getKey());
                 });
             }
@@ -133,9 +137,15 @@ public class DashboardUI extends JFrame {
             panels.put("Manage Customer", new ManageUserPanel(userService, UserRole.CUSTOMER, rightPanel, cardLayout));
 
         }
+
         //Manage Service
         if (perm.canSetServicePrice()) {
             panels.put("Manage Service", new ManageServicePanel());
+        }
+
+        // ViewFeedback
+        if (perm.canViewFeedback()) {
+            panels.put("Feedback", new ViewFeedbackPanel());
         }
 
         return panels;

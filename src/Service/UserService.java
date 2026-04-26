@@ -15,6 +15,7 @@ public class UserService {
         return getAllUsers()
                 .stream()
                 .filter(u -> u.getUsername().equals(username) && u.getPassword().equals(password))
+                .filter(User::getIsActive) //checks whether user account is deleted or not
                 .findFirst()
                 .orElse(null);
     }

@@ -31,14 +31,12 @@ public class UserService {
 
             if (fileUsername.equals(username)) {
                 throw new Exception("Username " + username + " already exists!");
-            } else {
-                String userID = generateNewID(UserRole.USER);
-                String roleID = generateNewID(role);
-                String newData = String.join(",", userID, username, firstName, lastName, password, email, contact, "true", roleID);
-                FileHandler.appendToFile(FILE_NAME, newData);
-                break;
             }
         }
+        String userID = generateNewID(UserRole.USER);
+        String roleID = generateNewID(role);
+        String newData = String.join(",", userID, username, firstName, lastName, password, email, contact, "true", roleID);
+        FileHandler.appendToFile(FILE_NAME, newData);
     }
 
     public void generateDefaultManager() {

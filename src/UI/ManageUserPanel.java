@@ -13,14 +13,16 @@ import java.util.List;
 public class ManageUserPanel extends JPanel {
     private final UserService userService;
     private final UserRole role;
+    private final User currentUser;
     private JTable table;
     private DefaultTableModel model;
     private final JPanel rightPanel;
     private final CardLayout cardLayout;
 
-    public ManageUserPanel(UserService userService, UserRole role, JPanel rightPanel, CardLayout cardLayout) {
+    public ManageUserPanel(UserService userService, UserRole role, User currentUser, JPanel rightPanel, CardLayout cardLayout) {
         this.userService = userService;
         this.role = role;
+        this.currentUser = currentUser;
         this.rightPanel = rightPanel;
         this.cardLayout = cardLayout;
 
@@ -76,10 +78,16 @@ public class ManageUserPanel extends JPanel {
         deleteBtn.setForeground(Color.WHITE);
         deleteBtn.addActionListener(_ -> handleDelete());
 
+        JButton restoreBtn = new JButton("Restore");
+        restoreBtn.setBackground(new Color(40,167,69));
+        restoreBtn.setForeground(Color.WHITE);
+        restoreBtn.addActionListener(_ -> handleRestore());
+
         // Add to Panels
         buttonPanel.add(createBtn);
         buttonPanel.add(editBtn);
         buttonPanel.add(deleteBtn);
+        buttonPanel.add(restoreBtn);
 
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(scrollPane);
@@ -173,6 +181,12 @@ public class ManageUserPanel extends JPanel {
 
         String userID = table.getValueAt(row, 0).toString();
 
+        // Prevent manager from deleting their own account
+        if (currentUser != null && currentUser.getUserID().equals(userID)) {
+            JOptionPane.showMessageDialog(this, "You cannot delete your own account.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         int confirm = JOptionPane.showConfirmDialog(this, "Delete this user?", "Confirm", JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
@@ -182,6 +196,39 @@ public class ManageUserPanel extends JPanel {
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
+        }
+    }
+
+    private void handleRestore() {
+        try {
+            List<User> inactiveUsers = userService.getInactiveUsersByRole(role);
+
+            if (inactiveUsers.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No inactive " + role.getDisplayName() + " found.");
+                return;
+            }
+
+            String[] options = new String[inactiveUsers.size()];
+
+            for (int i = 0; i < inactiveUsers.size(); i++) {
+                User user = inactiveUsers.get(i);
+                options[i] = user.getUserID() + " - " + user.getUsername() + " (" + user.getFirstName() + " " + user.getLastName() + ")";
+            }
+
+            String selectedOption = (String) JOptionPane.showInputDialog(this, "Select a user to restore:", "Restore " + role.getDisplayName(),
+                    JOptionPane.PLAIN_MESSAGE, null, options,options[0]);
+
+            if (selectedOption == null) {
+                return;
+            }
+
+            String userID = selectedOption.split(" - ")[0].trim();
+
+            userService.restoreUser(userID);
+            JOptionPane.showMessageDialog(this, role.getDisplayName() + " restored successfully." );
+            loadData();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

@@ -15,6 +15,7 @@ public class UserService {
         return getAllUsers()
                 .stream()
                 .filter(u -> u.getUsername().equals(username) && u.getPassword().equals(password))
+                .filter(User::getIsActive) //checks whether user account is deleted or not
                 .findFirst()
                 .orElse(null);
     }
@@ -30,14 +31,12 @@ public class UserService {
 
             if (fileUsername.equals(username)) {
                 throw new Exception("Username " + username + " already exists!");
-            } else {
-                String userID = generateNewID(UserRole.USER);
-                String roleID = generateNewID(role);
-                String newData = String.join(",", userID, username, firstName, lastName, password, email, contact, "true", roleID);
-                FileHandler.appendToFile(FILE_NAME, newData);
-                break;
             }
         }
+        String userID = generateNewID(UserRole.USER);
+        String roleID = generateNewID(role);
+        String newData = String.join(",", userID, username, firstName, lastName, password, email, contact, "true", roleID);
+        FileHandler.appendToFile(FILE_NAME, newData);
     }
 
     public void generateDefaultManager() {
@@ -239,6 +238,27 @@ public class UserService {
         return getAllUsers()
                 .stream()
                 .filter(User::getIsActive)
+                .toList();
+    }
+
+    public List<User> getInactiveUsers() {
+        return getAllUsers()
+                .stream()
+                .filter(u -> !u.getIsActive())
+                .toList();
+    }
+
+    //returns inactive users only for the selected role
+    public List<User> getInactiveUsersByRole(UserRole role) {
+        return getInactiveUsers()
+                .stream()
+                .filter(user -> switch (role){
+                    case MANAGER -> user instanceof Manager;
+                    case COUNTER_STAFF -> user instanceof  CounterStaff;
+                    case TECHNICIAN -> user instanceof Technician;
+                    case CUSTOMER -> user instanceof Customer;
+                    default -> false;
+                })
                 .toList();
     }
 }

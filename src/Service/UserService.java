@@ -241,4 +241,25 @@ public class UserService {
                 .filter(User::getIsActive)
                 .toList();
     }
+
+    public List<User> getInactiveUsers() {
+        return getAllUsers()
+                .stream()
+                .filter(u -> !u.getIsActive())
+                .toList();
+    }
+
+    //returns inactive users only for the selected role
+    public List<User> getInactiveUsersByRole(UserRole role) {
+        return getInactiveUsers()
+                .stream()
+                .filter(user -> switch (role){
+                    case MANAGER -> user instanceof Manager;
+                    case COUNTER_STAFF -> user instanceof  CounterStaff;
+                    case TECHNICIAN -> user instanceof Technician;
+                    case CUSTOMER -> user instanceof Customer;
+                    default -> false;
+                })
+                .toList();
+    }
 }

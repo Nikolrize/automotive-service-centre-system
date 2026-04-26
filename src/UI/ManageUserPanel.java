@@ -76,10 +76,16 @@ public class ManageUserPanel extends JPanel {
         deleteBtn.setForeground(Color.WHITE);
         deleteBtn.addActionListener(_ -> handleDelete());
 
+        JButton restoreBtn = new JButton("Restore");
+        restoreBtn.setBackground(new Color(40,167,69));
+        restoreBtn.setForeground(Color.WHITE);
+        restoreBtn.addActionListener(_ -> handleRestore());
+
         // Add to Panels
         buttonPanel.add(createBtn);
         buttonPanel.add(editBtn);
         buttonPanel.add(deleteBtn);
+        buttonPanel.add(restoreBtn);
 
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(scrollPane);
@@ -182,6 +188,39 @@ public class ManageUserPanel extends JPanel {
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
+        }
+    }
+
+    private void handleRestore() {
+        try {
+            List<User> inactiveUsers = userService.getInactiveUsersByRole(role);
+
+            if (inactiveUsers.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No inactive " + role.getDisplayName() + " found.");
+                return;
+            }
+
+            String[] options = new String[inactiveUsers.size()];
+
+            for (int i = 0; i < inactiveUsers.size(); i++) {
+                User user = inactiveUsers.get(i);
+                options[i] = user.getUserID() + " - " + user.getUsername() + " (" + user.getFirstName() + " " + user.getLastName() + ")";
+            }
+
+            String selectedOption = (String) JOptionPane.showInputDialog(this, "Select a user to restore:", "Restore " + role.getDisplayName(),
+                    JOptionPane.PLAIN_MESSAGE, null, options,options[0]);
+
+            if (selectedOption == null) {
+                return;
+            }
+
+            String userID = selectedOption.split(" - ")[0].trim();
+
+            userService.restoreUser(userID);
+            JOptionPane.showMessageDialog(this, role.getDisplayName() + " restored successfully." );
+            loadData();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

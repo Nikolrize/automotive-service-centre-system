@@ -13,14 +13,16 @@ import java.util.List;
 public class ManageUserPanel extends JPanel {
     private final UserService userService;
     private final UserRole role;
+    private final User currentUser;
     private JTable table;
     private DefaultTableModel model;
     private final JPanel rightPanel;
     private final CardLayout cardLayout;
 
-    public ManageUserPanel(UserService userService, UserRole role, JPanel rightPanel, CardLayout cardLayout) {
+    public ManageUserPanel(UserService userService, UserRole role, User currentUser, JPanel rightPanel, CardLayout cardLayout) {
         this.userService = userService;
         this.role = role;
+        this.currentUser = currentUser;
         this.rightPanel = rightPanel;
         this.cardLayout = cardLayout;
 
@@ -178,6 +180,12 @@ public class ManageUserPanel extends JPanel {
         }
 
         String userID = table.getValueAt(row, 0).toString();
+
+        // Prevent manager from deleting their own account
+        if (currentUser != null && currentUser.getUserID().equals(userID)) {
+            JOptionPane.showMessageDialog(this, "You cannot delete your own account.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         int confirm = JOptionPane.showConfirmDialog(this, "Delete this user?", "Confirm", JOptionPane.YES_NO_OPTION);
 

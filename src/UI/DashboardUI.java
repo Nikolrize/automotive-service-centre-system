@@ -126,19 +126,19 @@ public class DashboardUI extends JFrame {
 
         // User Management
         if (perm.canManageManager()) {
-            panels.put("Manage Manager", new ManageUserPanel(userService, UserRole.MANAGER, rightPanel, cardLayout));
+            panels.put("Manage Manager", new ManageUserPanel(userService, UserRole.MANAGER, currentUser, rightPanel, cardLayout));
 
         }
         if (perm.canManageCounterStaff()) {
-            panels.put("Manage Counter Staff", new ManageUserPanel(userService, UserRole.COUNTER_STAFF, rightPanel, cardLayout));
+            panels.put("Manage Counter Staff", new ManageUserPanel(userService, UserRole.COUNTER_STAFF, currentUser, rightPanel, cardLayout));
 
         }
         if (perm.canManageTechnician()) {
-            panels.put("Manage Technician", new ManageUserPanel(userService, UserRole.TECHNICIAN, rightPanel, cardLayout));
+            panels.put("Manage Technician", new ManageUserPanel(userService, UserRole.TECHNICIAN, currentUser, rightPanel, cardLayout));
 
         }
         if (perm.canManageCustomer()) {
-            panels.put("Manage Customer", new ManageUserPanel(userService, UserRole.CUSTOMER, rightPanel, cardLayout));
+            panels.put("Manage Customer", new ManageUserPanel(userService, UserRole.CUSTOMER, currentUser, rightPanel, cardLayout));
 
         }
 

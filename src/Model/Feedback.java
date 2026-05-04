@@ -1,16 +1,18 @@
 package Model;
 
+import java.time.LocalDateTime;
+
 public class Feedback {
     private String feedbackID;
     private Appointment appointment;
-    private String comment;
-    private int rating;
+    private String feedbackText;
+    private LocalDateTime dateTime;
 
-    public Feedback(String feedbackID, Appointment appointment, String comment, int rating) {
+    public Feedback(String feedbackID, Appointment appointment, String feedbackText, LocalDateTime dateTime) {
         setFeedbackID(feedbackID);
         setAppointment(appointment);
-        setComment(comment);
-        setRating(rating);
+        setFeedbackText(feedbackText);
+        setDateTime(dateTime);
     }
 
     public String getFeedbackID() {
@@ -29,19 +31,19 @@ public class Feedback {
         this.appointment = appointment;
     }
 
-    public String getComment() {
-        return comment;
+    public String getFeedbackText() {
+        return feedbackText;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setFeedbackText(String feedbackText) {
+        this.feedbackText = feedbackText;
     }
 
-    public int getRating() {
-        return rating;
+    public LocalDateTime getDateTime() {
+        return dateTime;
     }
 
-    public void setRating(int rating) {
-        this.rating = rating;
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 }

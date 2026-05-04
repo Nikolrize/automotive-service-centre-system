@@ -1,9 +1,8 @@
 package Model;
 
-import Interface.RolePermission;
 import UI.DashboardUI;
 
-public class CounterStaff extends User implements RolePermission {
+public class CounterStaff extends User {
     public CounterStaff(String userID, String username, String firstName, String lastName, String password, String email, String contact, boolean isActive, String roleID) {
         super(userID, username, firstName, lastName, password, email, contact, isActive, roleID);
     }
@@ -16,11 +15,6 @@ public class CounterStaff extends User implements RolePermission {
     @Override
     public String getRoleName() {
         return "Counter Staff";
-    }
-
-    @Override
-    public RolePermission getPermission() {
-        return this;
     }
 
     @Override

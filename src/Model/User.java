@@ -2,7 +2,7 @@ package Model;
 
 import Interface.RolePermission;
 
-public abstract class User {
+public abstract class User implements RolePermission {
     private String userID;
     private String username;
     private String firstName;
@@ -100,6 +100,4 @@ public abstract class User {
     public abstract void openDashboard();
 
     public abstract String getRoleName();
-
-    public abstract RolePermission getPermission();
 }

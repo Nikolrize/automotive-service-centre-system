@@ -116,44 +116,43 @@ public class DashboardUI extends JFrame {
 
     private Map<String, JPanel> getPanels() {
         Map<String, JPanel> panels = new LinkedHashMap<>();
-        RolePermission perm = currentUser.getPermission();
 
         // Profile
-        if (perm.canEditProfile()) {
+        if (currentUser.canEditProfile()) {
             panels.put("My Profile", new UserFormPanel(FormMode.EDIT, currentUser, userService, null, null));
 
         }
 
         // User Management
-        if (perm.canManageManager()) {
+        if (currentUser.canManageManager()) {
             panels.put("Manage Manager", new ManageUserPanel(userService, UserRole.MANAGER, currentUser, rightPanel, cardLayout));
 
         }
-        if (perm.canManageCounterStaff()) {
+        if (currentUser.canManageCounterStaff()) {
             panels.put("Manage Counter Staff", new ManageUserPanel(userService, UserRole.COUNTER_STAFF, currentUser, rightPanel, cardLayout));
 
         }
-        if (perm.canManageTechnician()) {
+        if (currentUser.canManageTechnician()) {
             panels.put("Manage Technician", new ManageUserPanel(userService, UserRole.TECHNICIAN, currentUser, rightPanel, cardLayout));
 
         }
-        if (perm.canManageCustomer()) {
+        if (currentUser.canManageCustomer()) {
             panels.put("Manage Customer", new ManageUserPanel(userService, UserRole.CUSTOMER, currentUser, rightPanel, cardLayout));
 
         }
 
         //Manage Service
-        if (perm.canSetServicePrice()) {
+        if (currentUser.canSetServicePrice()) {
             panels.put("Manage Service", new ManageServicePanel());
         }
 
         // ViewFeedback
-        if (perm.canViewFeedback()) {
+        if (currentUser.canViewFeedback()) {
             panels.put("Feedback", new ViewFeedbackPanel());
         }
 
         //Report
-        if (perm.canViewReports()) {
+        if (currentUser.canViewReports()) {
             panels.put("View Report", new ReportPanel());
         }
 
@@ -161,52 +160,50 @@ public class DashboardUI extends JFrame {
     }
 
     private void assignMenuButton() {
-        RolePermission perm = currentUser.getPermission();
-
         // Profile
-        if (perm.canEditProfile()) {
+        if (currentUser.canEditProfile()) {
             addMenuButton("My Profile");
         }
 
         // User Management
-        if (perm.canManageManager()) {
+        if (currentUser.canManageManager()) {
             addMenuButton("Manage Manager");
         }
-        if (perm.canManageCounterStaff()) {
+        if (currentUser.canManageCounterStaff()) {
             addMenuButton("Manage Counter Staff");
         }
-        if (perm.canManageTechnician()) {
+        if (currentUser.canManageTechnician()) {
             addMenuButton("Manage Technician");
         }
-        if (perm.canManageCustomer()) {
+        if (currentUser.canManageCustomer()) {
             addMenuButton("Manage Customer");
         }
 
         // Service
-        if (perm.canSetServicePrice()) {
+        if (currentUser.canSetServicePrice()) {
             addMenuButton("Manage Service");
         }
 
         // Appointment
-        if (perm.canManageAppointment() || perm.canUpdateAssignedAppointment() || perm.canViewAssignedAppointments()) {
+        if (currentUser.canManageAppointment() || currentUser.canUpdateAssignedAppointment() || currentUser.canViewAssignedAppointments()) {
             addMenuButton("Appointments");
         }
 
         // Payment
-        if (perm.canManagePayment()) {
+        if (currentUser.canManagePayment()) {
             addMenuButton("Payments");
         }
-        if (perm.canViewPaymentHistory()) {
+        if (currentUser.canViewPaymentHistory()) {
             addMenuButton("Payment History");
         }
 
         // Feedback
-        if (perm.canCreateFeedback() || perm.canViewFeedback()) {
+        if (currentUser.canCreateFeedback() || currentUser.canViewFeedback()) {
             addMenuButton("Feedback");
         }
 
         // Report
-        if (perm.canViewReports()) {
+        if (currentUser.canViewReports()) {
             addMenuButton("View Report");
         }
     }

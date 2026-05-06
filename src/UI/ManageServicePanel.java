@@ -6,10 +6,11 @@ import Service.ServiceManagementService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.List;
+
+import Enum.*;
 
 public class ManageServicePanel extends JPanel {
     private final ServiceManagementService serviceManagementService;
@@ -53,14 +54,11 @@ public class ManageServicePanel extends JPanel {
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JButton updatePriceBtn = new JButton("Update Price");
-        updatePriceBtn.setBackground(new Color (135,90,224));
-        updatePriceBtn.setForeground(Color.WHITE);
+        JButton updatePriceBtn = UIHelper.createStyledButton("Update Price", ButtonMode.PRIMARY);
+        updatePriceBtn.setPreferredSize(new Dimension(150, 35));
         updatePriceBtn.addActionListener(_ -> handleUpdatePrice());
 
-        JButton refreshBtn = new JButton("Refresh");
-        refreshBtn.setBackground(new Color(66,135,245));
-        refreshBtn.setForeground(Color.WHITE);
+        JButton refreshBtn = UIHelper.createStyledButton("Refresh", ButtonMode.CREATE);
         refreshBtn.addActionListener(_ -> loadData());
 
         buttonPanel.add(updatePriceBtn);

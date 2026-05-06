@@ -62,24 +62,16 @@ public class ManageUserPanel extends JPanel {
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JButton createBtn = new JButton("Create");
-        createBtn.setBackground(new Color(66, 135, 245));
-        createBtn.setForeground(Color.WHITE);
+        JButton createBtn = UIHelper.createStyledButton("Create", ButtonMode.CREATE);
         createBtn.addActionListener(_ -> handleCreate());
 
-        JButton editBtn = new JButton("Edit");
-        editBtn.setBackground(new Color(135, 90, 224));
-        editBtn.setForeground(Color.WHITE);
+        JButton editBtn = UIHelper.createStyledButton("Edit", ButtonMode.PRIMARY);
         editBtn.addActionListener(_ -> handleEdit());
 
-        JButton deleteBtn = new JButton("Delete");
-        deleteBtn.setBackground(new Color(220, 53, 69));
-        deleteBtn.setForeground(Color.WHITE);
+        JButton deleteBtn = UIHelper.createStyledButton("Delete", ButtonMode.DESTRUCTIVE);
         deleteBtn.addActionListener(_ -> handleDelete());
 
-        JButton restoreBtn = new JButton("Restore");
-        restoreBtn.setBackground(new Color(40, 167, 69));
-        restoreBtn.setForeground(Color.WHITE);
+        JButton restoreBtn = UIHelper.createStyledButton("Restore", ButtonMode.RESTORE);
         restoreBtn.addActionListener(_ -> handleRestore());
 
         // Add to Panels
@@ -218,25 +210,35 @@ public class ManageUserPanel extends JPanel {
                 return;
             }
 
-            String[] options = new String[inactiveUsers.size()];
+            SelectionDialog<User> dialog = new SelectionDialog<>(
+                    (JFrame) SwingUtilities.getWindowAncestor(this),
+                    "Restore " + role.getDisplayName(),
+                    inactiveUsers,
+                    new String[]{"User ID", "Role ID", "Username", "First Name", "Last Name", "Email", "Contact"},
+                    u -> new Object[]{
+                            u.getUserID(),
+                            u.getRoleID(),
+                            u.getUsername(),
+                            u.getFirstName(),
+                            u.getLastName(),
+                            u.getEmail(),
+                            u.getContact()
+                    }
+            );
 
-            for (int i = 0; i < inactiveUsers.size(); i++) {
-                User user = inactiveUsers.get(i);
-                options[i] = user.getUserID() + " - " + user.getUsername() + " (" + user.getFirstName() + " " + user.getLastName() + ")";
-            }
+            dialog.setVisible(true);
 
-            String selectedOption = (String) JOptionPane.showInputDialog(this, "Select a user to restore:", "Restore " + role.getDisplayName(),
-                    JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+            User selectedUser = dialog.getSelectedItem();
 
-            if (selectedOption == null) {
+            if (selectedUser == null) {
                 return;
             }
 
-            String userID = selectedOption.split(" - ")[0].trim();
+            userService.restoreUser(selectedUser.getUserID());
 
-            userService.restoreUser(userID);
             JOptionPane.showMessageDialog(this, role.getDisplayName() + " restored successfully.");
             loadData();
+
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }

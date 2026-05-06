@@ -182,7 +182,7 @@ public class AppointmentPanel extends JPanel {
                 appointmentService.deleteAppointment(appt.getAppointmentID());
                 loadData();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, ex.getMessage());
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -191,6 +191,28 @@ public class AppointmentPanel extends JPanel {
         Appointment appt = getSelectedAppointment();
         if (appt == null) return;
 
+        if (appt.getIsCompleted()) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "This appointment is already completed.",
+                    "Invalid Action",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Mark this appointment as completed?",
+                "Confirm Completion",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
         try {
             appointmentService.markCompleted(
                     appt.getAppointmentID(),
@@ -198,7 +220,7 @@ public class AppointmentPanel extends JPanel {
             );
             loadData();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage());
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

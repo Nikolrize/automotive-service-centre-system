@@ -51,6 +51,14 @@ public class ServiceManagementService {
         return services;
     }
 
+    public Service getServiceByID(String serviceID) throws Exception {
+        return getAllServices()
+                .stream()
+                .filter(s -> s.getServiceID().equals(serviceID))
+                .findFirst()
+                .orElseThrow(() -> new Exception("Service not found."));
+    }
+
     public void updateServicePrice(String serviceID, String priceText) throws Exception {
         double newPrice = validatePrice(priceText);
 

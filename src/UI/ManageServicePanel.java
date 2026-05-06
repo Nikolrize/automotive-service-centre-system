@@ -46,10 +46,6 @@ public class ManageServicePanel extends JPanel {
         JPanel searchPanel = UIHelper.createSearchPanel(searchField, this::applyFilter);
         searchPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JTableHeader header = table.getTableHeader();
-        header.setFont(new Font("SansSerif", Font.BOLD, 14));
-        header.setBackground(new Color(245,245,245));
-
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
 

@@ -3,6 +3,8 @@ package UI;
 import Enum.*;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -68,6 +70,53 @@ public class UIHelper {
         panel.add(separator);
         panel.add(Box.createVerticalStrut(10));
 
+        return panel;
+    }
+
+    public static JTable createTable(DefaultTableModel model) {
+        JTable table = new JTable(model);
+
+        table.setRowHeight(40);
+        table.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        table.setSelectionBackground(new Color(230, 220, 255));
+        table.setGridColor(new Color(240, 240, 240));
+        table.setShowVerticalLines(false);
+
+        JTableHeader header = table.getTableHeader();
+        header.setFont(new Font("SansSerif", Font.BOLD, 14));
+        header.setBackground(new Color(245, 245, 245));
+
+        table.setAutoCreateRowSorter(true);
+
+        return table;
+    }
+
+    public static JPanel createSearchPanel(JTextField searchField, Runnable onSearch) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setMaximumSize(new Dimension(450, 35));
+
+        JLabel searchLabel = new JLabel("Search:");
+        searchLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+
+        searchField.setPreferredSize(new Dimension(250, 35));
+
+        searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                onSearch.run();
+            }
+
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                onSearch.run();
+            }
+
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                onSearch.run();
+            }
+        });
+
+        panel.add(searchLabel, BorderLayout.WEST);
+        panel.add(searchField, BorderLayout.CENTER);
         return panel;
     }
 }

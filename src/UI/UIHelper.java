@@ -81,6 +81,7 @@ public class UIHelper {
         table.setSelectionBackground(new Color(230, 220, 255));
         table.setGridColor(new Color(240, 240, 240));
         table.setShowVerticalLines(false);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         JTableHeader header = table.getTableHeader();
         header.setFont(new Font("SansSerif", Font.BOLD, 14));
@@ -118,5 +119,45 @@ public class UIHelper {
         panel.add(searchLabel, BorderLayout.WEST);
         panel.add(searchField, BorderLayout.CENTER);
         return panel;
+    }
+
+    public static JPanel createCardPanel(String title) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(230, 230, 230)),
+                BorderFactory.createEmptyBorder(12, 14, 12, 14)
+        ));
+
+        if (title != null) {
+            JLabel label = new JLabel(title);
+            label.setFont(new Font("SansSerif", Font.BOLD, 14));
+            label.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+            label.setAlignmentX(Component.LEFT_ALIGNMENT);
+            panel.add(label);
+        }
+
+        return panel;
+    }
+
+    public static JButton createStyledButton(String text, ButtonMode mode) {
+        JButton btn = new JButton(text);
+        btn.setForeground(Color.WHITE);
+        btn.setFocusPainted(false);
+        btn.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btn.setPreferredSize(new Dimension(100, 35));
+
+        if (mode.equals(ButtonMode.PRIMARY)) {
+            btn.setBackground(new Color(135, 90, 224));
+        } else if (mode.equals(ButtonMode.CREATE)) {
+            btn.setBackground(new Color(66, 135, 245));
+        } else if (mode.equals(ButtonMode.DESTRUCTIVE)){
+            btn.setBackground(new Color(220, 53, 69));
+        } else if (mode.equals(ButtonMode.RESTORE)){
+            btn.setBackground(new Color(40, 167, 69));
+        }
+
+        return btn;
     }
 }

@@ -6,7 +6,7 @@ import Service.UserService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.List;
 
@@ -18,6 +18,8 @@ public class ManageUserPanel extends JPanel {
     private DefaultTableModel model;
     private final JPanel rightPanel;
     private final CardLayout cardLayout;
+    private final JTextField searchField = new JTextField();
+    private TableRowSorter<DefaultTableModel> sorter;
 
     public ManageUserPanel(UserService userService, UserRole role, User currentUser, JPanel rightPanel, CardLayout cardLayout) {
         this.userService = userService;
@@ -43,16 +45,13 @@ public class ManageUserPanel extends JPanel {
             }
         };
 
-        table = new JTable(model);
-        table.setRowHeight(40);
-        table.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        table.setSelectionBackground(new Color(230, 220, 255));
-        table.setGridColor(new Color(240, 240, 240));
-        table.setShowVerticalLines(false);
+        table = UIHelper.createTable(model);
+        sorter = new TableRowSorter<>(model);
+        table.setRowSorter(sorter);
 
-        JTableHeader header = table.getTableHeader();
-        header.setFont(new Font("SansSerif", Font.BOLD, 14));
-        header.setBackground(new Color(245, 245, 245));
+        // Search bar
+        JPanel searchPanel = UIHelper.createSearchPanel(searchField, this::applyFilter);
+        searchPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // ScrollPane
         JScrollPane scrollPane = new JScrollPane(table);
@@ -63,24 +62,16 @@ public class ManageUserPanel extends JPanel {
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JButton createBtn = new JButton("Create");
-        createBtn.setBackground(new Color(66, 135, 245));
-        createBtn.setForeground(Color.WHITE);
+        JButton createBtn = UIHelper.createStyledButton("Create", ButtonMode.CREATE);
         createBtn.addActionListener(_ -> handleCreate());
 
-        JButton editBtn = new JButton("Edit");
-        editBtn.setBackground(new Color(135, 90, 224));
-        editBtn.setForeground(Color.WHITE);
+        JButton editBtn = UIHelper.createStyledButton("Edit", ButtonMode.PRIMARY);
         editBtn.addActionListener(_ -> handleEdit());
 
-        JButton deleteBtn = new JButton("Delete");
-        deleteBtn.setBackground(new Color(220, 53, 69));
-        deleteBtn.setForeground(Color.WHITE);
+        JButton deleteBtn = UIHelper.createStyledButton("Delete", ButtonMode.DESTRUCTIVE);
         deleteBtn.addActionListener(_ -> handleDelete());
 
-        JButton restoreBtn = new JButton("Restore");
-        restoreBtn.setBackground(new Color(40,167,69));
-        restoreBtn.setForeground(Color.WHITE);
+        JButton restoreBtn = UIHelper.createStyledButton("Restore", ButtonMode.RESTORE);
         restoreBtn.addActionListener(_ -> handleRestore());
 
         // Add to Panels
@@ -89,12 +80,23 @@ public class ManageUserPanel extends JPanel {
         buttonPanel.add(deleteBtn);
         buttonPanel.add(restoreBtn);
 
+        mainPanel.add(searchPanel);
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(scrollPane);
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(buttonPanel);
 
         add(mainPanel, BorderLayout.CENTER);
+    }
+
+    private void applyFilter() {
+        String text = searchField.getText();
+
+        if (text.trim().isEmpty()) {
+            sorter.setRowFilter(null);
+        } else {
+            sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+        }
     }
 
     public void loadData() {
@@ -208,25 +210,35 @@ public class ManageUserPanel extends JPanel {
                 return;
             }
 
-            String[] options = new String[inactiveUsers.size()];
+            SelectionDialog<User> dialog = new SelectionDialog<>(
+                    (JFrame) SwingUtilities.getWindowAncestor(this),
+                    "Restore " + role.getDisplayName(),
+                    inactiveUsers,
+                    new String[]{"User ID", "Role ID", "Username", "First Name", "Last Name", "Email", "Contact"},
+                    u -> new Object[]{
+                            u.getUserID(),
+                            u.getRoleID(),
+                            u.getUsername(),
+                            u.getFirstName(),
+                            u.getLastName(),
+                            u.getEmail(),
+                            u.getContact()
+                    }
+            );
 
-            for (int i = 0; i < inactiveUsers.size(); i++) {
-                User user = inactiveUsers.get(i);
-                options[i] = user.getUserID() + " - " + user.getUsername() + " (" + user.getFirstName() + " " + user.getLastName() + ")";
-            }
+            dialog.setVisible(true);
 
-            String selectedOption = (String) JOptionPane.showInputDialog(this, "Select a user to restore:", "Restore " + role.getDisplayName(),
-                    JOptionPane.PLAIN_MESSAGE, null, options,options[0]);
+            User selectedUser = dialog.getSelectedItem();
 
-            if (selectedOption == null) {
+            if (selectedUser == null) {
                 return;
             }
 
-            String userID = selectedOption.split(" - ")[0].trim();
+            userService.restoreUser(selectedUser.getUserID());
 
-            userService.restoreUser(userID);
-            JOptionPane.showMessageDialog(this, role.getDisplayName() + " restored successfully." );
+            JOptionPane.showMessageDialog(this, role.getDisplayName() + " restored successfully.");
             loadData();
+
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }

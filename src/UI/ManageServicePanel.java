@@ -6,14 +6,18 @@ import Service.ServiceManagementService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.List;
+
+import Enum.*;
 
 public class ManageServicePanel extends JPanel {
     private final ServiceManagementService serviceManagementService;
     private JTable table;
     private DefaultTableModel model;
+    private final JTextField searchField = new JTextField();
+    private TableRowSorter<DefaultTableModel> sorter;
 
     public ManageServicePanel() {
         this.serviceManagementService = new ServiceManagementService();
@@ -35,16 +39,13 @@ public class ManageServicePanel extends JPanel {
             }
         };
 
-        table = new JTable(model);
-        table.setRowHeight(40);
-        table.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        table.setSelectionBackground(new Color(230,220,255));
-        table.setGridColor(new Color(240,240,240));
-        table.setShowVerticalLines(false);
+        table = UIHelper.createTable(model);
+        sorter = new TableRowSorter<>(model);
+        table.setRowSorter(sorter);
 
-        JTableHeader header = table.getTableHeader();
-        header.setFont(new Font("SansSerif", Font.BOLD, 14));
-        header.setBackground(new Color(245,245,245));
+        // Search bar
+        JPanel searchPanel = UIHelper.createSearchPanel(searchField, this::applyFilter);
+        searchPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -53,25 +54,33 @@ public class ManageServicePanel extends JPanel {
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JButton updatePriceBtn = new JButton("Update Price");
-        updatePriceBtn.setBackground(new Color (135,90,224));
-        updatePriceBtn.setForeground(Color.WHITE);
+        JButton updatePriceBtn = UIHelper.createStyledButton("Update Price", ButtonMode.PRIMARY);
+        updatePriceBtn.setPreferredSize(new Dimension(150, 35));
         updatePriceBtn.addActionListener(_ -> handleUpdatePrice());
 
-        JButton refreshBtn = new JButton("Refresh");
-        refreshBtn.setBackground(new Color(66,135,245));
-        refreshBtn.setForeground(Color.WHITE);
+        JButton refreshBtn = UIHelper.createStyledButton("Refresh", ButtonMode.CREATE);
         refreshBtn.addActionListener(_ -> loadData());
 
         buttonPanel.add(updatePriceBtn);
         buttonPanel.add(refreshBtn);
 
+        mainPanel.add(searchPanel);
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(scrollPane);
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(buttonPanel);
 
         add(mainPanel, BorderLayout.CENTER);
+    }
+
+    private void applyFilter() {
+        String text = searchField.getText();
+
+        if (text.trim().isEmpty()) {
+            sorter.setRowFilter(null);
+        } else {
+            sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+        }
     }
 
     public void loadData() {

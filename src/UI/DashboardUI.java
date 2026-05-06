@@ -1,6 +1,7 @@
 package UI;
 
-import Interface.RolePermission;
+import Service.AppointmentService;
+import Service.ServiceManagementService;
 import Service.UserService;
 import Model.User;
 import Enum.*;
@@ -14,6 +15,8 @@ import java.util.Map;
 public class DashboardUI extends JFrame {
     private final User currentUser;
     private final UserService userService;
+    private final AppointmentService appointmentService;
+    private final ServiceManagementService serviceManagementService;
     private JPanel leftPanel;
     private JPanel rightPanel;
     private CardLayout cardLayout;
@@ -22,6 +25,8 @@ public class DashboardUI extends JFrame {
     public DashboardUI(User user) {
         this.currentUser = user;
         this.userService = new UserService();
+        this.serviceManagementService = new ServiceManagementService();
+        this.appointmentService = new AppointmentService(userService, serviceManagementService);
     }
 
     public void showDashboard() {
@@ -100,7 +105,7 @@ public class DashboardUI extends JFrame {
                         manageServicePanel.loadData();
                     }
 
-                    if (panel instanceof  ViewFeedbackPanel viewFeedbackPanel) {
+                    if (panel instanceof ViewFeedbackPanel viewFeedbackPanel) {
                         viewFeedbackPanel.loadData();
                     }
 
@@ -148,12 +153,17 @@ public class DashboardUI extends JFrame {
 
         // ViewFeedback
         if (currentUser.canViewFeedback()) {
-            panels.put("Feedback", new ViewFeedbackPanel());
+            panels.put("View Feedback", new ViewFeedbackPanel());
         }
 
         //Report
         if (currentUser.canViewReports()) {
             panels.put("View Report", new ReportPanel());
+        }
+
+        // Manage Appointment
+        if (currentUser.canManageAppointment() || currentUser.canUpdateAssignedAppointment() || currentUser.canViewAssignedAppointments()) {
+            panels.put("Manage Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, currentUser, rightPanel, cardLayout));
         }
 
         return panels;
@@ -186,20 +196,24 @@ public class DashboardUI extends JFrame {
 
         // Appointment
         if (currentUser.canManageAppointment() || currentUser.canUpdateAssignedAppointment() || currentUser.canViewAssignedAppointments()) {
-            addMenuButton("Appointments");
+            addMenuButton("Manage Appointment");
         }
 
         // Payment
         if (currentUser.canManagePayment()) {
-            addMenuButton("Payments");
+            addMenuButton("Manage Payments");
         }
         if (currentUser.canViewPaymentHistory()) {
             addMenuButton("Payment History");
         }
 
         // Feedback
-        if (currentUser.canCreateFeedback() || currentUser.canViewFeedback()) {
-            addMenuButton("Feedback");
+        if (currentUser.canCreateFeedback()) {
+            addMenuButton("Create Feedback");
+        }
+
+        if (currentUser.canViewFeedback()) {
+            addMenuButton("View Feedback");
         }
 
         // Report

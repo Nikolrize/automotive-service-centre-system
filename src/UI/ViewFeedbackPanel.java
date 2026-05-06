@@ -8,6 +8,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.util.List;
+import Enum.*;
 
 public class ViewFeedbackPanel extends JPanel{
     private final FeedbackService feedbackService;
@@ -76,18 +77,15 @@ public class ViewFeedbackPanel extends JPanel{
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JButton refreshBtn = new JButton("Refresh");
-        refreshBtn.setBackground(new Color(66,135,245));
-        refreshBtn.setForeground(Color.WHITE);
+        JButton refreshBtn = UIHelper.createStyledButton("Refresh", ButtonMode.CREATE);
         refreshBtn.addActionListener(_ -> loadData());
 
-        JButton viewCommmentBtn = new JButton("View Selected Comment");
-        viewCommmentBtn.setBackground(new Color(130,90,224));
-        viewCommmentBtn.setForeground(Color.WHITE);
+        JButton viewCommmentBtn = UIHelper.createStyledButton("View Comment", ButtonMode.PRIMARY);
+        viewCommmentBtn.setPreferredSize(new Dimension(150, 35));
         viewCommmentBtn.addActionListener(_ -> handleViewComment());
 
-        buttonPanel.add(refreshBtn);
         buttonPanel.add(viewCommmentBtn);
+        buttonPanel.add(refreshBtn);
 
         mainPanel.add(summaryPanel);
         mainPanel.add(Box.createVerticalStrut(10));

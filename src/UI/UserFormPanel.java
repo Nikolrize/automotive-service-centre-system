@@ -111,12 +111,7 @@ public class UserFormPanel extends JPanel {
     }
 
     private JButton createSaveButton() {
-        JButton saveBtn = new JButton(mode == FormMode.EDIT ? "Save Changes" : "Create " + role.getDisplayName());
-        saveBtn.setBackground(new Color(135, 90, 224));
-        saveBtn.setForeground(Color.WHITE);
-        saveBtn.setFocusPainted(false);
-        saveBtn.setFont(new Font("SansSerif", Font.BOLD, 14));
-        saveBtn.setPreferredSize(new Dimension(100, 35));
+        JButton saveBtn = UIHelper.createStyledButton(mode == FormMode.EDIT ? "Save Changes" : "Create " + role.getDisplayName(), ButtonMode.PRIMARY);
 
         saveBtn.addActionListener(_ -> {
             try {
@@ -139,12 +134,7 @@ public class UserFormPanel extends JPanel {
     }
 
     private JButton createBackButton() {
-        JButton backBtn = new JButton("Back");
-        backBtn.setBackground(new Color(135, 90, 224));
-        backBtn.setForeground(Color.WHITE);
-        backBtn.setFocusPainted(false);
-        backBtn.setFont(new Font("SansSerif", Font.BOLD, 14));
-        backBtn.setPreferredSize(new Dimension(100, 35));
+        JButton backBtn = UIHelper.createStyledButton("Back", ButtonMode.PRIMARY);
 
         backBtn.addActionListener(_ -> onBack.run());
 

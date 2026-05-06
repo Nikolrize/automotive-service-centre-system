@@ -5,6 +5,8 @@ import Service.ReportService;
 import javax.swing.*;
 import java.awt.*;
 
+import Enum.*;
+
 public class ReportPanel extends JPanel {
     private final ReportService reportService;
 
@@ -58,18 +60,15 @@ public class ReportPanel extends JPanel {
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JButton refreshBtn = new JButton("Refresh");
-        refreshBtn.setBackground(new Color(135,90,224));
-        refreshBtn.setForeground(Color.WHITE);
+        JButton refreshBtn = UIHelper.createStyledButton("Refresh", ButtonMode.CREATE);
         refreshBtn.addActionListener(_ -> loadData());
 
-        JButton editNotesBtn = new JButton("Edit Notes");
-        editNotesBtn.setBackground(new Color(66, 135, 245));
-        editNotesBtn.setForeground(Color.WHITE);
+        JButton editNotesBtn = UIHelper.createStyledButton("Edit Notes", ButtonMode.PRIMARY);
+        editNotesBtn.setPreferredSize(new Dimension(150, 35));
         editNotesBtn.addActionListener(_ -> handleEditNotes());
 
-        buttonPanel.add(refreshBtn);
         buttonPanel.add(editNotesBtn);
+        buttonPanel.add(refreshBtn);
 
         noteArea = new JTextArea();
         noteArea.setEditable(false);

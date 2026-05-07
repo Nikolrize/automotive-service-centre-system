@@ -73,6 +73,16 @@ public class Customer extends User {
     }
 
     @Override
+    public boolean canCreateComment() {
+        return true;
+    }
+
+    @Override
+    public boolean canviewComment() {
+        return false;
+    }
+
+    @Override
     public boolean canCreateFeedback() {
         return true;
     }
@@ -85,5 +95,15 @@ public class Customer extends User {
     @Override
     public boolean canSetServicePrice() {
         return false;
+    }
+
+    @Override
+    public boolean canManageVehicle() {
+        return false;
+    }
+
+    @Override
+    public boolean canViewVehicle() {
+        return true;
     }
 }

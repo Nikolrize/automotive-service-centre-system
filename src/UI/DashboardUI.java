@@ -162,8 +162,16 @@ public class DashboardUI extends JFrame {
         }
 
         // Manage Appointment
-        if (currentUser.canManageAppointment() || currentUser.canUpdateAssignedAppointment() || currentUser.canViewAssignedAppointments()) {
+        if (currentUser.canManageAppointment()) {
             panels.put("Manage Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, currentUser, rightPanel, cardLayout));
+        }
+
+        if (currentUser.canUpdateAssignedAppointment()) {
+            panels.put("Update Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, currentUser, rightPanel, cardLayout));
+        }
+
+        if (currentUser.canViewAssignedAppointments()) {
+            panels.put("View Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, currentUser, rightPanel, cardLayout));
         }
 
         return panels;
@@ -195,8 +203,16 @@ public class DashboardUI extends JFrame {
         }
 
         // Appointment
-        if (currentUser.canManageAppointment() || currentUser.canUpdateAssignedAppointment() || currentUser.canViewAssignedAppointments()) {
+        if (currentUser.canManageAppointment()) {
             addMenuButton("Manage Appointment");
+        }
+
+        if (currentUser.canUpdateAssignedAppointment()) {
+            addMenuButton("Update Appointment");
+        }
+
+        if (currentUser.canViewAssignedAppointments()) {
+            addMenuButton("View Appointment");
         }
 
         // Payment

@@ -49,7 +49,7 @@ public class Technician extends User {
 
     @Override
     public boolean canViewAssignedAppointments() {
-        return true;
+        return false;
     }
 
     @Override
@@ -73,6 +73,16 @@ public class Technician extends User {
     }
 
     @Override
+    public boolean canCreateComment() {
+        return false;
+    }
+
+    @Override
+    public boolean canviewComment() {
+        return true;
+    }
+
+    @Override
     public boolean canCreateFeedback() {
         return true;
     }
@@ -84,6 +94,16 @@ public class Technician extends User {
 
     @Override
     public boolean canSetServicePrice() {
+        return false;
+    }
+
+    @Override
+    public boolean canManageVehicle() {
+        return false;
+    }
+
+    @Override
+    public boolean canViewVehicle() {
         return false;
     }
 }

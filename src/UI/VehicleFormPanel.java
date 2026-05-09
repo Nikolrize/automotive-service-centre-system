@@ -50,12 +50,13 @@ public class VehicleFormPanel extends JPanel {
         JPanel mainPanel = UIHelper.createSectionPanel(
                 mode == FormMode.EDIT
                         ? "Edit Vehicle"
-                        : "Add Vehicle"
+                        : "Create Vehicle"
         );
 
         // Main Content Panel
         JPanel contentPanel = new JPanel(new GridLayout(1, 2, 15, 0));
         contentPanel.setBackground(Color.WHITE);
+        contentPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Customer Card
         JPanel customerCard = UIHelper.createCardPanel("Customer");
@@ -88,7 +89,6 @@ public class VehicleFormPanel extends JPanel {
 
         JPanel vehicleForm = new JPanel(new GridBagLayout());
         vehicleForm.setBackground(Color.WHITE);
-        vehicleForm.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         int y = 0;
 
@@ -120,6 +120,7 @@ public class VehicleFormPanel extends JPanel {
         // Button Panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JButton saveBtn = createSaveButton();
         saveBtn.setPreferredSize(new Dimension(150, 35));

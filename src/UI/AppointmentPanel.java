@@ -39,7 +39,7 @@ public class AppointmentPanel extends JPanel {
     }
 
     private void AppointmentUI() {
-        JPanel mainPanel = UIHelper.createSectionPanel("Manage Appointments");
+        JPanel mainPanel = UIHelper.createSectionPanel("Manage Appointment");
 
         String[] columns = {"ID", "Service", "Customer", "Technician", "Date", "Start", "End", "Status"};
 

@@ -28,7 +28,7 @@ public class ReportPanel extends JPanel {
     }
 
     private void reportUI() {
-        JPanel mainPanel = UIHelper.createSectionPanel("View Reports");
+        JPanel mainPanel = UIHelper.createSectionPanel("View Report");
 
         JPanel summaryWrapperPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         summaryWrapperPanel.setBackground(Color.WHITE);
@@ -76,11 +76,6 @@ public class ReportPanel extends JPanel {
         noteArea.setWrapStyleWord(true);
         noteArea.setBackground(new Color(248,248,248));
         noteArea.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        noteArea.setText("""
-                This report gives a simple summary for manager use.
-                It reads data from appointments, payments, feedback, and services files.
-                The values update based on the current text-file records.
-                """);
 
         JScrollPane noteScrollPane = new JScrollPane(noteArea);
         noteScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -114,6 +109,7 @@ public class ReportPanel extends JPanel {
         normalServicesLabel.setText("Normal Services: " + reportService.getNormalServiceCount());
         majorServicesLabel.setText("Major Services: " + reportService.getMajorServiceCount());
         averageRatingLabel.setText(String.format("Average Customer Rating: %.2f", reportService.getAverageCustomerRating()));
+        noteArea.setText(reportService.getReportNotes());
     }
 
     private void handleEditNotes() {
@@ -133,7 +129,13 @@ public class ReportPanel extends JPanel {
         );
 
         if (result == JOptionPane.OK_OPTION) {
-            noteArea.setText(editArea.getText().trim());
+            try {
+                reportService.saveReportNotes(editArea.getText());
+                noteArea.setText(reportService.getReportNotes());
+                JOptionPane.showMessageDialog(this, "Report notes saved successfully. ");
+            } catch (Exception ex ) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 }

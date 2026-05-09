@@ -156,6 +156,7 @@ public class PaymentPanel extends JPanel {
     private void handleCreatePayment() {
         List<Appointment> appointments = appointmentService.getAllAppointments()
                 .stream()
+                .filter(Appointment::getIsCompleted)
                 .filter(a -> !paymentService.isAppointmentPaid(a.getAppointmentID()))
                 .toList();
 

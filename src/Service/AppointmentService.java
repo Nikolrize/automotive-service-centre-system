@@ -251,4 +251,13 @@ public class AppointmentService {
 
         return list;
     }
+
+    public Appointment getAppointmentByID(String appointmentID) {
+        for (Appointment a : getAllAppointments()) {
+            if (a.getAppointmentID().equals(appointmentID)) {
+                return a;
+            }
+        }
+        return null;
+    }
 }

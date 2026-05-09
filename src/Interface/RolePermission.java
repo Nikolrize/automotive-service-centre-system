@@ -23,9 +23,17 @@ public interface RolePermission {
     boolean canCreateFeedback();
     boolean canViewFeedback();
 
+    // COMMENT
+    boolean canCreateComment();
+    boolean canviewComment();
+
     // REPORT
     boolean canViewReports();
 
     // SERVICE
     boolean canSetServicePrice();
+
+    // VEHICLE
+    boolean canManageVehicle();
+    boolean canViewVehicle();
 }

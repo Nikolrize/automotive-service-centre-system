@@ -5,6 +5,7 @@ import Service.ServiceManagementService;
 import Service.UserService;
 import Model.User;
 import Enum.*;
+import Service.VehicleService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,6 +18,7 @@ public class DashboardUI extends JFrame {
     private final UserService userService;
     private final AppointmentService appointmentService;
     private final ServiceManagementService serviceManagementService;
+    private final VehicleService vehicleService;
     private JPanel leftPanel;
     private JPanel rightPanel;
     private CardLayout cardLayout;
@@ -26,7 +28,8 @@ public class DashboardUI extends JFrame {
         this.currentUser = user;
         this.userService = new UserService();
         this.serviceManagementService = new ServiceManagementService();
-        this.appointmentService = new AppointmentService(userService, serviceManagementService);
+        this.vehicleService = new VehicleService(userService);
+        this.appointmentService = new AppointmentService(userService, serviceManagementService, vehicleService);
     }
 
     public void showDashboard() {
@@ -154,24 +157,41 @@ public class DashboardUI extends JFrame {
 
         }
 
-        //Manage Service
+        // Vehicle
+        if (currentUser.canManageVehicle()) {
+            panels.put("Manage Vehicle", new ManageVehiclePanel(vehicleService, userService, rightPanel, cardLayout));
+        }
+
+        if (currentUser.canViewVehicle()) {
+            panels.put("Manage Vehicle", new ManageVehiclePanel(vehicleService, userService, rightPanel, cardLayout));
+        }
+
+        // Service
         if (currentUser.canSetServicePrice()) {
             panels.put("Manage Service", new ManageServicePanel());
         }
 
-        // ViewFeedback
+        // Feedback
         if (currentUser.canViewFeedback()) {
             panels.put("View Feedback", new ViewFeedbackPanel());
         }
 
-        //Report
+        // Report
         if (currentUser.canViewReports()) {
             panels.put("View Report", new ReportPanel());
         }
 
-        // Manage Appointment
-        if (currentUser.canManageAppointment() || currentUser.canUpdateAssignedAppointment() || currentUser.canViewAssignedAppointments()) {
-            panels.put("Manage Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, currentUser, rightPanel, cardLayout));
+        // Appointment
+        if (currentUser.canManageAppointment()) {
+            panels.put("Manage Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, currentUser, rightPanel, cardLayout));
+        }
+
+        if (currentUser.canUpdateAssignedAppointment()) {
+            panels.put("Update Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, currentUser, rightPanel, cardLayout));
+        }
+
+        if (currentUser.canViewAssignedAppointments()) {
+            panels.put("View Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, currentUser, rightPanel, cardLayout));
         }
 
         return panels;
@@ -200,14 +220,31 @@ public class DashboardUI extends JFrame {
             addMenuButton("Manage Customer");
         }
 
+        // Vehicle
+        if (currentUser.canManageVehicle()) {
+            addMenuButton("Manage Vehicle");
+        }
+
+        if (currentUser.canViewVehicle()) {
+            addMenuButton("View Vehicle");
+        }
+
         // Service
         if (currentUser.canSetServicePrice()) {
             addMenuButton("Manage Service");
         }
 
         // Appointment
-        if (currentUser.canManageAppointment() || currentUser.canUpdateAssignedAppointment() || currentUser.canViewAssignedAppointments()) {
+        if (currentUser.canManageAppointment()) {
             addMenuButton("Manage Appointment");
+        }
+
+        if (currentUser.canUpdateAssignedAppointment()) {
+            addMenuButton("Update Appointment");
+        }
+
+        if (currentUser.canViewAssignedAppointments()) {
+            addMenuButton("View Appointment");
         }
 
         // Payment

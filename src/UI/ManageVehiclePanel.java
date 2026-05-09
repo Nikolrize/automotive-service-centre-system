@@ -42,7 +42,7 @@ public class ManageVehiclePanel extends JPanel {
     }
 
     private void buildUI() {
-        JPanel mainPanel = UIHelper.createSectionPanel("Manage Vehicles");
+        JPanel mainPanel = UIHelper.createSectionPanel("Manage Vehicle");
 
         // Table
         String[] columns = {

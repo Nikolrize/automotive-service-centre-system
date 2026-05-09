@@ -101,6 +101,10 @@ public class DashboardUI extends JFrame {
                         managePanel.loadData();
                     }
 
+                    if (panel instanceof RestoreUserPanel restoreUserPanel) {
+                        restoreUserPanel.loadData();
+                    }
+
                     if (panel instanceof ManageServicePanel manageServicePanel) {
                         manageServicePanel.loadData();
                     }
@@ -139,6 +143,10 @@ public class DashboardUI extends JFrame {
         }
         if (currentUser.canManageTechnician()) {
             panels.put("Manage Technician", new ManageUserPanel(userService, UserRole.TECHNICIAN, currentUser, rightPanel, cardLayout));
+
+        }
+        if (currentUser.canManageManager()) {
+            panels.put("Restore Users", new RestoreUserPanel(userService));
 
         }
         if (currentUser.canManageCustomer()) {
@@ -184,6 +192,9 @@ public class DashboardUI extends JFrame {
         }
         if (currentUser.canManageTechnician()) {
             addMenuButton("Manage Technician");
+        }
+        if (currentUser.canManageManager()) {
+            addMenuButton("Restore Users");
         }
         if (currentUser.canManageCustomer()) {
             addMenuButton("Manage Customer");

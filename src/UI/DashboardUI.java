@@ -1,11 +1,9 @@
 package UI;
 
-import Service.AppointmentService;
-import Service.ServiceManagementService;
-import Service.UserService;
+import Model.CounterStaff;
+import Service.*;
 import Model.User;
 import Enum.*;
-import Service.VehicleService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,6 +17,7 @@ public class DashboardUI extends JFrame {
     private final AppointmentService appointmentService;
     private final ServiceManagementService serviceManagementService;
     private final VehicleService vehicleService;
+    private final PaymentService paymentService;
     private JPanel leftPanel;
     private JPanel rightPanel;
     private CardLayout cardLayout;
@@ -30,6 +29,7 @@ public class DashboardUI extends JFrame {
         this.serviceManagementService = new ServiceManagementService();
         this.vehicleService = new VehicleService(userService);
         this.appointmentService = new AppointmentService(userService, serviceManagementService, vehicleService);
+        this.paymentService = new PaymentService(appointmentService, userService);
     }
 
     public void showDashboard() {
@@ -159,11 +159,11 @@ public class DashboardUI extends JFrame {
 
         // Vehicle
         if (currentUser.canManageVehicle()) {
-            panels.put("Manage Vehicle", new ManageVehiclePanel(vehicleService, userService, rightPanel, cardLayout));
+            panels.put("Manage Vehicle", new ManageVehiclePanel(vehicleService, userService, currentUser, rightPanel, cardLayout));
         }
 
         if (currentUser.canViewVehicle()) {
-            panels.put("Manage Vehicle", new ManageVehiclePanel(vehicleService, userService, rightPanel, cardLayout));
+            panels.put("View Vehicle", new ManageVehiclePanel(vehicleService, userService, currentUser, rightPanel, cardLayout));
         }
 
         // Service
@@ -192,6 +192,15 @@ public class DashboardUI extends JFrame {
 
         if (currentUser.canViewAssignedAppointments()) {
             panels.put("View Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, currentUser, rightPanel, cardLayout));
+        }
+
+        // Payment
+        if (currentUser.canManagePayment()) {
+            panels.put("Manage Payment", new PaymentPanel(paymentService, appointmentService, currentUser));
+        }
+
+        if (currentUser.canViewPaymentHistory()) {
+            panels.put("Payment History", new PaymentPanel(paymentService, appointmentService, currentUser));
         }
 
         return panels;
@@ -249,7 +258,7 @@ public class DashboardUI extends JFrame {
 
         // Payment
         if (currentUser.canManagePayment()) {
-            addMenuButton("Manage Payments");
+            addMenuButton("Manage Payment");
         }
         if (currentUser.canViewPaymentHistory()) {
             addMenuButton("Payment History");

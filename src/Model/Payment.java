@@ -1,18 +1,25 @@
 package Model;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class Payment {
     private String paymentID;
     private Appointment appointment;
-    private double amountPaid;
+    private CounterStaff counterStaff;
+    private double amount;
+    private String method;
     private LocalDate paymentDate;
+    private LocalTime paymentTime;
 
-    public Payment(String paymentID, Appointment appointment, double amountPaid, LocalDate paymentDate) {
+    public Payment(String paymentID, Appointment appointment, CounterStaff counterStaff, double amount, String method, LocalDate paymentDate, LocalTime paymentTime) {
         setPaymentID(paymentID);
         setAppointment(appointment);
-        setAmountPaid(amountPaid);
+        setCounterStaff(counterStaff);
+        setAmount(amount);
+        setMethod(method);
         setPaymentDate(paymentDate);
+        setPaymentTime(paymentTime);
     }
 
     public String getPaymentID() {
@@ -31,12 +38,28 @@ public class Payment {
         this.appointment = appointment;
     }
 
-    public double getAmountPaid() {
-        return amountPaid;
+    public CounterStaff getCounterStaff() {
+        return counterStaff;
     }
 
-    public void setAmountPaid(double amountPaid) {
-        this.amountPaid = amountPaid;
+    public void setCounterStaff(CounterStaff counterStaff) {
+        this.counterStaff = counterStaff;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
     }
 
     public LocalDate getPaymentDate() {
@@ -45,5 +68,13 @@ public class Payment {
 
     public void setPaymentDate(LocalDate paymentDate) {
         this.paymentDate = paymentDate;
+    }
+
+    public LocalTime getPaymentTime() {
+        return paymentTime;
+    }
+
+    public void setPaymentTime(LocalTime paymentTime) {
+        this.paymentTime = paymentTime;
     }
 }

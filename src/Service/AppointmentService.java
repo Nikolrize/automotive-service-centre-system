@@ -53,7 +53,7 @@ public class AppointmentService {
                 Appointment a = parseAppointment(line);
                 if (a != null) list.add(a);
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new IllegalArgumentException("Failed to get appointments");
             }
         }
 

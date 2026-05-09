@@ -45,7 +45,7 @@ public class PaymentService {
                 Payment payment = parsePayment(line);
                 if (payment != null) payments.add(payment);
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new IllegalArgumentException("Failed to get payments");
             }
         }
 
@@ -97,6 +97,10 @@ public class PaymentService {
 
         if (isAppointmentPaid(appointment.getAppointmentID())) {
             throw new Exception("This appointment has already been paid.");
+        }
+
+        if (!appointment.getIsCompleted()) {
+            throw new Exception("Payment can only be collected for completed appointments.");
         }
 
         double amount = appointment.getService().getPrice();

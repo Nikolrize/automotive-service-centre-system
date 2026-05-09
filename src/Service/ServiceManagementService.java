@@ -18,12 +18,12 @@ public class ServiceManagementService {
         List<String> lines = FileHandler.readFile(FILE_NAME);
 
         if (lines.isEmpty()) {
-            FileHandler.appendToFile(FILE_NAME, "SV001,Normal Service,Normal,100.00,1");
-            FileHandler.appendToFile(FILE_NAME, "SV002,Major Service,Major,300.00,3");
+            FileHandler.appendToFile(FILE_NAME, "SV0001,Normal Service,Normal,100.00,1");
+            FileHandler.appendToFile(FILE_NAME, "SV0002,Major Service,Major,300.00,3");
         }
     }
 
-    //parsing information
+    //convert one line in services.txt into service object
     private Service parseService(String line) {
         String[] data = line.split(",");
         if (data.length < 5) return null;
@@ -84,6 +84,71 @@ public class ServiceManagementService {
         FileHandler.writeFile(FILE_NAME,lines);
     }
 
+    //creating new service
+    public void createService(String name, String type, String priceText, String durationText) throws Exception{
+        name = validateName(name);
+        type = validateType(type);
+        double price = validatePrice(priceText);
+        int duration = validateDuration(durationText);
+
+        List<Service> services = getAllServices();
+
+        for (Service service : services) {
+            if (service.getName().equalsIgnoreCase(name)) {
+                throw new Exception("Service name already exists.");
+            }
+        }
+
+        String serviceID = generateNewServiceID();
+        String newLine = String.join(",", serviceID, name, type, String.format("%.2f",price),String.valueOf(duration));
+
+        FileHandler.appendToFile(FILE_NAME,newLine);
+    }
+
+    private String generateNewServiceID() {
+        List<String> lines = FileHandler.readFile(FILE_NAME);
+        int max = 0;
+
+        for (String line : lines) {
+            String[] data = line.split(",");
+            if (data.length < 5) continue;
+
+            String serviceID = data[0].trim();
+
+            if (serviceID.startsWith("SV")) {
+                int number = Integer.parseInt(serviceID.substring(2));
+                if (number > max) {
+                    max = number;
+                }
+            }
+        }
+
+        return String.format("SV%04d", max + 1);
+    }
+
+    //error validation
+    private String validateName(String name) throws Exception {
+        if (name == null || name.trim().isEmpty()) {
+            throw new Exception("Service name cannot be empty.");
+        }
+
+        return name.trim();
+    }
+
+    private String validateType(String type) throws Exception {
+        if (type == null || type.trim().isEmpty()) {
+            throw new Exception("Service type cannot be empty.");
+        }
+
+        type = type.trim();
+
+        if (!type.equalsIgnoreCase("Normal") && !type.equalsIgnoreCase("Major")) {
+            throw new Exception("Service type must be either Normal or Major.");
+        }
+
+        return Character.toUpperCase(type.charAt(0)) + type.substring(1).toLowerCase();
+    }
+
     private double validatePrice(String priceText) throws Exception {
         if (priceText == null || priceText.trim().isEmpty()) {
             throw new Exception("Price cannot be empty");
@@ -99,6 +164,24 @@ public class ServiceManagementService {
             return price;
         } catch (NumberFormatException e) {
             throw new Exception("Price must be a valid number");
+        }
+    }
+
+    private int validateDuration(String durationText) throws Exception {
+        if (durationText == null || durationText.trim().isEmpty()) {
+            throw new Exception("Duration cannot be empty");
+        }
+
+        try {
+            int duration = Integer.parseInt(durationText.trim());
+
+            if (duration <= 0) {
+                throw new Exception("Duration must be greater than 0");
+            }
+
+            return duration;
+        } catch (NumberFormatException e) {
+            throw new Exception("Duration must be a valid whole number.");
         }
     }
 }

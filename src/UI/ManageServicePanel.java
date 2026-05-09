@@ -34,6 +34,7 @@ public class ManageServicePanel extends JPanel {
         String[] columns = {"Service ID", "Service Name", "Type", "Price (RM)", "Duration(Hours)"};
 
         model = new DefaultTableModel(columns, 0 ) {
+            @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
@@ -54,6 +55,10 @@ public class ManageServicePanel extends JPanel {
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        JButton createBtn = UIHelper.createStyledButton("Create Service", ButtonMode.CREATE);
+        createBtn.setPreferredSize(new Dimension(150,35));
+        createBtn.addActionListener(_ -> handleCreateService());
+
         JButton updatePriceBtn = UIHelper.createStyledButton("Update Price", ButtonMode.PRIMARY);
         updatePriceBtn.setPreferredSize(new Dimension(150, 35));
         updatePriceBtn.addActionListener(_ -> handleUpdatePrice());
@@ -61,6 +66,7 @@ public class ManageServicePanel extends JPanel {
         JButton refreshBtn = UIHelper.createStyledButton("Refresh", ButtonMode.CREATE);
         refreshBtn.addActionListener(_ -> loadData());
 
+        buttonPanel.add(createBtn);
         buttonPanel.add(updatePriceBtn);
         buttonPanel.add(refreshBtn);
 
@@ -99,6 +105,37 @@ public class ManageServicePanel extends JPanel {
         }
     }
 
+    private void handleCreateService() {
+        JTextField nameField = new JTextField();
+        JTextField typeField = new JTextField();
+        JTextField priceField = new JTextField();
+        JTextField durationField = new JTextField();
+
+        Object[] fields = {
+                "Service Name", nameField,
+                "Type (Normal/Major):", typeField,
+                "Price (RM):", priceField,
+                "Duration (Hours):", durationField
+        };
+
+        while (true) {
+            int result = JOptionPane.showConfirmDialog(this, fields, "Create Service", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+            if (result != JOptionPane.OK_OPTION) {
+                return;
+            }
+
+            try {
+                serviceManagementService.createService(nameField.getText(), typeField.getText(), priceField.getText(), durationField.getText());
+                JOptionPane.showMessageDialog(this, "Service created successfully.");
+                loadData();
+                return;
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
     private void handleUpdatePrice() {
         int row = table.getSelectedRow();
 
@@ -111,22 +148,25 @@ public class ManageServicePanel extends JPanel {
         String serviceName = table.getValueAt(row, 1).toString();
         String currentPrice = table.getValueAt(row, 3).toString();
 
-        String newPrice = JOptionPane.showInputDialog(
-                this,
-                "Enter new price for " + serviceName + ":",
-                currentPrice
-        );
+        while (true) { //ensures loop for price input
+            String newPrice = JOptionPane.showInputDialog(
+                    this,
+                    "Enter new price for " + serviceName + ":",
+                    currentPrice
+            );
 
-        if (newPrice == null) {
-            return;
-        }
+            //cancel
+            if (newPrice == null) {
+                return;
+            }
 
-        try {
-            serviceManagementService.updateServicePrice(serviceID, newPrice);
-            JOptionPane.showMessageDialog(this, "Service price updated successfully.");
-            loadData();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            try {
+                serviceManagementService.updateServicePrice(serviceID, newPrice);
+                JOptionPane.showMessageDialog(this, "Service price updated successfully.");
+                loadData();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 }

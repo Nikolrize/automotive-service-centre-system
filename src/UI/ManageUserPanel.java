@@ -5,6 +5,7 @@ import Model.*;
 import Service.UserService;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
@@ -49,6 +50,30 @@ public class ManageUserPanel extends JPanel {
         sorter = new TableRowSorter<>(model);
         table.setRowSorter(sorter);
 
+        //highlights logged in user
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component component = super.getTableCellRendererComponent(table,value, isSelected, hasFocus, row, column);
+
+                String rowUserID = table.getValueAt(row, 0).toString();
+                boolean isCurrentUserRow = currentUser != null && currentUser.getUserID().equals(rowUserID);
+
+                if (isSelected) {
+                    component.setBackground(table.getSelectionBackground());
+                    component.setForeground(Color.BLACK);
+                } else if (isCurrentUserRow) {
+                    component.setBackground(new Color(255,244,204));
+                    component.setForeground(Color.BLACK);
+                } else {
+                    component.setBackground(Color.WHITE);
+                    component.setForeground(Color.BLACK);
+                }
+
+                return component;
+            }
+        });
+
         // Search bar
         JPanel searchPanel = UIHelper.createSearchPanel(searchField, this::applyFilter);
         searchPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -71,14 +96,10 @@ public class ManageUserPanel extends JPanel {
         JButton deleteBtn = UIHelper.createStyledButton("Delete", ButtonMode.DESTRUCTIVE);
         deleteBtn.addActionListener(_ -> handleDelete());
 
-        JButton restoreBtn = UIHelper.createStyledButton("Restore", ButtonMode.RESTORE);
-        restoreBtn.addActionListener(_ -> handleRestore());
-
         // Add to Panels
         buttonPanel.add(createBtn);
         buttonPanel.add(editBtn);
         buttonPanel.add(deleteBtn);
-        buttonPanel.add(restoreBtn);
 
         mainPanel.add(searchPanel);
         mainPanel.add(Box.createVerticalStrut(10));
@@ -124,7 +145,13 @@ public class ManageUserPanel extends JPanel {
     }
 
     private void addRow(User u) {
-        model.addRow(new Object[]{u.getUserID(), u.getRoleID(), u.getUsername(), u.getFirstName(), u.getLastName(), u.getEmail(), u.getContact()});
+        String usernameDisplay = u.getUsername();
+
+        if (currentUser != null && currentUser.getUserID().equals(u.getUserID())) {
+            usernameDisplay += " (You)";
+        }
+
+        model.addRow(new Object[]{u.getUserID(), u.getRoleID(), usernameDisplay,u.getUsername(), u.getFirstName(), u.getLastName(), u.getEmail(), u.getContact()});
     }
 
     private void handleCreate() {
@@ -198,49 +225,6 @@ public class ManageUserPanel extends JPanel {
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
-        }
-    }
-
-    private void handleRestore() {
-        try {
-            List<User> inactiveUsers = userService.getInactiveUsersByRole(role);
-
-            if (inactiveUsers.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "No inactive " + role.getDisplayName() + " found.");
-                return;
-            }
-
-            SelectionDialog<User> dialog = new SelectionDialog<>(
-                    (JFrame) SwingUtilities.getWindowAncestor(this),
-                    "Restore " + role.getDisplayName(),
-                    inactiveUsers,
-                    new String[]{"User ID", "Role ID", "Username", "First Name", "Last Name", "Email", "Contact"},
-                    u -> new Object[]{
-                            u.getUserID(),
-                            u.getRoleID(),
-                            u.getUsername(),
-                            u.getFirstName(),
-                            u.getLastName(),
-                            u.getEmail(),
-                            u.getContact()
-                    }
-            );
-
-            dialog.setVisible(true);
-
-            User selectedUser = dialog.getSelectedItem();
-
-            if (selectedUser == null) {
-                return;
-            }
-
-            userService.restoreUser(selectedUser.getUserID());
-
-            JOptionPane.showMessageDialog(this, role.getDisplayName() + " restored successfully.");
-            loadData();
-
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

@@ -12,32 +12,36 @@ public class AppointmentService {
     private static final String FILE_NAME = "appointments.txt";
     private final UserService userService;
     private final ServiceManagementService serviceManagementService;
+    private final VehicleService vehicleService;
 
-    public AppointmentService(UserService userService, ServiceManagementService serviceManagementService) {
+    public AppointmentService(UserService userService, ServiceManagementService serviceManagementService, VehicleService vehicleService) {
         this.userService = userService;
         this.serviceManagementService = serviceManagementService;
+        this.vehicleService = vehicleService;
     }
 
     private Appointment parseAppointment(String line) throws Exception {
         String[] data = line.split(",");
-        if (data.length < 9) return null;
+        if (data.length < 10) return null;
 
         String appointmentID = data[0];
         String serviceID = data[1];
         String customerID = data[2];
         String counterStaffID = data[3];
         String technicianID = data[4];
-        boolean isCompleted = Boolean.parseBoolean(data[5]);
-        LocalDate date = LocalDate.parse(data[6]);
-        LocalTime startTime = LocalTime.parse(data[7]);
-        LocalTime endTime = LocalTime.parse(data[8]);
+        String vehicleID = data[5];
+        boolean isCompleted = Boolean.parseBoolean(data[6]);
+        LocalDate date = LocalDate.parse(data[7]);
+        LocalTime startTime = LocalTime.parse(data[8]);
+        LocalTime endTime = LocalTime.parse(data[9]);
 
         Service service = serviceManagementService.getServiceByID(serviceID);
         Customer customer = (Customer) userService.getUserById(customerID);
         CounterStaff staff = (CounterStaff) userService.getUserById(counterStaffID);
         Technician technician = (Technician) userService.getUserById(technicianID);
+        Vehicle vehicle = vehicleService.getVehicleByID(vehicleID);
 
-        return new Appointment(appointmentID, service, customer, staff, technician, isCompleted, date, startTime, endTime);
+        return new Appointment(appointmentID, service, customer, staff, technician, vehicle, isCompleted, date, startTime, endTime);
     }
 
     public List<Appointment> getAllAppointments() {
@@ -92,6 +96,27 @@ public class AppointmentService {
         return availableTechnicians;
     }
 
+    private boolean isTechnicianAvailableForUpdate(
+            String appointmentID,
+            Technician technician,
+            LocalDate date,
+            LocalTime startTime,
+            LocalTime endTime
+    ) {
+        for (Appointment a : getAllAppointments()) {
+            if (a.getAppointmentID().equals(appointmentID)) continue;
+            if (!a.getTechnician().getUserID().equals(technician.getUserID())) continue;
+            if (!a.getDate().equals(date)) continue;
+
+            boolean overlap = startTime.isBefore(a.getEndTime()) &&
+                    endTime.isAfter(a.getStartTime());
+
+            if (overlap) return false;
+        }
+
+        return true;
+    }
+
     private String generateNewID() {
         List<String> lines = FileHandler.readFile(FILE_NAME);
         int max = 0;
@@ -105,8 +130,8 @@ public class AppointmentService {
         return String.format("A%04d", max + 1);
     }
 
-    public void createAppointment(Service service, Customer customer, CounterStaff staff, Technician technician, LocalDate date, LocalTime startTime) throws Exception {
-        if (service == null || customer == null || staff == null || technician == null) {
+    public void createAppointment(Service service, Customer customer, CounterStaff staff, Technician technician, Vehicle vehicle, LocalDate date, LocalTime startTime) throws Exception {
+        if (service == null || customer == null || staff == null || technician == null || vehicle == null) {
             throw new Exception("All fields must be provided.");
         }
 
@@ -122,35 +147,34 @@ public class AppointmentService {
 
         String appointmentID = generateNewID();
 
-        String data = String.join(",", appointmentID, service.getServiceID(), customer.getUserID(), staff.getUserID(), technician.getUserID(), "false", date.toString(), startTime.toString(), endTime.toString());
+        String data = String.join(",", appointmentID, service.getServiceID(), customer.getUserID(), staff.getUserID(), technician.getUserID(), vehicle.getVehicleID(), "false", date.toString(), startTime.toString(), endTime.toString());
 
         FileHandler.appendToFile(FILE_NAME, data);
     }
 
-    public void updateAppointment(String appointmentID, LocalDate newDate, LocalTime newStartTime, Technician newTechnician) throws Exception {
+    public void updateAppointment(Customer newCustomer, Vehicle newVehicle, Service newService, String appointmentID, LocalDate newDate, LocalTime newStartTime, Technician newTechnician) throws Exception {
         List<String> lines = FileHandler.readFile(FILE_NAME);
         boolean updated = false;
 
         for (int i = 0; i < lines.size(); i++) {
             String[] data = lines.get(i).split(",");
 
-            if (data.length < 9) continue;
+            if (data.length < 10) continue;
 
             if (data[0].equals(appointmentID)) {
+                LocalTime newEndTime = calculateEndTime(newStartTime, newService);
 
-                Service service = serviceManagementService.getServiceByID(data[1]);
-
-                LocalTime newEndTime = calculateEndTime(newStartTime, service);
-
-                // check availability (exclude current appointment)
-                if (!isTechnicianAvailable(newTechnician, newDate, newStartTime, newEndTime)) {
+                if (!isTechnicianAvailableForUpdate(appointmentID, newTechnician, newDate, newStartTime, newEndTime)) {
                     throw new Exception("Technician is not available for new schedule.");
                 }
 
+                data[1] = newService.getServiceID();
+                data[2] = newCustomer.getUserID();
                 data[4] = newTechnician.getUserID();
-                data[6] = newDate.toString();
-                data[7] = newStartTime.toString();
-                data[8] = newEndTime.toString();
+                data[5] = newVehicle.getVehicleID();
+                data[7] = newDate.toString();
+                data[8] = newStartTime.toString();
+                data[9] = newEndTime.toString();
 
                 lines.set(i, String.join(",", data));
                 updated = true;
@@ -170,7 +194,7 @@ public class AppointmentService {
 
         boolean removed = lines.removeIf(line -> {
             String[] data = line.split(",");
-            if (data.length < 9) return false;
+            if (data.length < 10) return false;
 
             return data[0].equals(appointmentID);
         });
@@ -193,7 +217,7 @@ public class AppointmentService {
                     throw new Exception("Not your appointment");
                 }
 
-                data[5] = "true";
+                data[6] = "true";
                 lines.set(i, String.join(",", data));
                 break;
             }

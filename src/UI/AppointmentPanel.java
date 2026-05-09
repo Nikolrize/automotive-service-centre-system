@@ -15,6 +15,7 @@ public class AppointmentPanel extends JPanel {
     private final AppointmentService appointmentService;
     private final UserService userService;
     private final ServiceManagementService serviceManagementService;
+    private final VehicleService vehicleService;
     private final User currentUser;
     private JTable table;
     private DefaultTableModel model;
@@ -23,11 +24,11 @@ public class AppointmentPanel extends JPanel {
     private final JTextField searchField = new JTextField();
     private TableRowSorter<DefaultTableModel> sorter;
 
-    public AppointmentPanel(AppointmentService appointmentService, UserService userService, ServiceManagementService serviceManagementService, User currentUser, JPanel rightPanel, CardLayout cardLayout) {
-
+    public AppointmentPanel(AppointmentService appointmentService, UserService userService, ServiceManagementService serviceManagementService, VehicleService vehicleService, User currentUser, JPanel rightPanel, CardLayout cardLayout) {
         this.appointmentService = appointmentService;
         this.serviceManagementService = serviceManagementService;
         this.userService = userService;
+        this.vehicleService = vehicleService;
         this.currentUser = currentUser;
         this.rightPanel = rightPanel;
         this.cardLayout = cardLayout;
@@ -127,6 +128,7 @@ public class AppointmentPanel extends JPanel {
                 appt,
                 appointmentService,
                 userService,
+                vehicleService,
                 serviceManagementService,
                 (CounterStaff) currentUser,
                 () -> {

@@ -16,6 +16,7 @@ public class AppointmentFormPanel extends JPanel {
     private final Appointment appointment;
     private final AppointmentService appointmentService;
     private final UserService userService;
+    private final VehicleService vehicleService;
     private final ServiceManagementService serviceService;
     private final CounterStaff currentUser;
     private final Runnable onBack;
@@ -24,19 +25,22 @@ public class AppointmentFormPanel extends JPanel {
     private Technician selectedTechnician;
     private List<Technician> availableTechnicians = List.of();
     private Service selectedService;
+    private Vehicle selectedVehicle;
 
-    private final JTextArea customerField = new JTextArea(4, 20);
-    private final JTextArea technicianField = new JTextArea(4, 20);
-    private final JTextArea serviceField = new JTextArea(4, 20);
+    private final JTextArea customerField = new JTextArea();
+    private final JTextArea technicianField = new JTextArea();
+    private final JTextArea serviceField = new JTextArea();
+    private final JTextArea vehicleField = new JTextArea();
 
     private DateTimePicker dateTimePicker;
     private final JLabel endTimeLabel = new JLabel("End Time: -");
 
-    public AppointmentFormPanel(FormMode mode, Appointment appointment, AppointmentService appointmentService, UserService userService, ServiceManagementService serviceService, CounterStaff currentUser, Runnable onBack) {
+    public AppointmentFormPanel(FormMode mode, Appointment appointment, AppointmentService appointmentService, UserService userService, VehicleService vehicleService, ServiceManagementService serviceService, CounterStaff currentUser, Runnable onBack) {
         this.mode = mode;
         this.appointment = appointment;
         this.appointmentService = appointmentService;
         this.userService = userService;
+        this.vehicleService = vehicleService;
         this.serviceService = serviceService;
         this.currentUser = currentUser;
         this.onBack = onBack;
@@ -50,7 +54,7 @@ public class AppointmentFormPanel extends JPanel {
         JPanel mainPanel = UIHelper.createSectionPanel(mode == FormMode.EDIT ? "Edit Appointment" : "Create Appointment");
 
         // Customer Card
-        JPanel customerCard = UIHelper.createCardPanel("Customer");
+        JPanel customerCard = UIHelper.createCardPanel("1. Select Customer");
         customerCard.setAlignmentX(Component.LEFT_ALIGNMENT);
         customerField.setFont(new Font("SansSerif", Font.PLAIN, 13));
         customerField.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
@@ -63,8 +67,22 @@ public class AppointmentFormPanel extends JPanel {
         customerCard.add(Box.createVerticalStrut(8));
         customerCard.add(selectCustomerBtn);
 
-        // Service
-        JPanel serviceCard = UIHelper.createCardPanel("Service");
+        // Vehicle Card
+        JPanel vehicleCard = UIHelper.createCardPanel("2. Select Vehicle");
+        vehicleCard.setAlignmentX(Component.LEFT_ALIGNMENT);
+        vehicleField.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        vehicleField.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+        vehicleField.setAlignmentX(Component.LEFT_ALIGNMENT);
+        vehicleField.setEditable(false);
+
+        JButton selectVehicleBtn = createSelectVehicleButton();
+
+        vehicleCard.add(vehicleField);
+        vehicleCard.add(Box.createVerticalStrut(8));
+        vehicleCard.add(selectVehicleBtn);
+
+        // Service Card
+        JPanel serviceCard = UIHelper.createCardPanel("3. Choose Service");
         serviceCard.setAlignmentX(Component.LEFT_ALIGNMENT);
         serviceField.setFont(new Font("SansSerif", Font.PLAIN, 13));
         serviceField.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
@@ -78,10 +96,11 @@ public class AppointmentFormPanel extends JPanel {
         serviceCard.add(selectServiceBtn);
 
         // Schedule Card
-        JPanel scheduleCard = UIHelper.createCardPanel("Schedule");
+        JPanel scheduleCard = UIHelper.createCardPanel("4. Schedule Appointment");
         scheduleCard.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel dateTimeLabel = new JLabel("Date and Time");
+        dateTimeLabel.setFont(new Font("SansSerif", Font.BOLD, 13));
         dateTimeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         endTimeLabel.setFont(new Font("SansSerif", Font.BOLD, 13));
@@ -98,13 +117,12 @@ public class AppointmentFormPanel extends JPanel {
 
         scheduleCard.add(dateTimeLabel);
         scheduleCard.add(Box.createVerticalStrut(8));
-        scheduleCard.add(endTimeLabel);
-        scheduleCard.add(Box.createVerticalStrut(8));
         scheduleCard.add(dateTimePicker);
         scheduleCard.add(Box.createVerticalStrut(8));
+        scheduleCard.add(endTimeLabel);
 
         // Technician Card
-        JPanel techCard = UIHelper.createCardPanel("Technician");
+        JPanel techCard = UIHelper.createCardPanel("5. Assign Technician");
         techCard.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JButton selectTechBtn = createSelectTechnicianButton();
@@ -136,6 +154,9 @@ public class AppointmentFormPanel extends JPanel {
         mainPanel.add(customerCard);
         mainPanel.add(Box.createVerticalStrut(10));
 
+        mainPanel.add(vehicleCard);
+        mainPanel.add(Box.createVerticalStrut(10));
+
         mainPanel.add(serviceCard);
         mainPanel.add(Box.createVerticalStrut(10));
 
@@ -158,41 +179,25 @@ public class AppointmentFormPanel extends JPanel {
         // Customer
         selectedCustomer = appointment.getCustomer();
         if (selectedCustomer != null) {
-            customerField.setText(
-                    "User ID: " + selectedCustomer.getUserID() + "\n" +
-                    "Customer ID: " + selectedCustomer.getRoleID() + "\n" +
-                    "Username: " + selectedCustomer.getUsername() + "\n" +
-                    "First Name: " + selectedCustomer.getFirstName() + "\n" +
-                    "Last Name: " + selectedCustomer.getLastName() + "\n" +
-                    "Email: " + selectedCustomer.getEmail() + "\n" +
-                    "Contact: " + selectedCustomer.getContact()
-            );
+            customerField.setText(TextFormatter.formatCustomer(selectedCustomer));
+        }
+
+        // Vehicle
+        selectedVehicle = appointment.getVehicle();
+        if (selectedVehicle != null) {
+            vehicleField.setText(TextFormatter.formatVehicle(selectedVehicle));
         }
 
         // Service
         selectedService = appointment.getService();
         if (selectedService != null) {
-            serviceField.setText(
-                    "Service ID: " + selectedService.getServiceID() + "\n" +
-                    "Name: " + selectedService.getName() + "\n" +
-                    "Type: " + selectedService.getType() + "\n" +
-                    "Price: RM" + selectedService.getPrice() + "\n" +
-                    "Duration: " + selectedService.getDuration()
-            );
+            serviceField.setText(TextFormatter.formatService(selectedService));
         }
 
         // Technician
         selectedTechnician = appointment.getTechnician();
         if (selectedTechnician != null) {
-            technicianField.setText(
-                    "User ID: " + selectedTechnician.getUserID() + "\n" +
-                    "Technician ID: " + selectedTechnician.getRoleID() + "\n" +
-                    "Username: " + selectedTechnician.getUsername() + "\n" +
-                    "First Name: " + selectedTechnician.getFirstName() + "\n" +
-                    "Last Name: " + selectedTechnician.getLastName() + "\n" +
-                    "Email: " + selectedTechnician.getEmail() + "\n" +
-                    "Contact: " + selectedTechnician.getContact()
-            );
+            technicianField.setText(TextFormatter.formatTechnician(selectedTechnician));
         }
 
         // Date and time
@@ -218,11 +223,48 @@ public class AppointmentFormPanel extends JPanel {
             Customer c = dialog.getSelectedItem();
             if (c != null) {
                 selectedCustomer = c;
+                selectedVehicle = null;
                 customerField.setText(TextFormatter.formatCustomer(c));
+                vehicleField.setText("");
             }
         });
 
         return selectCustomerBtn;
+    }
+
+    private JButton createSelectVehicleButton() {
+        JButton selectVehicleButton = UIHelper.createStyledButton("Select Vehicle", ButtonMode.PRIMARY);
+
+        selectVehicleButton.addActionListener(_ -> {
+            if (selectedCustomer == null) {
+                JOptionPane.showMessageDialog(this, "Please select a customer first.");
+                return;
+            }
+
+            List<Vehicle> customerVehicles = vehicleService.getVehiclesByCustomer(selectedCustomer);
+
+            if (customerVehicles.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "This customer has no vehicles.");
+                return;
+            }
+
+            SelectionDialog<Vehicle> dialog = new SelectionDialog<>(
+                    (JFrame) SwingUtilities.getWindowAncestor(this),
+                    "Select Vehicle", vehicleService.getVehiclesByCustomer(selectedCustomer),
+                    new String[]{"Vehicle ID", "Plate Number", "Brand", "Model", "Year", "Color"},
+                    v -> new Object[]{v.getVehicleID(), v.getPlateNumber(), v.getBrand(), v.getModel(), v.getYear(), v.getColor()}
+            );
+
+            dialog.setVisible(true);
+
+            Vehicle v = dialog.getSelectedItem();
+            if (v != null) {
+                selectedVehicle = v;
+                vehicleField.setText(TextFormatter.formatVehicle(v));
+            }
+        });
+
+        return selectVehicleButton;
     }
 
     private JButton createSelectTechnicianButton() {
@@ -286,6 +328,11 @@ public class AppointmentFormPanel extends JPanel {
                 return;
             }
 
+            if (selectedVehicle == null) {
+                JOptionPane.showMessageDialog(this, "Please select a vehicle.");
+                return;
+            }
+
             if (selectedService == null) {
                 JOptionPane.showMessageDialog(this, "Please select a service.");
                 return;
@@ -305,9 +352,18 @@ public class AppointmentFormPanel extends JPanel {
             }
 
             if (mode == FormMode.CREATE) {
-                appointmentService.createAppointment(selectedService, selectedCustomer, currentUser, selectedTechnician, date, time);
+                appointmentService.createAppointment(selectedService, selectedCustomer, currentUser, selectedTechnician, selectedVehicle, date, time);
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Appointment created successfully!"
+                );
             } else {
-                appointmentService.updateAppointment(appointment.getAppointmentID(), date, time, selectedTechnician);
+                appointmentService.updateAppointment(selectedCustomer, selectedVehicle, selectedService, appointment.getAppointmentID(), date, time, selectedTechnician);
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Appointment updated successfully!"
+                );
+
             }
 
             onBack.run();

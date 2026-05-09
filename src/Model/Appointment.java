@@ -9,17 +9,19 @@ public class Appointment {
     private Customer customer;
     private CounterStaff counterStaff;
     private Technician technician;
+    private Vehicle vehicle;
     private boolean isCompleted;
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
 
-    public Appointment(String appointmentID, Service service, Customer customer, CounterStaff counterStaff, Technician technician, boolean isCompleted, LocalDate date, LocalTime startTime, LocalTime endTime) {
+    public Appointment(String appointmentID, Service service, Customer customer, CounterStaff counterStaff, Technician technician, Vehicle vehicle, boolean isCompleted, LocalDate date, LocalTime startTime, LocalTime endTime) {
         setAppointmentID(appointmentID);
         setService(service);
         setCustomer(customer);
         setCounterStaff(counterStaff);
         setTechnician(technician);
+        setVehicle(vehicle);
         setISCompleted(isCompleted);
         setDate(date);
         setStartTime(startTime);
@@ -64,6 +66,14 @@ public class Appointment {
 
     public void setTechnician(Technician technician) {
         this.technician = technician;
+    }
+
+    public Vehicle getVehicle() {
+        return vehicle;
+    }
+
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
     }
 
     public boolean getIsCompleted() {

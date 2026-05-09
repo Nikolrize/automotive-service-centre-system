@@ -151,11 +151,11 @@ public class DashboardUI extends JFrame {
 
         // Vehicle
         if (currentUser.canManageVehicle()) {
-            panels.put("Manage Vehicle", new ManageVehiclePanel(vehicleService, userService, rightPanel, cardLayout));
+            panels.put("Manage Vehicle", new ManageVehiclePanel(vehicleService, userService, currentUser, rightPanel, cardLayout));
         }
 
         if (currentUser.canViewVehicle()) {
-            panels.put("View Vehicle", new ManageVehiclePanel(vehicleService, userService, rightPanel, cardLayout));
+            panels.put("View Vehicle", new ManageVehiclePanel(vehicleService, userService, currentUser, rightPanel, cardLayout));
         }
 
         // Service

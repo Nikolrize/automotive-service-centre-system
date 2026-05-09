@@ -2,6 +2,8 @@ package UI;
 
 import Enum.ButtonMode;
 import Enum.FormMode;
+import Model.Customer;
+import Model.User;
 import Model.Vehicle;
 import Service.UserService;
 import Service.VehicleService;
@@ -10,10 +12,12 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.util.List;
 
 public class ManageVehiclePanel extends JPanel {
     private final VehicleService vehicleService;
     private final UserService userService;
+    private final User currentUser;
 
     private JTable table;
     private DefaultTableModel model;
@@ -27,11 +31,13 @@ public class ManageVehiclePanel extends JPanel {
     public ManageVehiclePanel(
             VehicleService vehicleService,
             UserService userService,
+            User currentUser,
             JPanel rightPanel,
             CardLayout cardLayout
     ) {
         this.vehicleService = vehicleService;
         this.userService = userService;
+        this.currentUser = currentUser;
         this.rightPanel = rightPanel;
         this.cardLayout = cardLayout;
 
@@ -42,7 +48,7 @@ public class ManageVehiclePanel extends JPanel {
     }
 
     private void buildUI() {
-        JPanel mainPanel = UIHelper.createSectionPanel("Manage Vehicle");
+        JPanel mainPanel = UIHelper.createSectionPanel(currentUser.canManageVehicle() ? "Manage Vehicle" : "View Vehicle");
 
         // Table
         String[] columns = {
@@ -81,28 +87,30 @@ public class ManageVehiclePanel extends JPanel {
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JButton createBtn = UIHelper.createStyledButton(
-                "Create",
-                ButtonMode.CREATE
-        );
+        if (currentUser.canManageVehicle()) {
+            JButton createBtn = UIHelper.createStyledButton(
+                    "Create",
+                    ButtonMode.CREATE
+            );
 
-        JButton editBtn = UIHelper.createStyledButton(
-                "Edit",
-                ButtonMode.PRIMARY
-        );
+            JButton editBtn = UIHelper.createStyledButton(
+                    "Edit",
+                    ButtonMode.PRIMARY
+            );
 
-        JButton deleteBtn = UIHelper.createStyledButton(
-                "Delete",
-                ButtonMode.DESTRUCTIVE
-        );
+            JButton deleteBtn = UIHelper.createStyledButton(
+                    "Delete",
+                    ButtonMode.DESTRUCTIVE
+            );
 
-        createBtn.addActionListener(_ -> handleCreate());
-        editBtn.addActionListener(_ -> handleEdit());
-        deleteBtn.addActionListener(_ -> handleDelete());
+            createBtn.addActionListener(_ -> handleCreate());
+            editBtn.addActionListener(_ -> handleEdit());
+            deleteBtn.addActionListener(_ -> handleDelete());
 
-        buttonPanel.add(createBtn);
-        buttonPanel.add(editBtn);
-        buttonPanel.add(deleteBtn);
+            buttonPanel.add(createBtn);
+            buttonPanel.add(editBtn);
+            buttonPanel.add(deleteBtn);
+        }
 
         mainPanel.add(searchPanel);
         mainPanel.add(Box.createVerticalStrut(10));
@@ -125,9 +133,15 @@ public class ManageVehiclePanel extends JPanel {
 
     private void loadData() {
         model.setRowCount(0);
+        List<Vehicle> vehicles;
 
-        for (Vehicle v : vehicleService.getAllVehicles()) {
+        if (currentUser instanceof Customer customer) {
+            vehicles = vehicleService.getVehiclesByCustomer(customer);
+        } else {
+            vehicles = vehicleService.getAllVehicles();
+        }
 
+        for (Vehicle v : vehicles) {
             model.addRow(new Object[]{
                     v.getVehicleID(),
                     v.getCustomer().getUsername(),

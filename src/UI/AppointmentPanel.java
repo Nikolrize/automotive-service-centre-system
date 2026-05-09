@@ -39,7 +39,11 @@ public class AppointmentPanel extends JPanel {
     }
 
     private void AppointmentUI() {
-        JPanel mainPanel = UIHelper.createSectionPanel("Manage Appointment");
+        JPanel mainPanel = UIHelper.createSectionPanel(currentUser.canManageAppointment()
+                ? "Manage Appointment"
+                : currentUser.canUpdateAssignedAppointment()
+                ? "Update Appointment"
+                : "View Appointment");
 
         String[] columns = {"ID", "Service", "Customer", "Technician", "Date", "Start", "End", "Status"};
 
@@ -66,7 +70,7 @@ public class AppointmentPanel extends JPanel {
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        if (currentUser instanceof CounterStaff) {
+        if (currentUser.canManageAppointment()) {
             JButton createBtn = UIHelper.createStyledButton("Create", ButtonMode.CREATE);
             createBtn.addActionListener(_ -> handleCreate());
 
@@ -82,7 +86,7 @@ public class AppointmentPanel extends JPanel {
             buttonPanel.add(deleteBtn);
         }
 
-        if (currentUser instanceof Technician) {
+        if (currentUser.canUpdateAssignedAppointment()) {
             JButton completeBtn = UIHelper.createStyledButton("Mark Completed", ButtonMode.RESTORE);
             completeBtn.setPreferredSize(new Dimension(150, 35));
             completeBtn.addActionListener(_ -> markCompleted());

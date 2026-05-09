@@ -73,6 +73,16 @@ public class CounterStaff extends User {
     }
 
     @Override
+    public boolean canCreateComment() {
+        return false;
+    }
+
+    @Override
+    public boolean canviewComment() {
+        return false;
+    }
+
+    @Override
     public boolean canCreateFeedback() {
         return false;
     }
@@ -84,6 +94,16 @@ public class CounterStaff extends User {
 
     @Override
     public boolean canSetServicePrice() {
+        return false;
+    }
+
+    @Override
+    public boolean canManageVehicle() {
+        return true;
+    }
+
+    @Override
+    public boolean canViewVehicle() {
         return false;
     }
 }

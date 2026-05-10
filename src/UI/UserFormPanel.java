@@ -118,8 +118,12 @@ public class UserFormPanel extends JPanel {
                 if (mode == FormMode.EDIT) {
                     userService.updateUserProfile(user.getUserID(), usernameField.getText(), firstNameField.getText(), lastNameField.getText(), new String(passwordField.getPassword()), emailField.getText(), contactField.getText());
                     JOptionPane.showMessageDialog(null, "Profile updated successfully!");
+
+                    if (onBack != null) {
+                        onBack.run();
+                    }
                 } else {
-                    new UserService().registerUser(usernameField.getText(), firstNameField.getText(), lastNameField.getText(), new String(passwordField.getPassword()), emailField.getText(), contactField.getText(), role);
+                    userService.registerUser(usernameField.getText(), firstNameField.getText(), lastNameField.getText(), new String(passwordField.getPassword()), emailField.getText(), contactField.getText(), role);
                     JOptionPane.showMessageDialog(null, role.getDisplayName() + " created successfully!");
 
                     if (onBack != null) {

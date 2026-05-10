@@ -84,7 +84,7 @@ public class Customer extends User {
 
     @Override
     public boolean canCreateFeedback() {
-        return true;
+        return false;
     }
 
     @Override

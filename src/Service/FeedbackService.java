@@ -74,4 +74,29 @@ public class FeedbackService {
     public int getTotalFeedbackCount() {
         return getAllFeedbackRecords().size();
     }
+
+    //temp helper methods for customer view feedback
+    public boolean hasFeedbackForAppointment(String appointmentID) {
+        for (String[] record : getAllFeedbackRecords()) {
+            if (record.length >= 5 && record[1].trim().equals(appointmentID)) {
+                return true;
+            }
+
+        }
+        return false;
+    }
+
+    public String getFeedbackTextByAppointmentID(String appointmentID) {
+        for (String[] record : getAllFeedbackRecords()) {
+            if (record.length >= 7 && record[1].trim().equals(appointmentID)) {
+                return record[6].trim();
+            }
+
+            if (record.length >= 5 && record[1].trim().equals(appointmentID)) {
+                return record[4].trim();
+            }
+        }
+        return null;
+    }
+
 }

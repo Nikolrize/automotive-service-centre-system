@@ -1,6 +1,7 @@
 package UI;
 
 import Model.CounterStaff;
+import Model.Customer;
 import Service.*;
 import Model.User;
 import Enum.*;
@@ -18,6 +19,8 @@ public class DashboardUI extends JFrame {
     private final ServiceManagementService serviceManagementService;
     private final VehicleService vehicleService;
     private final PaymentService paymentService;
+    private final CommentService commentService;
+    private final FeedbackService feedbackService;
     private JPanel leftPanel;
     private JPanel rightPanel;
     private CardLayout cardLayout;
@@ -30,6 +33,8 @@ public class DashboardUI extends JFrame {
         this.vehicleService = new VehicleService(userService);
         this.appointmentService = new AppointmentService(userService, serviceManagementService, vehicleService);
         this.paymentService = new PaymentService(appointmentService, userService);
+        this.commentService = new CommentService(appointmentService);
+        this.feedbackService = new FeedbackService();
     }
 
     public void showDashboard() {
@@ -171,9 +176,13 @@ public class DashboardUI extends JFrame {
             panels.put("Manage Service", new ManageServicePanel());
         }
 
-        // Feedback
+        // Feedback (checks if its customer, if not it will go to manager feedback, later need to add/change when adding technician feedback)
         if (currentUser.canViewFeedback()) {
-            panels.put("View Feedback", new ViewFeedbackPanel());
+            if (currentUser instanceof Customer customer) {
+                panels.put("View Feedback", new CustomerFeedbackPanel(customer, appointmentService, feedbackService));
+            } else {
+                panels.put("View Feedback", new ViewFeedbackPanel());
+            }
         }
 
         // Report
@@ -203,6 +212,10 @@ public class DashboardUI extends JFrame {
             panels.put("Payment History", new PaymentPanel(paymentService, appointmentService, currentUser));
         }
 
+        //comment
+        if (currentUser.canCreateComment() && currentUser instanceof Model.Customer customer) {
+            panels.put("Provide Comment", new CustomerCommentPanel(customer, appointmentService, commentService));
+        }
         return panels;
     }
 
@@ -276,6 +289,11 @@ public class DashboardUI extends JFrame {
         // Report
         if (currentUser.canViewReports()) {
             addMenuButton("View Report");
+        }
+
+        //comment
+        if (currentUser.canCreateComment()) {
+            addMenuButton("Provide Comment");
         }
     }
 

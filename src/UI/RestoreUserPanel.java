@@ -53,10 +53,15 @@ public class RestoreUserPanel extends JPanel {
         JButton restoreBtn = UIHelper.createStyledButton("Restore", ButtonMode.RESTORE);
         restoreBtn.addActionListener(_ -> handleRestore());
 
+        JButton permanentDeleteBtn = UIHelper.createStyledButton("Delete Permanently", ButtonMode.DESTRUCTIVE);
+        permanentDeleteBtn.setPreferredSize(new Dimension(180, 35));
+        permanentDeleteBtn.addActionListener(_ -> handlePermanentDelete());
+
         JButton refreshBtn = UIHelper.createStyledButton("Refresh", ButtonMode.CREATE);
-        refreshBtn.addActionListener(_ ->loadData());
+        refreshBtn.addActionListener(_ -> loadData());
 
         buttonPanel.add(restoreBtn);
+        buttonPanel.add(permanentDeleteBtn);
         buttonPanel.add(refreshBtn);
 
         mainPanel.add(searchPanel);
@@ -67,13 +72,14 @@ public class RestoreUserPanel extends JPanel {
 
         add(mainPanel, BorderLayout.CENTER);
     }
+
     private void applyFilter() {
         String text = searchField.getText();
 
         if (text.trim().isEmpty()) {
             sorter.setRowFilter(null);
         } else {
-            sorter.setRowFilter(RowFilter.regexFilter("(?i)"+ text));
+            sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
         }
     }
 
@@ -84,7 +90,13 @@ public class RestoreUserPanel extends JPanel {
 
         for (User user : inactiveUsers) {
             model.addRow(new Object[]{
-                    user.getUserID(),user.getRoleID(),user.getUsername(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getContact()
+                    user.getUserID(),
+                    user.getRoleID(),
+                    user.getUsername(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getEmail(),
+                    user.getContact()
             });
         }
     }
@@ -111,6 +123,36 @@ public class RestoreUserPanel extends JPanel {
             try {
                 userService.restoreUser(userID);
                 JOptionPane.showMessageDialog(this, "User restored successfully.");
+                loadData();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void handlePermanentDelete() {
+        int row = table.getSelectedRow();
+
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a user first!");
+            return;
+        }
+
+        String userID = table.getValueAt(row, 0).toString();
+        String username = table.getValueAt(row, 2).toString();
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Permanently delete user \"" + username + "\"?\nThis action cannot be undone.",
+                "Confirm Permanent Delete",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                userService.hardDeleteUser(userID);
+                JOptionPane.showMessageDialog(this, "User permanently deleted.");
                 loadData();
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

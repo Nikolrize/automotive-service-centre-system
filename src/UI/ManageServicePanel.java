@@ -164,6 +164,7 @@ public class ManageServicePanel extends JPanel {
                 serviceManagementService.updateServicePrice(serviceID, newPrice);
                 JOptionPane.showMessageDialog(this, "Service price updated successfully.");
                 loadData();
+                return;
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }

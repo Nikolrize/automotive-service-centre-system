@@ -18,6 +18,7 @@ public class DashboardUI extends JFrame {
     private final ServiceManagementService serviceManagementService;
     private final VehicleService vehicleService;
     private final PaymentService paymentService;
+    private final CommentService commentService;
     private JPanel leftPanel;
     private JPanel rightPanel;
     private CardLayout cardLayout;
@@ -30,6 +31,7 @@ public class DashboardUI extends JFrame {
         this.vehicleService = new VehicleService(userService);
         this.appointmentService = new AppointmentService(userService, serviceManagementService, vehicleService);
         this.paymentService = new PaymentService(appointmentService, userService);
+        this.commentService = new CommentService(appointmentService);
     }
 
     public void showDashboard() {
@@ -203,6 +205,10 @@ public class DashboardUI extends JFrame {
             panels.put("Payment History", new PaymentPanel(paymentService, appointmentService, currentUser));
         }
 
+        //comment
+        if (currentUser.canCreateComment() && currentUser instanceof Model.Customer customer) {
+            panels.put("Create Comment", new CustomerCommentPanel(customer, appointmentService, commentService));
+        }
         return panels;
     }
 
@@ -276,6 +282,11 @@ public class DashboardUI extends JFrame {
         // Report
         if (currentUser.canViewReports()) {
             addMenuButton("View Report");
+        }
+
+        //comment
+        if (currentUser.canCreateComment()) {
+            addMenuButton("Create Comment");
         }
     }
 

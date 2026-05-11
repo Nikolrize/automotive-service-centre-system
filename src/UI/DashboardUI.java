@@ -192,15 +192,15 @@ public class DashboardUI extends JFrame {
 
         // Appointment
         if (currentUser.canManageAppointment()) {
-            panels.put("Manage Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, currentUser, rightPanel, cardLayout));
+            panels.put("Manage Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, feedbackService,currentUser, rightPanel, cardLayout));
         }
 
         if (currentUser.canUpdateAssignedAppointment()) {
-            panels.put("Update Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, currentUser, rightPanel, cardLayout));
+            panels.put("Update Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, feedbackService, currentUser, rightPanel, cardLayout));
         }
 
         if (currentUser.canViewAssignedAppointments()) {
-            panels.put("View Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, currentUser, rightPanel, cardLayout));
+            panels.put("View Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, feedbackService, currentUser, rightPanel, cardLayout));
         }
 
         // Payment

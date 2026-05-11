@@ -69,7 +69,7 @@ public class Technician extends User {
 
     @Override
     public boolean canViewFeedback() {
-        return false;
+        return true;
     }
 
     @Override
@@ -84,7 +84,7 @@ public class Technician extends User {
 
     @Override
     public boolean canCreateFeedback() {
-        return true;
+        return false;
     }
 
     @Override

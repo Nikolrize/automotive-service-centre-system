@@ -80,11 +80,11 @@ public class ViewFeedbackPanel extends JPanel{
         JButton refreshBtn = UIHelper.createStyledButton("Refresh", ButtonMode.CREATE);
         refreshBtn.addActionListener(_ -> loadData());
 
-        JButton viewCommmentBtn = UIHelper.createStyledButton("View Comment", ButtonMode.PRIMARY);
-        viewCommmentBtn.setPreferredSize(new Dimension(150, 35));
-        viewCommmentBtn.addActionListener(_ -> handleViewComment());
+        JButton viewCommentBtn = UIHelper.createStyledButton("View Comment", ButtonMode.PRIMARY);
+        viewCommentBtn.setPreferredSize(new Dimension(150, 35));
+        viewCommentBtn.addActionListener(_ -> handleViewComment());
 
-        buttonPanel.add(viewCommmentBtn);
+        buttonPanel.add(viewCommentBtn);
         buttonPanel.add(refreshBtn);
 
         mainPanel.add(summaryPanel);

@@ -4,10 +4,15 @@
 
 package Service;
 
+import Model.Appointment;
+import Model.Feedback;
+import Model.Technician;
 import Util.FileHandler;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class FeedbackService {
     private static final String FILE_NAME = "feedback.txt";
@@ -39,6 +44,48 @@ public class FeedbackService {
         }
 
         return feedbackRecords;
+    }
+
+    // Fetch feedbacks based on current Technician
+    public List<String[]> getFeedbacksByTechnician(Technician technician) {
+        List<String[]> list = new ArrayList<>();
+
+        for (String[] record : getAllFeedbackRecords()) {
+            if (record[2].trim().equals(technician.getUserID())) {
+                list.add(record);
+            }
+        }
+
+        return list;
+    }
+
+    public void addFeedback(Appointment appointment, Technician technician, String feedbackText) {
+        String id = generateNewID();
+        String safeText = feedbackText.replace(",", ";");
+        String dateTime = LocalDateTime.now().toString();
+
+        String line = String.join(",",
+                id,
+                appointment.getAppointmentID(),
+                technician.getUserID(),
+                safeText,
+                dateTime
+        ) + System.lineSeparator(); //
+
+        FileHandler.appendToFile(FILE_NAME, line);
+    }
+
+    private String generateNewID() {
+        int max = 0;
+        for (String[] record : getAllFeedbackRecords()) {
+            try {
+                String id = record[0].trim();
+                if (id.length() < 2) continue;
+                int num = Integer.parseInt(id.substring(1));
+                if (num > max) max = num;
+            } catch (NumberFormatException ignored) {}
+        }
+        return String.format("F%04d", max + 1);
     }
 
     public boolean hasFeedbackRecords() {

@@ -5,12 +5,14 @@ import java.time.LocalDateTime;
 public class Feedback {
     private String feedbackID;
     private Appointment appointment;
+    private Technician technician;
     private String feedbackText;
     private LocalDateTime dateTime;
 
-    public Feedback(String feedbackID, Appointment appointment, String feedbackText, LocalDateTime dateTime) {
+    public Feedback(String feedbackID, Appointment appointment, Technician technician, String feedbackText, LocalDateTime dateTime) {
         setFeedbackID(feedbackID);
         setAppointment(appointment);
+        setTechnician(technician);
         setFeedbackText(feedbackText);
         setDateTime(dateTime);
     }
@@ -30,6 +32,10 @@ public class Feedback {
     public void setAppointment(Appointment appointment) {
         this.appointment = appointment;
     }
+
+    public Technician getTechnician() { return technician; }
+
+    public void setTechnician(Technician technician) { this.technician = technician; }
 
     public String getFeedbackText() {
         return feedbackText;

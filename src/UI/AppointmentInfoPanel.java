@@ -1,6 +1,7 @@
 package UI;
 
 import Model.Appointment;
+import Enum.ButtonMode;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,147 +12,132 @@ public class AppointmentInfoPanel extends JPanel {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
-        // Color Theme Define
-        Color primary      = new Color(135, 90, 224);
-        Color primaryLight = new Color(159, 126, 224);
-        Color bodyBg       = Color.WHITE;
-        Color borderCol    = new Color(220, 220, 220);
-        Color keyCol       = new Color(120, 120, 120);
-        Color valCol       = new Color(40, 40, 40);
+        JPanel mainPanel = UIHelper.createSectionPanel("Appointment Details");
 
-        Font headerFont = new Font("SansSerif", Font.BOLD, 16);
-        Font subFont    = new Font("SansSerif", Font.PLAIN, 12);
-        Font keyFont    = new Font("SansSerif", Font.BOLD, 13);
-        Font valFont    = new Font("SansSerif", Font.PLAIN, 13);
-        Font btnFont    = new Font("SansSerif", Font.BOLD, 13);
+        // Set 2x2 grid
+        JPanel gridPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+        gridPanel.setBackground(Color.WHITE);
+        gridPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Header
-        JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(primaryLight);
-        header.setBorder(BorderFactory.createEmptyBorder(14, 18, 14, 18));
+        // Card Section: Appointment Info
+        JPanel appointmentCard = UIHelper.createCardPanel("Appointment Info");
+        appointmentCard.setAlignmentX(Component.LEFT_ALIGNMENT);
+        appointmentCard.add(createField("Appointment ID", appt.getAppointmentID()));
+        appointmentCard.add(Box.createVerticalStrut(6));
+        appointmentCard.add(createBadgeField("Status", appt.getIsCompleted()));
+        appointmentCard.add(Box.createVerticalStrut(6));
+        appointmentCard.add(createField("Date",       appt.getDate().toString()));
+        appointmentCard.add(Box.createVerticalStrut(6));
+        appointmentCard.add(createField("Start Time", appt.getStartTime().toString()));
+        appointmentCard.add(Box.createVerticalStrut(6));
+        appointmentCard.add(createField("End Time",   appt.getEndTime().toString()));
 
-        JLabel title = new JLabel("Appointment Details");
-        title.setFont(headerFont);
-        title.setForeground(Color.WHITE);
+        // Card Section: Customer & Vehicle
+        JPanel customerCard = UIHelper.createCardPanel("Customer & Vehicle");
+        customerCard.setAlignmentX(Component.LEFT_ALIGNMENT);
+        customerCard.add(createField("Customer", appt.getCustomer().getUsername()));
+        customerCard.add(Box.createVerticalStrut(6));
+        customerCard.add(createField("Vehicle",
+                appt.getVehicle() == null
+                        ? "-"
+                        : appt.getVehicle().getPlateNumber()
+                        + " — " + appt.getVehicle().getBrand()
+                        + " "   + appt.getVehicle().getModel()));
 
-        JLabel subtitle = new JLabel("ID: " + appt.getAppointmentID());
-        subtitle.setFont(subFont);
-        subtitle.setForeground(new Color(255, 255, 255));
+        // Card Section: Service
+        JPanel serviceCard = UIHelper.createCardPanel("Service");
+        serviceCard.setAlignmentX(Component.LEFT_ALIGNMENT);
+        serviceCard.add(createField("Service Name", appt.getService().getName()));
+        serviceCard.add(Box.createVerticalStrut(6));
+        serviceCard.add(createField("Type",         appt.getService().getType()));
+        serviceCard.add(Box.createVerticalStrut(6));
+        serviceCard.add(createField("Duration",     appt.getService().getDuration() + " mins"));
+        serviceCard.add(Box.createVerticalStrut(6));
+        serviceCard.add(createField("Price",        "RM " + appt.getService().getPrice()));
 
-        header.add(title, BorderLayout.NORTH);
-        header.add(subtitle, BorderLayout.SOUTH);
 
-        // Main Body
-        JPanel body = new JPanel();
-        body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
-        body.setBackground(bodyBg);
-        body.setBorder(BorderFactory.createEmptyBorder(20, 24, 20, 24));
+        // Card Section: Technician
+        JPanel techCard = UIHelper.createCardPanel("Assigned Technician");
+        techCard.setAlignmentX(Component.LEFT_ALIGNMENT);
+        techCard.add(createField("Technician",
+                appt.getTechnician() == null
+                        ? "-"
+                        : appt.getTechnician().getUsername()));
 
-        body.add(createRow("Appointment ID", appt.getAppointmentID(),         keyFont, valFont, keyCol, valCol, borderCol));
-        body.add(Box.createVerticalStrut(4));
-        body.add(createRow("Service",        appt.getService().getName(),      keyFont, valFont, keyCol, valCol, borderCol));
-        body.add(Box.createVerticalStrut(4));
-        body.add(createRow("Customer",       appt.getCustomer().getUsername(), keyFont, valFont, keyCol, valCol, borderCol));
-        body.add(Box.createVerticalStrut(4));
-        body.add(createRow("Technician",     appt.getTechnician() == null
-                ? "-"
-                : appt.getTechnician().getUsername(), keyFont, valFont, keyCol, valCol, borderCol));
-        body.add(Box.createVerticalStrut(4));
-        body.add(createRow("Date",           appt.getDate().toString(),        keyFont, valFont, keyCol, valCol, borderCol));
-        body.add(Box.createVerticalStrut(4));
-        body.add(createRow("Start Time",     appt.getStartTime().toString(),   keyFont, valFont, keyCol, valCol, borderCol));
-        body.add(Box.createVerticalStrut(4));
-        body.add(createRow("End Time",       appt.getEndTime().toString(),     keyFont, valFont, keyCol, valCol, borderCol));
-        body.add(Box.createVerticalStrut(4));
+        // Button Panel
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Status row with coloured badge
-        body.add(createStatusRow(appt.getIsCompleted(), keyFont, keyCol, borderCol));
-
-        // Footer Section
-        JPanel footer = new JPanel(new FlowLayout(FlowLayout.LEFT, 18, 10));
-        footer.setBackground(bodyBg);
-        footer.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, borderCol));
-
-        JButton backBtn = new JButton("← Back");
-        backBtn.setFont(btnFont);
-        backBtn.setBackground(primary);
-        backBtn.setForeground(Color.WHITE);
-        backBtn.setFocusPainted(false);
-        backBtn.setBorderPainted(false);
-        backBtn.setPreferredSize(new Dimension(110, 35));
+        JButton backBtn = UIHelper.createStyledButton("Back", ButtonMode.PRIMARY);
         backBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         backBtn.addActionListener(_ -> onBack.run());
-        UIHelper.addHoverEffect(backBtn, primary, primaryLight);
+        UIHelper.addHoverEffect(backBtn, new Color(135, 90, 224), new Color(159, 126, 224));
 
-        footer.add(backBtn);
+        buttonPanel.add(backBtn);
 
-        add(header, BorderLayout.NORTH);
-        add(new JScrollPane(body), BorderLayout.CENTER);
-        add(footer, BorderLayout.SOUTH);
+
+        mainPanel.add(appointmentCard);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(customerCard);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(serviceCard);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(techCard);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(buttonPanel);
+
+        add(new JScrollPane(mainPanel), BorderLayout.CENTER);
     }
 
-    private JPanel createRow(String labelText, String value,
-                             Font keyFont, Font valFont,
-                             Color keyCol, Color valCol, Color borderCol) {
-        JPanel row = new JPanel(new BorderLayout(16, 0));
+    private JPanel createField(String label, String value) {
+        JPanel row = new JPanel(new BorderLayout());
         row.setBackground(Color.WHITE);
-        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
-        row.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, borderCol),
-                BorderFactory.createEmptyBorder(8, 0, 8, 0)
-        ));
+        row.setAlignmentX(Component.LEFT_ALIGNMENT);
+        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
-        JLabel key = new JLabel(labelText);
-        key.setFont(keyFont);
-        key.setForeground(keyCol);
-        key.setPreferredSize(new Dimension(140, 24));
+        JLabel labelComp = new JLabel(label);
+        labelComp.setFont(new Font("SansSerif", Font.BOLD, 13));
+        labelComp.setForeground(new Color(120, 120, 120));
+        labelComp.setPreferredSize(new Dimension(150, 24));
 
-        JLabel val = new JLabel(value);
-        val.setFont(valFont);
-        val.setForeground(valCol);
+        JLabel valueComp = new JLabel(value == null ? "-" : value);
+        valueComp.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        valueComp.setForeground(new Color(40, 40, 40));
 
-        row.add(key, BorderLayout.WEST);
-        row.add(val, BorderLayout.CENTER);
+        row.add(labelComp, BorderLayout.WEST);
+        row.add(valueComp, BorderLayout.CENTER);
 
         return row;
     }
 
-    private JPanel createStatusRow(boolean isCompleted,
-                                   Font keyFont, Color keyCol, Color borderCol) {
-        JPanel row = new JPanel(new BorderLayout(16, 0));
+    private JPanel createBadgeField(String label, boolean isCompleted) {
+        JPanel row = new JPanel(new BorderLayout());
         row.setBackground(Color.WHITE);
-        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
-        row.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, borderCol),
-                BorderFactory.createEmptyBorder(8, 0, 8, 0)
-        ));
+        row.setAlignmentX(Component.LEFT_ALIGNMENT);
+        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 
-        JLabel key = new JLabel("Status");
-        key.setFont(keyFont);
-        key.setForeground(keyCol);
-        key.setPreferredSize(new Dimension(140, 24));
+        JLabel labelComp = new JLabel(label);
+        labelComp.setFont(new Font("SansSerif", Font.BOLD, 13));
+        labelComp.setForeground(new Color(120, 120, 120));
+        labelComp.setPreferredSize(new Dimension(150, 24));
 
-        // Coloured pill badge
-        JLabel badge = getJLabel(isCompleted);
+        Color badgeBg = isCompleted ? new Color(198, 239, 206) : new Color(255, 235, 205);
+        Color badgeFg = isCompleted ? new Color(0, 128, 0)     : new Color(180, 100, 0);
 
-        row.add(key, BorderLayout.WEST);
-        row.add(badge, BorderLayout.CENTER);
-
-        return row;
-    }
-
-    private JLabel getJLabel(boolean isCompleted) {
-        Color badgeBg  = isCompleted ? new Color(198, 239, 206) : new Color(255, 235, 205);
-        Color badgeFg  = isCompleted ? new Color(0, 128, 0)     : new Color(180, 100, 0);
-        String badgeText = isCompleted ? "Completed" : "Pending";
-
-        JLabel badge = new JLabel(badgeText, SwingConstants.CENTER);
+        JLabel badge = new JLabel(isCompleted ? "  Completed  " : "  Pending  ");
         badge.setFont(new Font("SansSerif", Font.BOLD, 12));
         badge.setForeground(badgeFg);
         badge.setBackground(badgeBg);
         badge.setOpaque(true);
-        badge.setPreferredSize(new Dimension(90, 24));
-        badge.setBorder(BorderFactory.createEmptyBorder(2, 10, 2, 10));
-        return badge;
+
+        JPanel badgeWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        badgeWrapper.setBackground(Color.WHITE);
+        badgeWrapper.add(badge);
+
+        row.add(labelComp,    BorderLayout.WEST);
+        row.add(badgeWrapper, BorderLayout.CENTER);
+
+        return row;
     }
 }

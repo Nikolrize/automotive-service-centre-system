@@ -2,6 +2,7 @@ package UI;
 
 import Model.CounterStaff;
 import Model.Customer;
+import Model.Technician;
 import Service.*;
 import Model.User;
 import Enum.*;
@@ -34,7 +35,7 @@ public class DashboardUI extends JFrame {
         this.appointmentService = new AppointmentService(userService, serviceManagementService, vehicleService);
         this.paymentService = new PaymentService(appointmentService, userService);
         this.commentService = new CommentService(appointmentService);
-        this.feedbackService = new FeedbackService();
+        this.feedbackService = new FeedbackService(userService, appointmentService);
     }
 
     public void showDashboard() {
@@ -180,8 +181,10 @@ public class DashboardUI extends JFrame {
         if (currentUser.canViewFeedback()) {
             if (currentUser instanceof Customer customer) {
                 panels.put("View Feedback", new CustomerFeedbackPanel(customer, appointmentService, feedbackService));
+            } else if (currentUser instanceof Technician technician) {
+                panels.put("View Feedback", new TechnicianFeedbackPanel(technician, appointmentService, feedbackService));
             } else {
-                panels.put("View Feedback", new ViewFeedbackPanel());
+                panels.put("View Feedback", new ViewFeedbackPanel(feedbackService));
             }
         }
 

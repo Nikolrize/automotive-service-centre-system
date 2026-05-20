@@ -90,11 +90,11 @@ public class AppointmentPanel extends JPanel {
 
         if (currentUser.canUpdateAssignedAppointment()) {
 
-            JButton detailBtn = UIHelper.createStyledButton("View Details", ButtonMode.RESTORE);
+            JButton detailBtn = UIHelper.createStyledButton("View Details", ButtonMode.PRIMARY);
             detailBtn.setPreferredSize(new Dimension(155, 35));
             detailBtn.addActionListener(_ -> viewAppointment());
 
-            JButton feedbackBtn = UIHelper.createStyledButton("Add Feedback", ButtonMode.RESTORE);
+            JButton feedbackBtn = UIHelper.createStyledButton("Add Feedback", ButtonMode.CREATE);
             feedbackBtn.setPreferredSize(new Dimension(155, 35));
             feedbackBtn.addActionListener(_ -> addFeedback());
 
@@ -254,13 +254,6 @@ public class AppointmentPanel extends JPanel {
                     "Feedback cannot be added to a completed appointment.",
                     "Not Allowed",
                     JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        if (feedbackService.hasFeedbackForAppointment(appt.getAppointmentID())) {
-            JOptionPane.showMessageDialog(this,
-                    "Feedback has already been submitted for this appointment.",
-                    "Already Submitted", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 

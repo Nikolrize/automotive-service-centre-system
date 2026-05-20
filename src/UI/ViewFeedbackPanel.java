@@ -1,6 +1,7 @@
 //Manager: View Feedback and Comments
 package UI;
 
+import Service.AppointmentService;
 import Service.FeedbackService;
 
 import javax.swing.*;
@@ -17,8 +18,8 @@ public class ViewFeedbackPanel extends JPanel{
     private JLabel totalFeedbackLabel;
     private JLabel averageRatingLabel;
 
-    public ViewFeedbackPanel () {
-        this.feedbackService = new FeedbackService();
+    public ViewFeedbackPanel (FeedbackService  feedbackService) {
+        this.feedbackService = feedbackService;
         setLayout(new BorderLayout());
         viewFeedbackUI();
     }

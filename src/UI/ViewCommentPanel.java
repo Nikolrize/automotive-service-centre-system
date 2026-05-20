@@ -1,0 +1,131 @@
+package UI;
+
+import Model.Comment;
+import Model.Technician;
+import Service.AppointmentService;
+import Service.CommentService;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.util.List;
+
+import Enum.*;
+
+public class ViewCommentPanel extends JPanel {
+
+    private final Technician currentTechnician;
+    private final CommentService commentService;
+
+    private JTable table;
+    private DefaultTableModel model;
+    private final JTextField searchField = new JTextField();
+    private TableRowSorter<DefaultTableModel> sorter;
+    private Timer autoRefreshTimer;
+
+    public ViewCommentPanel(Technician currentTechnician, CommentService commentService) {
+        this.currentTechnician = currentTechnician;
+        this.commentService = commentService;
+
+        setLayout(new BorderLayout());
+        buildUI();
+        loadData();
+    }
+
+    private void buildUI() {
+        JPanel mainPanel = UIHelper.createSectionPanel("View Appointment Comments");
+
+        String[] columns = {"Comment ID", "Comment", "Rating", "Customer", "Appointment ID"};
+
+        model = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        autoRefreshTimer = new Timer(1000, _ -> loadData());
+        autoRefreshTimer.start();
+
+        table = UIHelper.createTable(model);
+        sorter = new TableRowSorter<>(model);
+        table.setRowSorter(sorter);
+
+        JPanel searchPanel = UIHelper.createSearchPanel(searchField, this::applyFilter);
+        searchPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+//      JPanel buttonPanel = new JPanel();
+//      buttonPanel.setBackground(Color.WHITE);
+//      buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+//
+//      JButton viewButton = UIHelper.createStyledButton("View Comment",ButtonMode.RESTORE);
+//      viewButton.addActionListener(_ -> handleViewComment());
+//      buttonPanel.add(viewButton);
+
+        mainPanel.add(searchPanel);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(scrollPane);
+        mainPanel.add(Box.createVerticalStrut(10));
+//      mainPanel.add(buttonPanel);
+
+        add(mainPanel, BorderLayout.CENTER);
+    }
+
+    public void loadData() {
+        model.setRowCount(0);
+
+        try {
+            List<Comment> comments = commentService.getCommentsByTechnician(currentTechnician);
+
+            for (Comment comment : comments) {
+                model.addRow(new Object[]{
+                        comment.getCommentID(),
+                        comment.getCommentText(),
+                        comment.getRating() + " / 5",
+                        comment.getAppointment().getCustomer().getUsername(),
+                        comment.getAppointment().getAppointmentID()
+                });
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error loading comments: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void applyFilter() {
+        String text = searchField.getText();
+
+        if (text.trim().isEmpty()) {
+            sorter.setRowFilter(null);
+        } else {
+            sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+        }
+    }
+
+    private void handleViewComment() {
+        int row = table.getSelectedRow();
+
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a comment first.");
+            return;
+        }
+
+        String commentID     = table.getValueAt(row, 0).toString();
+        String commentText   = table.getValueAt(row, 1).toString();
+        String rating        = table.getValueAt(row, 2).toString();
+        String customer      = table.getValueAt(row, 3).toString();
+        String appointmentID = table.getValueAt(row, 4).toString();
+
+        String message = "Comment ID: "     + commentID      + "\n"
+                + "Appointment ID: " + appointmentID  + "\n"
+                + "Customer: "       + customer       + "\n"
+                + "Rating: "         + rating         + "\n"
+                + "Comment: "        + commentText;
+
+        JOptionPane.showMessageDialog(this, message, "Comment Details", JOptionPane.INFORMATION_MESSAGE);
+    }
+}

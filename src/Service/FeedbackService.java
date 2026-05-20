@@ -18,12 +18,11 @@ public class FeedbackService {
     private final AppointmentService appointmentService;
 
     // Old FeedbackService by Dylan
-//    public FeedbackService() {
-//        //makes sure file exists even if no feedback
-//        FileHandler.readFile(FILE_NAME);
-//    }
-
-    // New FeedbackService by Zhen Yi
+    // public FeedbackService() {
+    //        //makes sure file exists even if no feedback
+    //        FileHandler.readFile(FILE_NAME);
+    //  }
+    
     public FeedbackService(UserService userService, AppointmentService appointmentService) {
         FileHandler.readFile(FILE_NAME); // ensure file exists even if no feedback
 

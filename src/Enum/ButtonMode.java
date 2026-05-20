@@ -4,5 +4,6 @@ public enum ButtonMode {
     PRIMARY,
     CREATE,
     DESTRUCTIVE,
-    RESTORE
+    RESTORE,
+    VIEW
 }

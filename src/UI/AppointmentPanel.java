@@ -17,6 +17,7 @@ public class AppointmentPanel extends JPanel {
     private final ServiceManagementService serviceManagementService;
     private final VehicleService vehicleService;
     private final FeedbackService feedbackService;
+    private final CommentService commentService;
     private final User currentUser;
     private JTable table;
     private DefaultTableModel model;
@@ -25,12 +26,13 @@ public class AppointmentPanel extends JPanel {
     private final JTextField searchField = new JTextField();
     private TableRowSorter<DefaultTableModel> sorter;
 
-    public AppointmentPanel(AppointmentService appointmentService, UserService userService, ServiceManagementService serviceManagementService, VehicleService vehicleService, FeedbackService feedbackService, User currentUser, JPanel rightPanel, CardLayout cardLayout) {
+    public AppointmentPanel(AppointmentService appointmentService, UserService userService, ServiceManagementService serviceManagementService, VehicleService vehicleService, FeedbackService feedbackService, CommentService commentService, User currentUser, JPanel rightPanel, CardLayout cardLayout) {
         this.appointmentService = appointmentService;
         this.serviceManagementService = serviceManagementService;
         this.userService = userService;
         this.vehicleService = vehicleService;
         this.feedbackService = feedbackService;
+        this.commentService = commentService;
         this.currentUser = currentUser;
         this.rightPanel = rightPanel;
         this.cardLayout = cardLayout;
@@ -90,7 +92,7 @@ public class AppointmentPanel extends JPanel {
 
         if (currentUser.canUpdateAssignedAppointment()) {
 
-            JButton detailBtn = UIHelper.createStyledButton("View Details", ButtonMode.PRIMARY);
+            JButton detailBtn = UIHelper.createStyledButton("View Details", ButtonMode.VIEW);
             detailBtn.setPreferredSize(new Dimension(155, 35));
             detailBtn.addActionListener(_ -> viewAppointment());
 
@@ -271,7 +273,7 @@ public class AppointmentPanel extends JPanel {
         dialog.setVisible(true);
     }
 
-    // View Appointment Method
+    // View Appointment Method for Technician
     private void viewAppointment() {
         Appointment appt = getSelectedAppointment();
         if (appt == null) return;
@@ -285,6 +287,9 @@ public class AppointmentPanel extends JPanel {
 
         AppointmentInfoPanel infoPanel = new AppointmentInfoPanel(
                 appt,
+                feedbackService,
+                commentService,
+                userService,
                 () -> cardLayout.show(rightPanel, cardName)
         );
 

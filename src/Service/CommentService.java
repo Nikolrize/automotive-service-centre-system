@@ -1,8 +1,6 @@
 package Service;
 
-import Model.Appointment;
-import Model.Comment;
-import Model.Customer;
+import Model.*;
 import Util.FileHandler;
 
 import java.util.ArrayList;
@@ -79,6 +77,18 @@ public class CommentService {
         }
 
         return null;
+    }
+
+    public List<Comment> getCommentsByTechnician(Technician technician) {
+        List<Comment> comments = new ArrayList<>();
+
+        for (Comment comment : getAllComments()) {
+            if (comment.getAppointment().getTechnician().getUserID().equals(technician.getUserID())) {
+                comments.add(comment);
+            }
+        }
+
+        return comments;
     }
 
     public boolean hasCommentForAppointment(String appointmentID) {

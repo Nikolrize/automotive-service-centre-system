@@ -195,15 +195,15 @@ public class DashboardUI extends JFrame {
 
         // Appointment
         if (currentUser.canManageAppointment()) {
-            panels.put("Manage Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, feedbackService,currentUser, rightPanel, cardLayout));
+            panels.put("Manage Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, feedbackService, commentService,currentUser, rightPanel, cardLayout));
         }
 
         if (currentUser.canUpdateAssignedAppointment()) {
-            panels.put("Update Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, feedbackService, currentUser, rightPanel, cardLayout));
+            panels.put("Update Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, feedbackService, commentService, currentUser, rightPanel, cardLayout));
         }
 
         if (currentUser.canViewAssignedAppointments()) {
-            panels.put("View Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, feedbackService, currentUser, rightPanel, cardLayout));
+            panels.put("View Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, feedbackService, commentService, currentUser, rightPanel, cardLayout));
         }
 
         // Payment
@@ -218,6 +218,10 @@ public class DashboardUI extends JFrame {
         //comment
         if (currentUser.canCreateComment() && currentUser instanceof Model.Customer customer) {
             panels.put("Provide Comment", new CustomerCommentPanel(customer, appointmentService, commentService));
+        }
+
+        if (currentUser.canviewComment() && currentUser instanceof Model.Technician technician) {
+            panels.put("View Comment", new ViewCommentPanel(technician, commentService));
         }
         return panels;
     }
@@ -297,6 +301,10 @@ public class DashboardUI extends JFrame {
         //comment
         if (currentUser.canCreateComment()) {
             addMenuButton("Provide Comment");
+        }
+
+        if (currentUser.canviewComment()) {
+            addMenuButton("View Comment");
         }
     }
 

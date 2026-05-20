@@ -58,15 +58,15 @@ public class TechnicianFeedbackPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setBackground(Color.WHITE);
-        buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+//      JPanel buttonPanel = new JPanel();
+//      buttonPanel.setBackground(Color.WHITE);
+//      buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         mainPanel.add(searchPanel);
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(scrollPane);
         mainPanel.add(Box.createVerticalStrut(10));
-        mainPanel.add(buttonPanel);
+//      mainPanel.add(buttonPanel);
 
         add(mainPanel, BorderLayout.CENTER);
     }
@@ -78,13 +78,13 @@ public class TechnicianFeedbackPanel extends JPanel {
             List<Feedback> feedbacks = feedbackService.getFeedbacksByTechnician(currentTechnician);
 
             for (Feedback feedback : feedbacks) {
-                String technicianName = feedback.getTechnician().getFirstName() + " " + feedback.getTechnician().getLastName();
+                String technicianName = feedback.getTechnician().getUsername();
 
                 model.addRow(new Object[]{
                         feedback.getFeedbackID(),
                         feedback.getFeedbackText(),
                         technicianName,
-                        feedback.getAppointment().getCustomer().getFirstName(),
+                        feedback.getAppointment().getCustomer().getUsername(),
                         feedback.getDateTime().format(DISPLAY_FORMATTER),
                         feedback.getAppointment().getAppointmentID()
                 });

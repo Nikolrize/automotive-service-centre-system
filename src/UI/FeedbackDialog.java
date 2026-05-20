@@ -110,7 +110,7 @@ public class FeedbackDialog extends JDialog {
             try {
                 feedbackService.addFeedback(appt, technician, comment);
                 dispose();
-                onSuccess.run(); // notify AppointmentPanel to refresh
+                onSuccess.run();
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }

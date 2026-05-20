@@ -154,10 +154,11 @@ public class UIHelper {
             btn.setBackground(new Color(66, 135, 245));
         } else if (mode.equals(ButtonMode.DESTRUCTIVE)){
             btn.setBackground(new Color(220, 53, 69));
-        } else if (mode.equals(ButtonMode.RESTORE)){
+        } else if (mode.equals(ButtonMode.RESTORE)) {
             btn.setBackground(new Color(40, 167, 69));
+        } else if (mode.equals(ButtonMode.VIEW)){
+            btn.setBackground(new Color(227, 178, 0));
         }
-
         return btn;
     }
 }

@@ -118,7 +118,7 @@ public class ViewFeedbackPanel extends JPanel{
         }
 
         totalFeedbackLabel.setText("Total Feedback: " + feedbackService.getTotalFeedbackCount());
-        averageRatingLabel.setText(String.format("Average Rating: %.2f", feedbackService.getAverageRating()));
+        //averageRatingLabel.setText(String.format("Average Rating: %.2f", feedbackService.getAverageRating()));
     }
 
     private void handleViewComment() {

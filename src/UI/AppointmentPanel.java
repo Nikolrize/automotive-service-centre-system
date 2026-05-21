@@ -259,7 +259,7 @@ public class AppointmentPanel extends JPanel {
             return;
         }
 
-        FeedbackDialog dialog = new FeedbackDialog(
+        AddFeedbackDialog dialog = new AddFeedbackDialog(
                 this,
                 appt,
                 (Technician) currentUser,

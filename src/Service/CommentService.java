@@ -8,7 +8,7 @@ import java.util.List;
 
 public class CommentService {
     private static final String FILE_NAME = "comments.txt";
-
+    private Runnable onCommentChangedCallback;
     private final AppointmentService appointmentService;
 
     public CommentService(AppointmentService appointmentService) {
@@ -170,5 +170,18 @@ public class CommentService {
         );
 
         FileHandler.appendToFile(FILE_NAME, data);
+
+        notifyCommentChanged();
+    }
+
+    // For UI autorefresh
+    public void setOnCommentChangedCallback(Runnable callback) {
+        this.onCommentChangedCallback = callback;
+    }
+
+    private void notifyCommentChanged() {
+        if (onCommentChangedCallback != null) {
+            onCommentChangedCallback.run();
+        }
     }
 }

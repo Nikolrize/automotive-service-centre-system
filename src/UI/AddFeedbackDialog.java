@@ -7,11 +7,11 @@ import Service.FeedbackService;
 import javax.swing.*;
 import java.awt.*;
 
-public class FeedbackDialog extends JDialog {
+public class AddFeedbackDialog extends JDialog {
 
-    public FeedbackDialog(Component parent, Appointment appt,
-                          Technician technician, FeedbackService feedbackService,
-                          Runnable onSuccess) {
+    public AddFeedbackDialog(Component parent, Appointment appt,
+                             Technician technician, FeedbackService feedbackService,
+                             Runnable onSuccess) {
 
         super((Frame) SwingUtilities.getWindowAncestor(parent), true);
         setTitle("Add Feedback");

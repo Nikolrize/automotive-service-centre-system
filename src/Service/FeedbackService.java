@@ -16,6 +16,7 @@ public class FeedbackService {
     private static final String FILE_NAME = "feedback.txt";
     private final UserService userService;
     private final AppointmentService appointmentService;
+    private Runnable onFeedbackChangedCallback;
 
     // Old FeedbackService by Dylan
     // public FeedbackService() {
@@ -107,6 +108,17 @@ public class FeedbackService {
         );
 
         FileHandler.appendToFile(FILE_NAME, line);
+        notifyFeedbackChanged();
+    }
+
+    public void setOnFeedbackChangedCallback(Runnable callback) {
+        this.onFeedbackChangedCallback = callback;
+    }
+
+    private void notifyFeedbackChanged() {
+        if (onFeedbackChangedCallback != null) {
+            onFeedbackChangedCallback.run();
+        }
     }
 
     private String generateNewID() {
@@ -123,9 +135,9 @@ public class FeedbackService {
         return String.format("F%04d", max + 1);
     }
 
-    public boolean hasFeedbackRecords() {
-        return !getAllFeedbackRecords().isEmpty();
-    }
+//    public boolean hasFeedbackRecords() {
+//        return !getAllFeedbackRecords().isEmpty();
+//    }
 
     public double getAverageRating(){
         List<String[]> feedbackRecords = getAllFeedbackRecords();

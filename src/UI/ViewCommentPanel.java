@@ -22,7 +22,6 @@ public class ViewCommentPanel extends JPanel {
     private DefaultTableModel model;
     private final JTextField searchField = new JTextField();
     private TableRowSorter<DefaultTableModel> sorter;
-    private Timer autoRefreshTimer;
 
     public ViewCommentPanel(Technician currentTechnician, CommentService commentService) {
         this.currentTechnician = currentTechnician;
@@ -31,6 +30,10 @@ public class ViewCommentPanel extends JPanel {
         setLayout(new BorderLayout());
         buildUI();
         loadData();
+
+        commentService.setOnCommentChangedCallback(
+                () -> SwingUtilities.invokeLater(this::loadData)
+        );
     }
 
     private void buildUI() {
@@ -45,9 +48,6 @@ public class ViewCommentPanel extends JPanel {
             }
         };
 
-        autoRefreshTimer = new Timer(1000, _ -> loadData());
-        autoRefreshTimer.start();
-
         table = UIHelper.createTable(model);
         sorter = new TableRowSorter<>(model);
         table.setRowSorter(sorter);
@@ -58,19 +58,20 @@ public class ViewCommentPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-//      JPanel buttonPanel = new JPanel();
-//      buttonPanel.setBackground(Color.WHITE);
-//      buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-//
-//      JButton viewButton = UIHelper.createStyledButton("View Comment",ButtonMode.RESTORE);
-//      viewButton.addActionListener(_ -> handleViewComment());
-//      buttonPanel.add(viewButton);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JButton viewButton = UIHelper.createStyledButton("View Comment",ButtonMode.PRIMARY);
+        viewButton.addActionListener(_ -> handleViewComment());
+        viewButton.setPreferredSize(new Dimension(155, 35));
+        buttonPanel.add(viewButton);
 
         mainPanel.add(searchPanel);
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(scrollPane);
         mainPanel.add(Box.createVerticalStrut(10));
-//      mainPanel.add(buttonPanel);
+        mainPanel.add(buttonPanel);
 
         add(mainPanel, BorderLayout.CENTER);
     }
@@ -120,12 +121,7 @@ public class ViewCommentPanel extends JPanel {
         String customer      = table.getValueAt(row, 3).toString();
         String appointmentID = table.getValueAt(row, 4).toString();
 
-        String message = "Comment ID: "     + commentID      + "\n"
-                + "Appointment ID: " + appointmentID  + "\n"
-                + "Customer: "       + customer       + "\n"
-                + "Rating: "         + rating         + "\n"
-                + "Comment: "        + commentText;
-
-        JOptionPane.showMessageDialog(this, message, "Comment Details", JOptionPane.INFORMATION_MESSAGE);
+        new ViewCommentDialog(this, commentID, commentText, rating, customer, appointmentID)
+                .setVisible(true);
     }
 }

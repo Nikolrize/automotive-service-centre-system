@@ -1,8 +1,6 @@
 package Service;
 
-import Model.Appointment;
-import Model.Comment;
-import Model.Customer;
+import Model.*;
 import Util.FileHandler;
 
 import java.util.ArrayList;
@@ -10,7 +8,7 @@ import java.util.List;
 
 public class CommentService {
     private static final String FILE_NAME = "comments.txt";
-
+    private Runnable onCommentChangedCallback;
     private final AppointmentService appointmentService;
 
     public CommentService(AppointmentService appointmentService) {
@@ -79,6 +77,18 @@ public class CommentService {
         }
 
         return null;
+    }
+
+    public List<Comment> getCommentsByTechnician(Technician technician) {
+        List<Comment> comments = new ArrayList<>();
+
+        for (Comment comment : getAllComments()) {
+            if (comment.getAppointment().getTechnician().getUserID().equals(technician.getUserID())) {
+                comments.add(comment);
+            }
+        }
+
+        return comments;
     }
 
     public boolean hasCommentForAppointment(String appointmentID) {
@@ -160,5 +170,18 @@ public class CommentService {
         );
 
         FileHandler.appendToFile(FILE_NAME, data);
+
+        notifyCommentChanged();
+    }
+
+    // For UI autorefresh
+    public void setOnCommentChangedCallback(Runnable callback) {
+        this.onCommentChangedCallback = callback;
+    }
+
+    private void notifyCommentChanged() {
+        if (onCommentChangedCallback != null) {
+            onCommentChangedCallback.run();
+        }
     }
 }

@@ -16,6 +16,8 @@ public class AppointmentPanel extends JPanel {
     private final UserService userService;
     private final ServiceManagementService serviceManagementService;
     private final VehicleService vehicleService;
+    private final FeedbackService feedbackService;
+    private final CommentService commentService;
     private final User currentUser;
     private JTable table;
     private DefaultTableModel model;
@@ -24,11 +26,13 @@ public class AppointmentPanel extends JPanel {
     private final JTextField searchField = new JTextField();
     private TableRowSorter<DefaultTableModel> sorter;
 
-    public AppointmentPanel(AppointmentService appointmentService, UserService userService, ServiceManagementService serviceManagementService, VehicleService vehicleService, User currentUser, JPanel rightPanel, CardLayout cardLayout) {
+    public AppointmentPanel(AppointmentService appointmentService, UserService userService, ServiceManagementService serviceManagementService, VehicleService vehicleService, FeedbackService feedbackService, CommentService commentService, User currentUser, JPanel rightPanel, CardLayout cardLayout) {
         this.appointmentService = appointmentService;
         this.serviceManagementService = serviceManagementService;
         this.userService = userService;
         this.vehicleService = vehicleService;
+        this.feedbackService = feedbackService;
+        this.commentService = commentService;
         this.currentUser = currentUser;
         this.rightPanel = rightPanel;
         this.cardLayout = cardLayout;
@@ -87,12 +91,24 @@ public class AppointmentPanel extends JPanel {
         }
 
         if (currentUser.canUpdateAssignedAppointment()) {
+
+            JButton detailBtn = UIHelper.createStyledButton("View Details", ButtonMode.VIEW);
+            detailBtn.setPreferredSize(new Dimension(155, 35));
+            detailBtn.addActionListener(_ -> viewAppointment());
+
+            JButton feedbackBtn = UIHelper.createStyledButton("Add Feedback", ButtonMode.CREATE);
+            feedbackBtn.setPreferredSize(new Dimension(155, 35));
+            feedbackBtn.addActionListener(_ -> addFeedback());
+
             JButton completeBtn = UIHelper.createStyledButton("Mark Completed", ButtonMode.RESTORE);
-            completeBtn.setPreferredSize(new Dimension(150, 35));
+            completeBtn.setPreferredSize(new Dimension(155, 35));
             completeBtn.addActionListener(_ -> markCompleted());
 
+            buttonPanel.add(detailBtn);
+            buttonPanel.add(feedbackBtn);
             buttonPanel.add(completeBtn);
         }
+
 
         mainPanel.add(searchPanel);
         mainPanel.add(Box.createVerticalStrut(10));
@@ -228,5 +244,56 @@ public class AppointmentPanel extends JPanel {
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    // Feedback method
+    private void addFeedback() {
+        Appointment appt = getSelectedAppointment();
+        if (appt == null) return;
+
+        if (appt.getIsCompleted()) {
+            JOptionPane.showMessageDialog(this,
+                    "Feedback cannot be added to a completed appointment.",
+                    "Not Allowed",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        AddFeedbackDialog dialog = new AddFeedbackDialog(
+                this,
+                appt,
+                (Technician) currentUser,
+                feedbackService,
+                () -> {
+                    JOptionPane.showMessageDialog(this, "Feedback submitted successfully!",
+                            "Success", JOptionPane.INFORMATION_MESSAGE);
+                    loadData();
+                }
+        );
+        dialog.setVisible(true);
+    }
+
+    // View Appointment Method for Technician
+    private void viewAppointment() {
+        Appointment appt = getSelectedAppointment();
+        if (appt == null) return;
+
+        // Resolve the correct card name based on role
+        String cardName = currentUser.canManageAppointment()
+                ? "Manage Appointment"
+                : currentUser.canUpdateAssignedAppointment()
+                ? "Update Appointment"
+                : "View Appointment";
+
+        AppointmentInfoPanel infoPanel = new AppointmentInfoPanel(
+                appt,
+                feedbackService,
+                commentService,
+                userService,
+                () -> cardLayout.show(rightPanel, cardName)
+        );
+
+        rightPanel.add(infoPanel, "AppointmentInfo");
+        cardLayout.show(rightPanel, "AppointmentInfo");
     }
 }

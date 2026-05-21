@@ -2,6 +2,7 @@ package UI;
 
 import Model.CounterStaff;
 import Model.Customer;
+import Model.Technician;
 import Service.*;
 import Model.User;
 import Enum.*;
@@ -34,7 +35,7 @@ public class DashboardUI extends JFrame {
         this.appointmentService = new AppointmentService(userService, serviceManagementService, vehicleService);
         this.paymentService = new PaymentService(appointmentService, userService);
         this.commentService = new CommentService(appointmentService);
-        this.feedbackService = new FeedbackService();
+        this.feedbackService = new FeedbackService(userService, appointmentService);
     }
 
     public void showDashboard() {
@@ -180,8 +181,10 @@ public class DashboardUI extends JFrame {
         if (currentUser.canViewFeedback()) {
             if (currentUser instanceof Customer customer) {
                 panels.put("View Feedback", new CustomerFeedbackPanel(customer, appointmentService, feedbackService));
+            } else if (currentUser instanceof Technician technician) {
+                panels.put("View Feedback", new TechnicianFeedbackPanel(technician, feedbackService));
             } else {
-                panels.put("View Feedback", new ViewFeedbackPanel());
+                panels.put("View Feedback", new ViewFeedbackPanel(feedbackService));
             }
         }
 
@@ -192,15 +195,15 @@ public class DashboardUI extends JFrame {
 
         // Appointment
         if (currentUser.canManageAppointment()) {
-            panels.put("Manage Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, currentUser, rightPanel, cardLayout));
+            panels.put("Manage Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, feedbackService, commentService,currentUser, rightPanel, cardLayout));
         }
 
         if (currentUser.canUpdateAssignedAppointment()) {
-            panels.put("Update Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, currentUser, rightPanel, cardLayout));
+            panels.put("Update Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, feedbackService, commentService, currentUser, rightPanel, cardLayout));
         }
 
         if (currentUser.canViewAssignedAppointments()) {
-            panels.put("View Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, currentUser, rightPanel, cardLayout));
+            panels.put("View Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, feedbackService, commentService, currentUser, rightPanel, cardLayout));
         }
 
         // Payment
@@ -215,6 +218,10 @@ public class DashboardUI extends JFrame {
         //comment
         if (currentUser.canCreateComment() && currentUser instanceof Model.Customer customer) {
             panels.put("Provide Comment", new CustomerCommentPanel(customer, appointmentService, commentService));
+        }
+
+        if (currentUser.canviewComment() && currentUser instanceof Model.Technician technician) {
+            panels.put("View Comment", new ViewCommentPanel(technician, commentService));
         }
         return panels;
     }
@@ -294,6 +301,10 @@ public class DashboardUI extends JFrame {
         //comment
         if (currentUser.canCreateComment()) {
             addMenuButton("Provide Comment");
+        }
+
+        if (currentUser.canviewComment()) {
+            addMenuButton("View Comment");
         }
     }
 

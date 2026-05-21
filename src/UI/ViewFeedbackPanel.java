@@ -1,6 +1,7 @@
 //Manager: View Feedback and Comments
 package UI;
 
+import Service.AppointmentService;
 import Service.FeedbackService;
 
 import javax.swing.*;
@@ -17,8 +18,8 @@ public class ViewFeedbackPanel extends JPanel{
     private JLabel totalFeedbackLabel;
     private JLabel averageRatingLabel;
 
-    public ViewFeedbackPanel () {
-        this.feedbackService = new FeedbackService();
+    public ViewFeedbackPanel (FeedbackService  feedbackService) {
+        this.feedbackService = feedbackService;
         setLayout(new BorderLayout());
         viewFeedbackUI();
     }
@@ -80,11 +81,11 @@ public class ViewFeedbackPanel extends JPanel{
         JButton refreshBtn = UIHelper.createStyledButton("Refresh", ButtonMode.CREATE);
         refreshBtn.addActionListener(_ -> loadData());
 
-        JButton viewCommmentBtn = UIHelper.createStyledButton("View Comment", ButtonMode.PRIMARY);
-        viewCommmentBtn.setPreferredSize(new Dimension(150, 35));
-        viewCommmentBtn.addActionListener(_ -> handleViewComment());
+        JButton viewCommentBtn = UIHelper.createStyledButton("View Comment", ButtonMode.PRIMARY);
+        viewCommentBtn.setPreferredSize(new Dimension(150, 35));
+        viewCommentBtn.addActionListener(_ -> handleViewComment());
 
-        buttonPanel.add(viewCommmentBtn);
+        buttonPanel.add(viewCommentBtn);
         buttonPanel.add(refreshBtn);
 
         mainPanel.add(summaryPanel);

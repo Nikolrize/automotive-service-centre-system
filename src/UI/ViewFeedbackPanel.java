@@ -1,7 +1,6 @@
-//Manager: View Feedback and Comments
+//Manager: View all Feedback
 package UI;
 
-import Service.AppointmentService;
 import Service.FeedbackService;
 
 import javax.swing.*;
@@ -9,6 +8,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.util.List;
+
 import Enum.*;
 
 public class ViewFeedbackPanel extends JPanel{
@@ -16,7 +16,6 @@ public class ViewFeedbackPanel extends JPanel{
     private JTable table;
     private DefaultTableModel model;
     private JLabel totalFeedbackLabel;
-    private JLabel averageRatingLabel;
 
     public ViewFeedbackPanel (FeedbackService  feedbackService) {
         this.feedbackService = feedbackService;
@@ -35,21 +34,16 @@ public class ViewFeedbackPanel extends JPanel{
         totalFeedbackLabel = new JLabel("Total Feedback: 0");
         totalFeedbackLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
 
-        averageRatingLabel = new JLabel("Average Rating: 0.00");
-        averageRatingLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
 
         summaryPanel.add(totalFeedbackLabel);
-        summaryPanel.add(averageRatingLabel);
 
         //table headers
         String[] columns = {
                 "Feedback ID",
                 "Appointment ID",
-                "Customer ID",
                 "Technician ID",
-                "Counter Staff ID",
-                "Rating",
-                "Comment",
+                "Feedback",
+                "Date Time",
         };
 
         model = new DefaultTableModel(columns, 0) {
@@ -81,11 +75,11 @@ public class ViewFeedbackPanel extends JPanel{
         JButton refreshBtn = UIHelper.createStyledButton("Refresh", ButtonMode.CREATE);
         refreshBtn.addActionListener(_ -> loadData());
 
-        JButton viewCommentBtn = UIHelper.createStyledButton("View Comment", ButtonMode.PRIMARY);
-        viewCommentBtn.setPreferredSize(new Dimension(150, 35));
-        viewCommentBtn.addActionListener(_ -> handleViewComment());
+        JButton viewFeedbackBtn = UIHelper.createStyledButton("View Feedback",ButtonMode.PRIMARY);
+        viewFeedbackBtn.setPreferredSize(new Dimension(150,35));
+        viewFeedbackBtn.addActionListener(_ -> handleViewFeedback());
 
-        buttonPanel.add(viewCommentBtn);
+        buttonPanel.add(viewFeedbackBtn);
         buttonPanel.add(refreshBtn);
 
         mainPanel.add(summaryPanel);
@@ -95,11 +89,8 @@ public class ViewFeedbackPanel extends JPanel{
         mainPanel.add(buttonPanel);
 
         add(mainPanel, BorderLayout.CENTER);
-
     }
 
-    //temporary cuz appointment service not finalized
-    // once finalized, use List<Feedback> instead
     public void loadData() {
         model.setRowCount(0);
 
@@ -111,9 +102,7 @@ public class ViewFeedbackPanel extends JPanel{
                     record[1],
                     record[2],
                     record[3],
-                    record[4],
-                    record[5],
-                    record[6]
+                    record[4]
             });
         }
 
@@ -121,22 +110,26 @@ public class ViewFeedbackPanel extends JPanel{
         //averageRatingLabel.setText(String.format("Average Rating: %.2f", feedbackService.getAverageRating()));
     }
 
-    private void handleViewComment() {
+    private void handleViewFeedback() {
         int row = table.getSelectedRow();
 
         if (row == -1) {
             JOptionPane.showMessageDialog(this, "Please select a feedback record first!");
-            return;
         }
 
-        String feedbackID = table.getValueAt(row,0).toString();
-        String rating = table.getValueAt(row, 5).toString();
-        String comment = table.getValueAt(row, 6).toString();
+        String feedbackID = table.getValueAt(row, 0).toString();
+        String appointmentID = table.getValueAt(row, 1).toString();
+        String technicianID = table.getValueAt(row ,2).toString();
+        String feedbackText = table.getValueAt(row,3 ).toString();
+        String dateTime = table.getValueAt(row,4).toString();
 
-        //show full comment in dialog in case table column to small
         JOptionPane.showMessageDialog(
                 this,
-                "Feedback ID: " + feedbackID + "\nRating: " + rating + "\nComment: " + comment,
+                "Feedback ID: " + feedbackID +
+                        "\nAppointment ID: " + appointmentID +
+                        "\nTechnician ID: " + technicianID +
+                        "\nDate Time: " + dateTime +
+                        "\nFeedback: " + feedbackText,
                 "Feedback Details",
                 JOptionPane.INFORMATION_MESSAGE
         );

@@ -184,7 +184,7 @@ public class DashboardUI extends JFrame {
             } else if (currentUser instanceof Technician technician) {
                 panels.put("View Feedback", new TechnicianFeedbackPanel(technician, feedbackService));
             } else {
-                panels.put("View Feedback", new ViewFeedbackPanel(feedbackService));
+                panels.put("View Feedback", new ViewFeedbackPanel(feedbackService, commentService));
             }
         }
 

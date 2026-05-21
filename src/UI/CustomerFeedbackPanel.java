@@ -3,12 +3,10 @@ package UI;
 import Enum.ButtonMode;
 import Model.Appointment;
 import Model.Customer;
-import Model.Technician;
 import Service.AppointmentService;
 import Service.FeedbackService;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
@@ -24,7 +22,7 @@ public class CustomerFeedbackPanel extends JPanel {
     private final JTextField searchField = new JTextField();
     private TableRowSorter<DefaultTableModel> sorter;
 
-    public CustomerFeedbackPanel(Customer currentCustomer, AppointmentService appointmentService,FeedbackService feedbackService) {
+    public CustomerFeedbackPanel(Customer currentCustomer, AppointmentService appointmentService, FeedbackService feedbackService) {
         this.currentCustomer = currentCustomer;
         this.appointmentService = appointmentService;
         this.feedbackService = feedbackService;
@@ -37,9 +35,15 @@ public class CustomerFeedbackPanel extends JPanel {
     private void buildUI() {
         JPanel mainPanel = UIHelper.createSectionPanel("My Feedback");
 
-        String[] columns = {"Appointment ID", "Service", "Technician", "Date", "Feedback Status"};
+        String[] columns = {
+                "Appointment ID",
+                "Service",
+                "Technician",
+                "Date",
+                "Feedback Status"
+        };
 
-        model = new DefaultTableModel(columns,0) {
+        model = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -61,7 +65,7 @@ public class CustomerFeedbackPanel extends JPanel {
         buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JButton viewBtn = UIHelper.createStyledButton("View Feedback", ButtonMode.PRIMARY);
-        viewBtn.setPreferredSize(new Dimension(180,35));
+        viewBtn.setPreferredSize(new Dimension(180, 35));
         viewBtn.addActionListener(_ -> handleViewFeedback());
 
         JButton refreshBtn = UIHelper.createStyledButton("Refresh", ButtonMode.CREATE);
@@ -89,7 +93,11 @@ public class CustomerFeedbackPanel extends JPanel {
             boolean hasFeedback = feedbackService.hasFeedbackForAppointment(appointment.getAppointmentID());
 
             model.addRow(new Object[]{
-                    appointment.getAppointmentID(), appointment.getService().getName(), technicianName, appointment.getDate(), hasFeedback ? "Available" : "Not Available"
+                    appointment.getAppointmentID(),
+                    appointment.getService().getName(),
+                    technicianName,
+                    appointment.getDate(),
+                    hasFeedback ? "Available" : "Not Available"
             });
         }
     }
@@ -107,12 +115,15 @@ public class CustomerFeedbackPanel extends JPanel {
     private void handleViewFeedback() {
         int row = table.getSelectedRow();
 
-        if (row == -1 ) {
+        if (row == -1) {
             JOptionPane.showMessageDialog(this, "Please select an appointment first.");
             return;
         }
 
         String appointmentID = table.getValueAt(row, 0).toString();
+        String serviceName = table.getValueAt(row, 1).toString();
+        String technicianName = table.getValueAt(row, 2).toString();
+        String date = table.getValueAt(row, 3).toString();
         String feedbackText = feedbackService.getFeedbackTextByAppointmentID(appointmentID);
 
         if (feedbackText == null || feedbackText.isBlank()) {
@@ -120,6 +131,15 @@ public class CustomerFeedbackPanel extends JPanel {
             return;
         }
 
-        JOptionPane.showMessageDialog(this, "Appointment ID: " + appointmentID + "\nFeedback: " + feedbackText, "My Feedback", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(
+                this,
+                "Appointment ID: " + appointmentID +
+                        "\nService: " + serviceName +
+                        "\nTechnician: " + technicianName +
+                        "\nDate: " + date +
+                        "\nFeedback: " + feedbackText,
+                "My Feedback",
+                JOptionPane.INFORMATION_MESSAGE
+        );
     }
 }

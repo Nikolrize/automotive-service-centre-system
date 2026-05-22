@@ -62,6 +62,16 @@ public class FeedbackService {
         return new Feedback(feedbackID, appointment, technician, feedbackText, dateTime);
     }
 
+    public List<Feedback> getAllFeedbacks() throws Exception {
+        List<Feedback> list = new ArrayList<>();
+
+        for (String[] record : getAllFeedbackRecords()) {
+            list.add(parseFeedback(record));
+        }
+
+        return list;
+    }
+
     // Fetch feedbacks based on current Technician
     public List<Feedback> getFeedbacksByTechnician(Technician technician) throws Exception {
         List<Feedback> list = new ArrayList<>();

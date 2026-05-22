@@ -1,14 +1,16 @@
 package UI;
 
 import Enum.ButtonMode;
+import Model.Comment;
+import Model.Feedback;
 import Service.CommentService;
 import Service.FeedbackService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class ViewFeedbackPanel extends JPanel {
@@ -31,6 +33,15 @@ public class ViewFeedbackPanel extends JPanel {
     private JLabel totalCommentLabel;
     private JLabel averageRatingLabel;
 
+    private CardLayout contentCardLayout;
+    private JPanel contentPanel;
+
+    private JButton feedbackTabBtn;
+    private JButton commentTabBtn;
+
+    private static final DateTimeFormatter DISPLAY_FORMATTER =
+            DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
+
     public ViewFeedbackPanel(FeedbackService feedbackService, CommentService commentService) {
         this.feedbackService = feedbackService;
         this.commentService = commentService;
@@ -38,6 +49,7 @@ public class ViewFeedbackPanel extends JPanel {
         setLayout(new BorderLayout());
         buildUI();
         loadData();
+        showTab("feedback");
     }
 
     private void buildUI() {
@@ -60,17 +72,62 @@ public class ViewFeedbackPanel extends JPanel {
         summaryPanel.add(totalCommentLabel);
         summaryPanel.add(averageRatingLabel);
 
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JPanel selectorPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        selectorPanel.setBackground(Color.WHITE);
+        selectorPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        tabbedPane.addTab("Technician Feedback", createFeedbackTab());
-        tabbedPane.addTab("Customer Comments", createCommentTab());
+        feedbackTabBtn = createTabButton("Technician Feedback");
+        feedbackTabBtn.setPreferredSize(new Dimension(180, 36));
+        feedbackTabBtn.addActionListener(_ -> showTab("feedback"));
+
+        commentTabBtn = createTabButton("Customer Comments");
+        commentTabBtn.setPreferredSize(new Dimension(180, 36));
+        commentTabBtn.addActionListener(_ -> showTab("comments"));
+
+        selectorPanel.add(feedbackTabBtn);
+        selectorPanel.add(commentTabBtn);
+
+        contentCardLayout = new CardLayout();
+        contentPanel = new JPanel(contentCardLayout);
+        contentPanel.setBackground(Color.WHITE);
+        contentPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        contentPanel.add(createFeedbackTab(), "feedback");
+        contentPanel.add(createCommentTab(), "comments");
 
         mainPanel.add(summaryPanel);
-        mainPanel.add(Box.createVerticalStrut(10));
-        mainPanel.add(tabbedPane);
+        mainPanel.add(Box.createVerticalStrut(12));
+        mainPanel.add(selectorPanel);
+        mainPanel.add(Box.createVerticalStrut(12));
+        mainPanel.add(contentPanel);
 
         add(mainPanel, BorderLayout.CENTER);
+    }
+
+    private JButton createTabButton(String text) {
+        JButton button = new JButton(text);
+        button.setFocusPainted(false);
+        button.setFont(new Font("SansSerif", Font.BOLD, 13));
+        button.setForeground(Color.WHITE);
+        button.setBackground(new Color(189, 195, 199));
+        button.setBorderPainted(false);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        return button;
+    }
+
+    private void showTab(String tabName) {
+        contentCardLayout.show(contentPanel, tabName);
+
+        Color activeColor = new Color(135, 90, 224);
+        Color inactiveColor = new Color(189, 195, 199);
+
+        if (tabName.equals("feedback")) {
+            feedbackTabBtn.setBackground(activeColor);
+            commentTabBtn.setBackground(inactiveColor);
+        } else {
+            feedbackTabBtn.setBackground(inactiveColor);
+            commentTabBtn.setBackground(activeColor);
+        }
     }
 
     private JPanel createFeedbackTab() {
@@ -81,8 +138,8 @@ public class ViewFeedbackPanel extends JPanel {
         String[] columns = {
                 "Feedback ID",
                 "Appointment ID",
-                "Technician ID",
-                "Feedback",
+                "Technician",
+                "Customer",
                 "Date Time"
         };
 
@@ -93,17 +150,7 @@ public class ViewFeedbackPanel extends JPanel {
             }
         };
 
-        feedbackTable = new JTable(feedbackModel);
-        feedbackTable.setRowHeight(40);
-        feedbackTable.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        feedbackTable.setSelectionBackground(new Color(230, 220, 255));
-        feedbackTable.setGridColor(new Color(240, 240, 240));
-        feedbackTable.setShowVerticalLines(false);
-
-        JTableHeader header = feedbackTable.getTableHeader();
-        header.setFont(new Font("SansSerif", Font.BOLD, 14));
-        header.setBackground(new Color(245, 245, 245));
-
+        feedbackTable = UIHelper.createTable(feedbackModel);
         feedbackSorter = new TableRowSorter<>(feedbackModel);
         feedbackTable.setRowSorter(feedbackSorter);
 
@@ -154,17 +201,7 @@ public class ViewFeedbackPanel extends JPanel {
             }
         };
 
-        commentTable = new JTable(commentModel);
-        commentTable.setRowHeight(40);
-        commentTable.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        commentTable.setSelectionBackground(new Color(230, 220, 255));
-        commentTable.setGridColor(new Color(240, 240, 240));
-        commentTable.setShowVerticalLines(false);
-
-        JTableHeader header = commentTable.getTableHeader();
-        header.setFont(new Font("SansSerif", Font.BOLD, 14));
-        header.setBackground(new Color(245, 245, 245));
-
+        commentTable = UIHelper.createTable(commentModel);
         commentSorter = new TableRowSorter<>(commentModel);
         commentTable.setRowSorter(commentSorter);
 
@@ -199,32 +236,35 @@ public class ViewFeedbackPanel extends JPanel {
 
         totalFeedbackLabel.setText("Total Feedback: " + feedbackService.getTotalFeedbackCount());
         totalCommentLabel.setText("Total Comments: " + commentService.getAllComments().size());
-        totalCommentLabel.setText("Total Comments: " + commentService.getAllComments().size());
         averageRatingLabel.setText(String.format("Average Rating: %.2f", getAverageCommentRating()));
     }
 
     private void loadFeedbackData() {
         feedbackModel.setRowCount(0);
 
-        List<String[]> feedbackRecords = feedbackService.getAllFeedbackRecords();
+        try {
+            List<Feedback> feedbacks = feedbackService.getAllFeedbacks();
 
-        for (String[] record : feedbackRecords) {
-            feedbackModel.addRow(new Object[]{
-                    record[0],
-                    record[1],
-                    record[2],
-                    record[3],
-                    record[4]
-            });
+            for (Feedback feedback : feedbacks) {
+                feedbackModel.addRow(new Object[]{
+                        feedback.getFeedbackID(),
+                        feedback.getAppointment().getAppointmentID(),
+                        feedback.getTechnician().getUsername(),
+                        feedback.getAppointment().getCustomer().getUsername(),
+                        feedback.getDateTime().format(DISPLAY_FORMATTER)
+                });
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error loading feedback: " + e.getMessage());
         }
     }
 
     private void loadCommentData() {
         commentModel.setRowCount(0);
 
-        List<Model.Comment> comments = commentService.getAllComments();
+        List<Comment> comments = commentService.getAllComments();
 
-        for (Model.Comment comment : comments) {
+        for (Comment comment : comments) {
             commentModel.addRow(new Object[]{
                     comment.getCommentID(),
                     comment.getAppointment().getAppointmentID(),
@@ -266,21 +306,35 @@ public class ViewFeedbackPanel extends JPanel {
         }
 
         String feedbackID = feedbackTable.getValueAt(row, 0).toString();
-        String appointmentID = feedbackTable.getValueAt(row, 1).toString();
-        String technicianID = feedbackTable.getValueAt(row, 2).toString();
-        String feedbackText = feedbackTable.getValueAt(row, 3).toString();
+        String feedbackText = getSelectedFeedbackText(feedbackID);
+        String technician = feedbackTable.getValueAt(row, 2).toString();
+        String customer = feedbackTable.getValueAt(row, 3).toString();
         String dateTime = feedbackTable.getValueAt(row, 4).toString();
+        String appointmentID = feedbackTable.getValueAt(row, 1).toString();
 
-        JOptionPane.showMessageDialog(
+        new ViewFeedbackDialog(
                 this,
-                "Feedback ID: " + feedbackID +
-                        "\nAppointment ID: " + appointmentID +
-                        "\nTechnician ID: " + technicianID +
-                        "\nDate Time: " + dateTime +
-                        "\nFeedback: " + feedbackText,
-                "Feedback Details",
-                JOptionPane.INFORMATION_MESSAGE
-        );
+                feedbackID,
+                feedbackText,
+                technician,
+                customer,
+                dateTime,
+                appointmentID
+        ).setVisible(true);
+    }
+
+    private String getSelectedFeedbackText(String feedbackID) {
+        try {
+            for (Feedback feedback : feedbackService.getAllFeedbacks()) {
+                if (feedback.getFeedbackID().equals(feedbackID)) {
+                    return feedback.getFeedbackText();
+                }
+            }
+        } catch (Exception e) {
+            return "";
+        }
+
+        return "";
     }
 
     private void handleViewComment() {
@@ -294,27 +348,21 @@ public class ViewFeedbackPanel extends JPanel {
         String commentID = commentTable.getValueAt(row, 0).toString();
         String appointmentID = commentTable.getValueAt(row, 1).toString();
         String customerID = commentTable.getValueAt(row, 2).toString();
-        String technicianID = commentTable.getValueAt(row, 3).toString();
-        String counterStaffID = commentTable.getValueAt(row, 4).toString();
         String rating = commentTable.getValueAt(row, 5).toString();
         String commentText = commentTable.getValueAt(row, 6).toString();
 
-        JOptionPane.showMessageDialog(
+        new ViewCommentDialog(
                 this,
-                "Comment ID: " + commentID +
-                        "\nAppointment ID: " + appointmentID +
-                        "\nCustomer ID: " + customerID +
-                        "\nTechnician ID: " + technicianID +
-                        "\nCounter Staff ID: " + counterStaffID +
-                        "\nRating: " + rating +
-                        "\nComment: " + commentText,
-                "Comment Details",
-                JOptionPane.INFORMATION_MESSAGE
-        );
+                commentID,
+                commentText,
+                rating,
+                customerID,
+                appointmentID
+        ).setVisible(true);
     }
 
     private double getAverageCommentRating() {
-        List<Model.Comment> comments = commentService.getAllComments();
+        List<Comment> comments = commentService.getAllComments();
 
         if (comments.isEmpty()) {
             return 0.0;
@@ -322,7 +370,7 @@ public class ViewFeedbackPanel extends JPanel {
 
         int total = 0;
 
-        for (Model.Comment comment : comments) {
+        for (Comment comment : comments) {
             total += comment.getRating();
         }
 

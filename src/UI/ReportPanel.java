@@ -30,13 +30,12 @@ public class ReportPanel extends JPanel {
     }
 
     private void reportUI() {
-        JPanel mainPanel = UIHelper.createSectionPanel("View Report");
+        JPanel mainPanel = UIHelper.createSectionPanel("Report");
 
         JPanel summaryWrapperPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         summaryWrapperPanel.setBackground(Color.WHITE);
         summaryWrapperPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        //summary panel shows simple analyzed report values
         JPanel summaryPanel = new JPanel(new GridLayout(4, 2, 20, 20));
         summaryPanel.setBackground(Color.WHITE);
         summaryPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
@@ -66,15 +65,11 @@ public class ReportPanel extends JPanel {
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JButton refreshBtn = UIHelper.createStyledButton("Refresh", ButtonMode.CREATE);
-        refreshBtn.addActionListener(_ -> loadData());
-
         JButton editNotesBtn = UIHelper.createStyledButton("Edit Notes", ButtonMode.PRIMARY);
         editNotesBtn.setPreferredSize(new Dimension(150, 35));
         editNotesBtn.addActionListener(_ -> handleEditNotes());
 
         buttonPanel.add(editNotesBtn);
-        buttonPanel.add(refreshBtn);
 
         noteArea = new JTextArea();
         noteArea.setEditable(false);

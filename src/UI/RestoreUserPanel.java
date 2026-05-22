@@ -57,12 +57,9 @@ public class RestoreUserPanel extends JPanel {
         permanentDeleteBtn.setPreferredSize(new Dimension(180, 35));
         permanentDeleteBtn.addActionListener(_ -> handlePermanentDelete());
 
-        JButton refreshBtn = UIHelper.createStyledButton("Refresh", ButtonMode.CREATE);
-        refreshBtn.addActionListener(_ -> loadData());
 
         buttonPanel.add(restoreBtn);
         buttonPanel.add(permanentDeleteBtn);
-        buttonPanel.add(refreshBtn);
 
         mainPanel.add(searchPanel);
         mainPanel.add(Box.createVerticalStrut(10));

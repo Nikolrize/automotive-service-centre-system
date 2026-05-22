@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReportService {
+    private static final String USER_FILE ="users.txt";
+    private static final String VEHICLE_FILE = "vehicles.txt";
     private static final String APPOINTMENT_FILE = "appointments.txt";
     private static final String PAYMENT_FILE = "payments.txt";
     private static final String COMMENT_FILE = "comments.txt";
@@ -16,6 +18,31 @@ public class ReportService {
             It reads data from appointments, payments, comments, and services files.
             The values update based on the current text-file records.
             """;
+
+    public int getTotalUsers(){
+        int count = 0;
+
+        for (String line : FileHandler.readFile(USER_FILE)) {
+            if (line == null || line.trim().isEmpty()) {
+                continue;
+            }
+
+            String[] data = line.split(",");
+            if (data.length < 9) {
+                continue;
+            }
+
+            if (Boolean.parseBoolean(data[7].trim())) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    public int getTotalVehicles() {
+        return countValidLines(VEHICLE_FILE);
+    }
 
     public int getTotalAppointments() {
         return countValidLines(APPOINTMENT_FILE);

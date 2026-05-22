@@ -3,6 +3,7 @@ package UI;
 import Enum.ButtonMode;
 import Model.Appointment;
 import Model.Customer;
+import Model.Feedback;
 import Service.AppointmentService;
 import Service.FeedbackService;
 
@@ -68,11 +69,7 @@ public class CustomerFeedbackPanel extends JPanel {
         viewBtn.setPreferredSize(new Dimension(180, 35));
         viewBtn.addActionListener(_ -> handleViewFeedback());
 
-        JButton refreshBtn = UIHelper.createStyledButton("Refresh", ButtonMode.CREATE);
-        refreshBtn.addActionListener(_ -> loadData());
-
         buttonPanel.add(viewBtn);
-        buttonPanel.add(refreshBtn);
 
         mainPanel.add(searchPanel);
         mainPanel.add(Box.createVerticalStrut(10));
@@ -90,7 +87,7 @@ public class CustomerFeedbackPanel extends JPanel {
 
         for (Appointment appointment : appointments) {
             String technicianName = appointment.getTechnician().getFirstName() + " " + appointment.getTechnician().getLastName();
-            boolean hasFeedback = feedbackService.hasFeedbackForAppointment(appointment.getAppointmentID());
+            boolean hasFeedback = hasFeedbackForAppointment(appointment.getAppointmentID());
 
             model.addRow(new Object[]{
                     appointment.getAppointmentID(),
@@ -100,6 +97,22 @@ public class CustomerFeedbackPanel extends JPanel {
                     hasFeedback ? "Available" : "Not Available"
             });
         }
+    }
+
+    private boolean hasFeedbackForAppointment(String appointmentID) {
+        try {
+            List<Feedback> feedbacks = feedbackService.getAllFeedbacks();
+
+            for (Feedback feedback : feedbacks) {
+                if (feedback.getAppointment().getAppointmentID().equals(appointmentID)) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
+        return false;
     }
 
     private void applyFilter() {
@@ -121,25 +134,28 @@ public class CustomerFeedbackPanel extends JPanel {
         }
 
         String appointmentID = table.getValueAt(row, 0).toString();
-        String serviceName = table.getValueAt(row, 1).toString();
-        String technicianName = table.getValueAt(row, 2).toString();
-        String date = table.getValueAt(row, 3).toString();
-        String feedbackText = feedbackService.getFeedbackTextByAppointmentID(appointmentID);
 
-        if (feedbackText == null || feedbackText.isBlank()) {
+        try {
+            List<Feedback> feedbacks = feedbackService.getAllFeedbacks();
+
+            for (Feedback feedback : feedbacks) {
+                if (feedback.getAppointment().getAppointmentID().equals(appointmentID)) {
+                    new ViewFeedbackDialog(
+                            this,
+                            feedback.getFeedbackID(),
+                            feedback.getFeedbackText(),
+                            feedback.getTechnician().getUsername(),
+                            feedback.getAppointment().getCustomer().getUsername(),
+                            feedback.getDateTime().toString(),
+                            feedback.getAppointment().getAppointmentID()
+                    ).setVisible(true);
+                    return;
+                }
+            }
+
             JOptionPane.showMessageDialog(this, "No feedback is available for this appointment yet.");
-            return;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error loading feedback: " + e.getMessage());
         }
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Appointment ID: " + appointmentID +
-                        "\nService: " + serviceName +
-                        "\nTechnician: " + technicianName +
-                        "\nDate: " + date +
-                        "\nFeedback: " + feedbackText,
-                "My Feedback",
-                JOptionPane.INFORMATION_MESSAGE
-        );
     }
 }

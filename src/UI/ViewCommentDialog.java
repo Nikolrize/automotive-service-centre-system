@@ -26,11 +26,11 @@ public class ViewCommentDialog extends JDialog {
         header.setBorder(BorderFactory.createEmptyBorder(14, 18, 14, 18));
 
         JLabel titleLabel = new JLabel("Comment Details");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
         titleLabel.setForeground(Color.WHITE);
 
         JLabel subtitleLabel = new JLabel("Appointment: " + appointmentID);
-        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        subtitleLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         subtitleLabel.setForeground(Color.WHITE);
 
         header.add(titleLabel, BorderLayout.NORTH);
@@ -57,12 +57,12 @@ public class ViewCommentDialog extends JDialog {
         msgPanel.setBackground(Color.WHITE);
 
         JLabel msgLabel = new JLabel("Comment:");
-        msgLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        msgLabel.setFont(new Font("SansSerif", Font.BOLD, 13));
         msgLabel.setForeground(new Color(120, 120, 120));
         msgLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
 
         JTextArea msgArea = new JTextArea(commentText);
-        msgArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        msgArea.setFont(new Font("SansSerif", Font.PLAIN, 13));
         msgArea.setLineWrap(true);
         msgArea.setWrapStyleWord(true);
         msgArea.setEditable(false);
@@ -87,7 +87,7 @@ public class ViewCommentDialog extends JDialog {
         footer.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(220, 220, 220)));
 
         JButton closeBtn = new JButton("Close");
-        closeBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        closeBtn.setFont(new Font("SansSerif", Font.BOLD, 13));
         closeBtn.setBackground(new Color(189, 195, 199));
         closeBtn.setForeground(Color.WHITE);
         closeBtn.setFocusPainted(false);
@@ -108,12 +108,12 @@ public class ViewCommentDialog extends JDialog {
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 24));
 
         JLabel labelComp = new JLabel(label + ":");
-        labelComp.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        labelComp.setFont(new Font("SansSerif", Font.BOLD, 13));
         labelComp.setForeground(new Color(120, 120, 120));
         labelComp.setPreferredSize(new Dimension(120, 24));
 
         JLabel valueComp = new JLabel(value == null ? "-" : value);
-        valueComp.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        valueComp.setFont(new Font("SansSerif", Font.PLAIN, 13));
         valueComp.setForeground(new Color(40, 40, 40));
 
         row.add(labelComp, BorderLayout.WEST);

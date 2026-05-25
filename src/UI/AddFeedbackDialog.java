@@ -5,6 +5,7 @@ import Model.Technician;
 import Service.FeedbackService;
 
 import javax.swing.*;
+import javax.swing.text.*;
 import java.awt.*;
 
 public class AddFeedbackDialog extends JDialog {
@@ -26,9 +27,9 @@ public class AddFeedbackDialog extends JDialog {
         Color bodyBg    = Color.WHITE;
         Color accentBtn = new Color(84, 0, 255);
         Color cancelBtn = new Color(189, 195, 199);
-        Font  headerFont = new Font("Segoe UI", Font.BOLD, 16);
-        Font  labelFont  = new Font("Segoe UI", Font.PLAIN, 13);
-        Font  btnFont    = new Font("Segoe UI", Font.BOLD, 13);
+        Font  headerFont = new Font("SansSerif", Font.BOLD, 16);
+        Font  labelFont  = new Font("SansSerif", Font.PLAIN, 13);
+        Font  btnFont    = new Font("SansSerif", Font.BOLD, 13);
 
         // Dialog's Header
         JPanel header = new JPanel(new BorderLayout());
@@ -40,7 +41,7 @@ public class AddFeedbackDialog extends JDialog {
         title.setForeground(headerFg);
 
         JLabel subtitle = new JLabel("Appointment: " + appt.getAppointmentID());
-        subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        subtitle.setFont(new Font("SansSerif", Font.PLAIN, 12));
         subtitle.setForeground(new Color(255, 255, 255));
 
         header.add(title, BorderLayout.NORTH);
@@ -58,13 +59,23 @@ public class AddFeedbackDialog extends JDialog {
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JTextArea commentArea = new JTextArea(8, 50);
-        commentArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        commentArea.setFont(new Font("SansSerif", Font.PLAIN, 13));
         commentArea.setLineWrap(true);
         commentArea.setWrapStyleWord(true);
         commentArea.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(189, 195, 199)),
                 BorderFactory.createEmptyBorder(6, 8, 6, 8)
         ));
+        commentArea.setDocument(new PlainDocument() {
+            @Override
+            public void insertString(int offs, String str, AttributeSet a)
+                    throws BadLocationException {
+                if (str == null) return;
+                if ((getLength() + str.length()) <= 500) {
+                    super.insertString(offs, str, a);
+                }
+            }
+        });
 
         JScrollPane scrollPane = new JScrollPane(commentArea);
         scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);

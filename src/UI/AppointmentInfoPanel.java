@@ -47,19 +47,29 @@ public class AppointmentInfoPanel extends JPanel {
         appointmentCard.add(Box.createVerticalStrut(6));
         appointmentCard.add(createField("End Time",   appt.getEndTime().toString()));
 
-        // Card Section: Customer & Vehicle
-        JPanel customerCard = UIHelper.createCardPanel("Vehicle");
+        // Card Section: Customer
+        JPanel customerCard = UIHelper.createCardPanel("Customer Info");
         customerCard.setAlignmentX(Component.LEFT_ALIGNMENT);
-        customerCard.add(createField("Plate Number",appt.getVehicle().getPlateNumber()));
+        customerCard.add(createField("First Name",appt.getCustomer().getFirstName()));
         customerCard.add(Box.createVerticalStrut(6));
-        customerCard.add(createField("Brand",appt.getVehicle().getBrand()));
+        customerCard.add(createField("Last Name",appt.getCustomer().getLastName()));
         customerCard.add(Box.createVerticalStrut(6));
-        customerCard.add(createField("Model",appt.getVehicle().getModel()));
+        customerCard.add(createField("Contact Number",appt.getCustomer().getContact()));
         customerCard.add(Box.createVerticalStrut(6));
-        customerCard.add(createField("Colour",appt.getVehicle().getColor()));
-        customerCard.add(Box.createVerticalStrut(6));
-        customerCard.add(createField("Year", String.valueOf(appt.getVehicle().getYear())));
-        customerCard.add(Box.createVerticalStrut(6));
+        customerCard.add(createField("Email",appt.getCustomer().getEmail()));
+
+        // Card Section: Vehicle
+        JPanel vehicleCard = UIHelper.createCardPanel("Vehicle");
+        vehicleCard.setAlignmentX(Component.LEFT_ALIGNMENT);
+        vehicleCard.add(createField("Plate Number",appt.getVehicle().getPlateNumber()));
+        vehicleCard.add(Box.createVerticalStrut(6));
+        vehicleCard.add(createField("Brand",appt.getVehicle().getBrand()));
+        vehicleCard.add(Box.createVerticalStrut(6));
+        vehicleCard.add(createField("Model",appt.getVehicle().getModel()));
+        vehicleCard.add(Box.createVerticalStrut(6));
+        vehicleCard.add(createField("Colour",appt.getVehicle().getColor()));
+        vehicleCard.add(Box.createVerticalStrut(6));
+        vehicleCard.add(createField("Year", String.valueOf(appt.getVehicle().getYear())));
 
         // Card Section: Service
         JPanel serviceCard = UIHelper.createCardPanel("Service");
@@ -144,6 +154,8 @@ public class AppointmentInfoPanel extends JPanel {
         mainPanel.add(appointmentCard);
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(customerCard);
+        mainPanel.add(Box.createVerticalStrut(10));
+        mainPanel.add(vehicleCard);
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(serviceCard);
         mainPanel.add(Box.createVerticalStrut(10));

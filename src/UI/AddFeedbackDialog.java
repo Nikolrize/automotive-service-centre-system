@@ -53,7 +53,7 @@ public class AddFeedbackDialog extends JDialog {
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         body.setBorder(BorderFactory.createEmptyBorder(16, 18, 8, 18));
 
-        JLabel label = new JLabel("Feedback / Comment:");
+        JLabel label = new JLabel("Feedback Message:");
         label.setFont(labelFont);
         label.setForeground(new Color(44, 62, 80));
         label.setAlignmentX(Component.LEFT_ALIGNMENT);

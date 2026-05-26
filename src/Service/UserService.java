@@ -35,8 +35,15 @@ public class UserService {
         }
         String userID = generateNewID(UserRole.USER);
         String roleID = generateNewID(role);
-        String newData = String.join(",", userID, username, firstName, lastName, password, email, contact, "true", roleID);
-        FileHandler.appendToFile(FILE_NAME, newData);
+        User user = createUserByRole(
+                userID, username, firstName, lastName,
+                password, email, contact, true, roleID
+        );
+
+        if (user == null) {
+            throw new Exception("Failed to register user.");
+        }
+        FileHandler.appendToFile(FILE_NAME, formatUser(user));
     }
 
     public void generateDefaultManager() {
@@ -55,15 +62,21 @@ public class UserService {
         }
 
         if (!hasDefaultManager) {
-            String username = "superuser";
-            String firstName = "Super";
-            String lastName = "User";
-            String password = "superuser123";
-            String email = "superuser@gmail.com";
-            String contact = "0123456789";
             String userID = generateNewID(UserRole.USER);
-            String data = String.join(",", userID, username, firstName, lastName, password, email, contact, "true", "M0001");
-            FileHandler.appendToFile(FILE_NAME, data);
+
+            User manager = new Manager(
+                    userID,
+                    "superuser",
+                    "Super",
+                    "User",
+                    "superuser123",
+                    "superuser@gmail.com",
+                    "0123456789",
+                    true,
+                    "M0001"
+            );
+
+            FileHandler.appendToFile(FILE_NAME, formatUser(manager));
         }
     }
 
@@ -117,14 +130,16 @@ public class UserService {
             if (data.length < 9) continue;
 
             if (data[0].equals(userID)) {
-                data[1] = newUsername;
-                data[2] = newFirstName;
-                data[3] = newLastName;
-                data[4] = newPassword;
-                data[5] = newEmail;
-                data[6] = newContact;
+                User user = getUserById(userID);
 
-                users.set(i, String.join(",", data));
+                user.setUsername(newUsername);
+                user.setFirstName(newFirstName);
+                user.setLastName(newLastName);
+                user.setPassword(newPassword);
+                user.setEmail(newEmail);
+                user.setContact(newContact);
+
+                users.set(i, formatUser(user));
                 updated = true;
                 break;
             }
@@ -172,8 +187,15 @@ public class UserService {
             String[] data = users.get(i).split(",");
 
             if (data[0].trim().equals(userID.trim())) {
-                data[7] = String.valueOf(status);
-                users.set(i, String.join(",", data));
+                User user = parseUser(users.get(i));
+
+                if (user == null) {
+                    throw new Exception("Failed to load user.");
+                }
+
+                user.setIsActive(status);
+
+                users.set(i, formatUser(user));
                 found = true;
                 break;
             }
@@ -209,15 +231,34 @@ public class UserService {
         boolean isActive = Boolean.parseBoolean(data[7]);
         String roleID = data[8];
 
+        return createUserByRole(
+                userID, username, firstName, lastName,
+                password, email, contact, isActive, roleID
+        );
+    }
+
+    private String formatUser(User user) {
+        return String.join(",",
+                user.getUserID(),
+                user.getUsername(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getPassword(),
+                user.getEmail(),
+                user.getContact(),
+                String.valueOf(user.getIsActive()),
+                user.getRoleID()
+        );
+    }
+
+    private User createUserByRole(String userID, String username, String firstName,
+                                  String lastName, String password, String email,
+                                  String contact, boolean isActive, String roleID) {
         return switch (roleID.charAt(0)) {
-            case 'M' ->
-                    new Manager(userID, username, firstName, lastName, password, email, contact, isActive, roleID);
-            case 'S' ->
-                    new CounterStaff(userID, username, firstName, lastName, password, email, contact, isActive, roleID);
-            case 'T' ->
-                    new Technician(userID, username, firstName, lastName, password, email, contact, isActive, roleID);
-            case 'C' ->
-                    new Customer(userID, username, firstName, lastName, password, email, contact, isActive, roleID);
+            case 'M' -> new Manager(userID, username, firstName, lastName, password, email, contact, isActive, roleID);
+            case 'S' -> new CounterStaff(userID, username, firstName, lastName, password, email, contact, isActive, roleID);
+            case 'T' -> new Technician(userID, username, firstName, lastName, password, email, contact, isActive, roleID);
+            case 'C' -> new Customer(userID, username, firstName, lastName, password, email, contact, isActive, roleID);
             default -> null;
         };
     }

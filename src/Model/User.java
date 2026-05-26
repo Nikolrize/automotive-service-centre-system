@@ -1,6 +1,7 @@
 package Model;
 
 import Interface.RolePermission;
+import Util.InputValidator;
 
 public abstract class User implements RolePermission {
     private String userID;
@@ -30,7 +31,7 @@ public abstract class User implements RolePermission {
     }
 
     public void setUserID(String userID) {
-        this.userID = userID;
+        this.userID = InputValidator.validateID(userID, "U");
     }
 
     public String getUsername() {
@@ -38,7 +39,7 @@ public abstract class User implements RolePermission {
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.username = InputValidator.validateUsername(username);
     }
 
     public String getFirstName() {
@@ -46,7 +47,7 @@ public abstract class User implements RolePermission {
     }
 
     public void setFirstName(String firstName) {
-        this.firstName = firstName;
+        this.firstName = InputValidator.validateName(firstName, "First name");
     }
 
     public String getLastName() {
@@ -54,7 +55,7 @@ public abstract class User implements RolePermission {
     }
 
     public void setLastName(String lastName) {
-        this.lastName = lastName;
+        this.lastName = InputValidator.validateName(lastName, "Last name");
     }
 
     public String getPassword() {
@@ -62,7 +63,7 @@ public abstract class User implements RolePermission {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password = InputValidator.validatePassword(password);
     }
 
     public String getEmail() {
@@ -70,7 +71,7 @@ public abstract class User implements RolePermission {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = InputValidator.validateEmail(email);
     }
 
     public String getContact() {
@@ -78,7 +79,7 @@ public abstract class User implements RolePermission {
     }
 
     public void setContact(String contact) {
-        this.contact = contact;
+        this.contact = InputValidator.validateContact(contact);
     }
 
     public boolean getIsActive() {
@@ -94,7 +95,7 @@ public abstract class User implements RolePermission {
     }
 
     public void setRoleID(String roleID) {
-        this.roleID = roleID;
+        this.roleID = InputValidator.validateRoleID(roleID);
     }
 
     public abstract void openDashboard();

@@ -1,5 +1,7 @@
 package Model;
 
+import Util.InputValidator;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -22,7 +24,7 @@ public class Appointment {
         setCounterStaff(counterStaff);
         setTechnician(technician);
         setVehicle(vehicle);
-        setISCompleted(isCompleted);
+        setIsCompleted(isCompleted);
         setDate(date);
         setStartTime(startTime);
         setEndTime(endTime);
@@ -33,7 +35,7 @@ public class Appointment {
     }
 
     public void setAppointmentID(String appointmentID) {
-        this.appointmentID = appointmentID;
+        this.appointmentID = InputValidator.validateID(appointmentID, "A");
     }
 
     public Service getService() {
@@ -41,7 +43,7 @@ public class Appointment {
     }
 
     public void setService(Service service) {
-        this.service = service;
+        this.service = InputValidator.validateObject(service, "Service");
     }
 
     public Customer getCustomer() {
@@ -49,7 +51,7 @@ public class Appointment {
     }
 
     public void setCustomer(Customer customer) {
-        this.customer = customer;
+        this.customer = InputValidator.validateObject(customer, "Customer");
     }
 
     public CounterStaff getCounterStaff() {
@@ -57,7 +59,7 @@ public class Appointment {
     }
 
     public void setCounterStaff(CounterStaff counterStaff) {
-        this.counterStaff = counterStaff;
+        this.counterStaff = InputValidator.validateObject(counterStaff, "Counter Staff");
     }
 
     public Technician getTechnician() {
@@ -65,7 +67,7 @@ public class Appointment {
     }
 
     public void setTechnician(Technician technician) {
-        this.technician = technician;
+        this.technician = InputValidator.validateObject(technician, "Technician");
     }
 
     public Vehicle getVehicle() {
@@ -73,14 +75,14 @@ public class Appointment {
     }
 
     public void setVehicle(Vehicle vehicle) {
-        this.vehicle = vehicle;
+        this.vehicle = InputValidator.validateObject(vehicle, "Vehicle");
     }
 
     public boolean getIsCompleted() {
         return isCompleted;
     }
 
-    public void setISCompleted(boolean isCompleted) {
+    public void setIsCompleted(boolean isCompleted) {
         this.isCompleted = isCompleted;
     }
 
@@ -89,7 +91,7 @@ public class Appointment {
     }
 
     public void setDate(LocalDate date) {
-        this.date = date;
+        this.date = InputValidator.validateDate(date);
     }
 
     public LocalTime getStartTime() {
@@ -97,14 +99,23 @@ public class Appointment {
     }
 
     public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
+        this.startTime = InputValidator.validateTime(startTime, "Start time");
+
+        if (this.endTime != null) {
+            InputValidator.validateTimeRange(this.startTime, this.endTime);
+        }
     }
+
 
     public LocalTime getEndTime() {
         return endTime;
     }
 
     public void setEndTime(LocalTime endTime) {
-        this.endTime = endTime;
+        this.endTime = InputValidator.validateTime(endTime, "End time");
+
+        if (this.startTime != null) {
+            InputValidator.validateTimeRange(this.startTime, this.endTime);
+        }
     }
 }

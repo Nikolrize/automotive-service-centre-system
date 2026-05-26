@@ -106,11 +106,17 @@ public class VehicleService {
             }
         }
 
-        String vehicleID = generateNewID();
+        Vehicle vehicle = new Vehicle(
+                generateNewID(),
+                customer,
+                plateNumber,
+                brand,
+                model,
+                year,
+                color
+        );
 
-        String data = String.join(",", vehicleID, customer.getUserID(), plateNumber, brand, model, String.valueOf(year), color);
-
-        FileHandler.appendToFile(FILE_NAME, data);
+        FileHandler.appendToFile(FILE_NAME, formatVehicle(vehicle));
     }
 
     public void updateVehicle(String vehicleID, String plateNumber, String brand, String model, int year, String color) throws Exception {
@@ -130,13 +136,15 @@ public class VehicleService {
                     }
                 }
 
-                data[2] = plateNumber;
-                data[3] = brand;
-                data[4] = model;
-                data[5] = String.valueOf(year);
-                data[6] = color;
+                Vehicle vehicle = getVehicleByID(vehicleID);
 
-                lines.set(i, String.join(",", data));
+                vehicle.setPlateNumber(plateNumber);
+                vehicle.setBrand(brand);
+                vehicle.setModel(model);
+                vehicle.setYear(year);
+                vehicle.setColor(color);
+
+                lines.set(i, formatVehicle(vehicle));
 
                 updated = true;
                 break;
@@ -164,5 +172,17 @@ public class VehicleService {
         }
 
         FileHandler.writeFile(FILE_NAME, lines);
+    }
+
+    private String formatVehicle(Vehicle vehicle) {
+        return String.join(",",
+                vehicle.getVehicleID(),
+                vehicle.getCustomer().getUserID(),
+                vehicle.getPlateNumber(),
+                vehicle.getBrand(),
+                vehicle.getModel(),
+                String.valueOf(vehicle.getYear()),
+                vehicle.getColor()
+        );
     }
 }

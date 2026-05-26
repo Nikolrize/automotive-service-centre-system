@@ -103,23 +103,17 @@ public class PaymentService {
             throw new Exception("Payment can only be collected for completed appointments.");
         }
 
-        double amount = appointment.getService().getPrice();
-
-        String paymentID = generateNewID();
-        LocalDate date = LocalDate.now();
-        LocalTime time = LocalTime.now();
-
-        String data = String.join(",",
-                paymentID,
-                appointment.getAppointmentID(),
-                currentUser.getUserID(),
-                String.format("%.2f", amount),
+        Payment payment = new Payment(
+                generateNewID(),
+                appointment,
+                (CounterStaff) currentUser,
+                appointment.getService().getPrice(),
                 method,
-                date.toString(),
-                time.toString()
+                LocalDate.now(),
+                LocalTime.now()
         );
 
-        FileHandler.appendToFile(FILE_NAME, data);
+        FileHandler.appendToFile(FILE_NAME, formatPayment(payment));
     }
 
     public String generateReceipt(Payment payment) {
@@ -174,5 +168,17 @@ public class PaymentService {
         }
 
         return list;
+    }
+
+    private String formatPayment(Payment payment) {
+        return String.join(",",
+                payment.getPaymentID(),
+                payment.getAppointment().getAppointmentID(),
+                payment.getCounterStaff().getUserID(),
+                String.format("%.2f", payment.getAmount()),
+                payment.getMethod(),
+                payment.getPaymentDate().toString(),
+                payment.getPaymentTime().toString()
+        );
     }
 }

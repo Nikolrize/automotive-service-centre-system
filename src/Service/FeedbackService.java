@@ -123,19 +123,15 @@ public class FeedbackService {
     }
 
     public void addFeedback(Appointment appointment, Technician technician, String feedbackText) {
-        String id = generateNewID();
-        String safeText = feedbackText.replace(",", ";");
-        String dateTime = LocalDateTime.now().toString();
-
-        String line = String.join(",",
-                id,
-                appointment.getAppointmentID(),
-                technician.getUserID(),
-                safeText,
-                dateTime
+        Feedback feedback = new Feedback(
+                generateNewID(),
+                appointment,
+                technician,
+                feedbackText,
+                LocalDateTime.now()
         );
 
-        FileHandler.appendToFile(FILE_NAME, line);
+        FileHandler.appendToFile(FILE_NAME, formatFeedback(feedback));
         notifyFeedbackChanged();
     }
 
@@ -161,5 +157,15 @@ public class FeedbackService {
             } catch (NumberFormatException ignored) {}
         }
         return String.format("F%04d", max + 1);
+    }
+
+    private String formatFeedback(Feedback feedback) {
+        return String.join(",",
+                feedback.getFeedbackID(),
+                feedback.getAppointment().getAppointmentID(),
+                feedback.getTechnician().getUserID(),
+                feedback.getFeedbackText().replace(",", ";"),
+                feedback.getDateTime().toString()
+        );
     }
 }

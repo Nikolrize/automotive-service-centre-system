@@ -157,21 +157,30 @@ public class CommentService {
             throw new Exception("Rating must be between 1 and 5.");
         }
 
-        String commentID = generateNewID();
-
-        String data = String.join(",",
-                commentID,
-                appointment.getAppointmentID(),
-                customer.getUserID(),
-                appointment.getTechnician().getUserID(),
-                appointment.getCounterStaff().getUserID(),
-                String.valueOf(rating),
-                commentText.trim()
+        Comment comment = new Comment(
+                generateNewID(),
+                appointment,
+                commentText,
+                rating
         );
 
-        FileHandler.appendToFile(FILE_NAME, data);
+        FileHandler.appendToFile(FILE_NAME, formatComment(comment));
 
         notifyCommentChanged();
+    }
+
+    private String formatComment(Comment comment) {
+        Appointment appointment = comment.getAppointment();
+
+        return String.join(",",
+                comment.getCommentID(),
+                appointment.getAppointmentID(),
+                appointment.getCustomer().getUserID(),
+                appointment.getTechnician().getUserID(),
+                appointment.getCounterStaff().getUserID(),
+                String.valueOf(comment.getRating()),
+                comment.getCommentText().replace(",", ";")
+        );
     }
 
     // For UI autorefresh

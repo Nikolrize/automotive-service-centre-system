@@ -48,16 +48,18 @@ public class AppointmentInfoPanel extends JPanel {
         appointmentCard.add(createField("End Time",   appt.getEndTime().toString()));
 
         // Card Section: Customer & Vehicle
-        JPanel customerCard = UIHelper.createCardPanel("Customer & Vehicle");
+        JPanel customerCard = UIHelper.createCardPanel("Vehicle");
         customerCard.setAlignmentX(Component.LEFT_ALIGNMENT);
-        customerCard.add(createField("Customer", appt.getCustomer().getUsername()));
+        customerCard.add(createField("Plate Number",appt.getVehicle().getPlateNumber()));
         customerCard.add(Box.createVerticalStrut(6));
-        customerCard.add(createField("Vehicle",
-                appt.getVehicle() == null
-                        ? "-"
-                        : appt.getVehicle().getPlateNumber()
-                        + " — " + appt.getVehicle().getBrand()
-                        + " "   + appt.getVehicle().getModel()));
+        customerCard.add(createField("Brand",appt.getVehicle().getBrand()));
+        customerCard.add(Box.createVerticalStrut(6));
+        customerCard.add(createField("Model",appt.getVehicle().getModel()));
+        customerCard.add(Box.createVerticalStrut(6));
+        customerCard.add(createField("Colour",appt.getVehicle().getColor()));
+        customerCard.add(Box.createVerticalStrut(6));
+        customerCard.add(createField("Year", String.valueOf(appt.getVehicle().getYear())));
+        customerCard.add(Box.createVerticalStrut(6));
 
         // Card Section: Service
         JPanel serviceCard = UIHelper.createCardPanel("Service");
@@ -66,7 +68,7 @@ public class AppointmentInfoPanel extends JPanel {
         serviceCard.add(Box.createVerticalStrut(6));
         serviceCard.add(createField("Type",         appt.getService().getType()));
         serviceCard.add(Box.createVerticalStrut(6));
-        serviceCard.add(createField("Duration",     appt.getService().getDuration() + " mins"));
+        serviceCard.add(createField("Duration",     appt.getService().getDuration() + " hour(s)"));
         serviceCard.add(Box.createVerticalStrut(6));
         serviceCard.add(createField("Price",        "RM " + appt.getService().getPrice()));
 
@@ -103,13 +105,20 @@ public class AppointmentInfoPanel extends JPanel {
         JPanel commentCard = UIHelper.createCardPanel("Customer Comment");
         commentCard.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        String[] commentColumns = {"Comment ID", "Customer", "Rating", "Comment"};
-        commentModel = new DefaultTableModel(commentColumns, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
+        Comment comment = commentService.getCommentByAppointmentID(appt.getAppointmentID());
+
+        if (comment != null) {
+            String[] commentColumns = {"Comment ID", "Customer", "Rating", "Comment"};
+            commentModel = new DefaultTableModel(commentColumns, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+        }
+
+        commentTable = UIHelper.createTable(commentModel);
+        commentTable.setPreferredScrollableViewportSize(new Dimension(Integer.MAX_VALUE, 100));
 
         commentTable = UIHelper.createTable(commentModel);
         commentTable.setPreferredScrollableViewportSize(new Dimension(Integer.MAX_VALUE, 100));
@@ -142,7 +151,10 @@ public class AppointmentInfoPanel extends JPanel {
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(feedbackCard);
         mainPanel.add(Box.createVerticalStrut(10));
-        mainPanel.add(commentCard);         // ← new comment section
+        if (comment != null) {
+            mainPanel.add(commentCard);
+            mainPanel.add(Box.createVerticalStrut(10));
+        }
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(buttonPanel);
 
@@ -186,6 +198,8 @@ public class AppointmentInfoPanel extends JPanel {
     }
 
     private void loadCommentData(String appointmentID) {
+        if (commentModel == null) return;
+
         commentModel.setRowCount(0);
 
         Comment comment = commentService.getCommentByAppointmentID(appointmentID);

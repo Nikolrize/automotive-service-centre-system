@@ -29,6 +29,12 @@ public class CustomerCommentPanel extends JPanel {
     private TableRowSorter<DefaultTableModel> appointmentSorter;
     private TableRowSorter<DefaultTableModel> commentSorter;
 
+    private CardLayout contentCardLayout;
+    private JPanel contentPanel;
+
+    private JButton appointmentTabBtn;
+    private JButton commentTabBtn;
+
     public CustomerCommentPanel(Customer currentCustomer, AppointmentService appointmentService, CommentService commentService) {
         this.currentCustomer = currentCustomer;
         this.appointmentService = appointmentService;
@@ -37,20 +43,66 @@ public class CustomerCommentPanel extends JPanel {
         setLayout(new BorderLayout());
         buildUI();
         loadData();
+        showTab("appointments");
     }
 
     private void buildUI() {
         JPanel mainPanel = UIHelper.createSectionPanel("My Comments");
 
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JPanel selectorPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        selectorPanel.setBackground(Color.WHITE);
+        selectorPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        tabbedPane.addTab("Eligible Appointments", createAppointmentTab());
-        tabbedPane.addTab("My Submitted Comments", createCommentTab());
+        appointmentTabBtn = createTabButton("Eligible Appointments");
+        appointmentTabBtn.setPreferredSize(new Dimension(190, 36));
+        appointmentTabBtn.addActionListener(_ -> showTab("appointments"));
 
-        mainPanel.add(tabbedPane);
+        commentTabBtn = createTabButton("My Submitted Comments");
+        commentTabBtn.setPreferredSize(new Dimension(210, 36));
+        commentTabBtn.addActionListener(_ -> showTab("comments"));
+
+        selectorPanel.add(appointmentTabBtn);
+        selectorPanel.add(commentTabBtn);
+
+        contentCardLayout = new CardLayout();
+        contentPanel = new JPanel(contentCardLayout);
+        contentPanel.setBackground(Color.WHITE);
+        contentPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        contentPanel.add(createAppointmentTab(), "appointments");
+        contentPanel.add(createCommentTab(), "comments");
+
+        mainPanel.add(selectorPanel);
+        mainPanel.add(Box.createVerticalStrut(12));
+        mainPanel.add(contentPanel);
 
         add(mainPanel, BorderLayout.CENTER);
+    }
+
+    private JButton createTabButton(String text) {
+        JButton button = new JButton(text);
+        button.setFocusPainted(false);
+        button.setFont(new Font("SansSerif", Font.BOLD, 13));
+        button.setForeground(Color.WHITE);
+        button.setBackground(new Color(189, 195, 199));
+        button.setBorderPainted(false);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        return button;
+    }
+
+    private void showTab(String tabName) {
+        contentCardLayout.show(contentPanel, tabName);
+
+        Color activeColor = new Color(135, 90, 224);
+        Color inactiveColor = new Color(189, 195, 199);
+
+        if (tabName.equals("appointments")) {
+            appointmentTabBtn.setBackground(activeColor);
+            commentTabBtn.setBackground(inactiveColor);
+        } else {
+            appointmentTabBtn.setBackground(inactiveColor);
+            commentTabBtn.setBackground(activeColor);
+        }
     }
 
     private JPanel createAppointmentTab() {
@@ -82,6 +134,9 @@ public class CustomerCommentPanel extends JPanel {
         JPanel searchPanel = UIHelper.createSearchPanel(appointmentSearchField, this::applyAppointmentFilter);
         searchPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        JScrollPane scrollPane = new JScrollPane(appointmentTable);
+        scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -90,15 +145,11 @@ public class CustomerCommentPanel extends JPanel {
         createBtn.setPreferredSize(new Dimension(180, 35));
         createBtn.addActionListener(_ -> handleCreateComment());
 
-        JButton refreshBtn = UIHelper.createStyledButton("Refresh", ButtonMode.PRIMARY);
-        refreshBtn.addActionListener(_ -> loadData());
-
         buttonPanel.add(createBtn);
-        buttonPanel.add(refreshBtn);
 
         panel.add(searchPanel);
         panel.add(Box.createVerticalStrut(10));
-        panel.add(new JScrollPane(appointmentTable));
+        panel.add(scrollPane);
         panel.add(Box.createVerticalStrut(10));
         panel.add(buttonPanel);
 
@@ -110,7 +161,13 @@ public class CustomerCommentPanel extends JPanel {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(Color.WHITE);
 
-        String[] columns = {"Comment ID", "Appointment ID", "Service", "Rating", "Comment"};
+        String[] columns = {
+                "Comment ID",
+                "Appointment ID",
+                "Service",
+                "Rating",
+                "Comment"
+        };
 
         commentModel = new DefaultTableModel(columns, 0) {
             @Override
@@ -126,6 +183,9 @@ public class CustomerCommentPanel extends JPanel {
         JPanel searchPanel = UIHelper.createSearchPanel(commentSearchField, this::applyCommentFilter);
         searchPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        JScrollPane scrollPane = new JScrollPane(commentTable);
+        scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -134,15 +194,11 @@ public class CustomerCommentPanel extends JPanel {
         viewBtn.setPreferredSize(new Dimension(150, 35));
         viewBtn.addActionListener(_ -> handleViewComment());
 
-        JButton refreshBtn = UIHelper.createStyledButton("Refresh", ButtonMode.CREATE);
-        refreshBtn.addActionListener(_ -> loadData());
-
         buttonPanel.add(viewBtn);
-        buttonPanel.add(refreshBtn);
 
         panel.add(searchPanel);
         panel.add(Box.createVerticalStrut(10));
-        panel.add(new JScrollPane(commentTable));
+        panel.add(scrollPane);
         panel.add(Box.createVerticalStrut(10));
         panel.add(buttonPanel);
 
@@ -247,61 +303,33 @@ public class CustomerCommentPanel extends JPanel {
         Appointment appointment = getSelectedAppointment();
         if (appointment == null) return;
 
-        JTextField ratingField = new JTextField();
-        JTextArea commentArea = new JTextArea(5, 25);
-        commentArea.setLineWrap(true);
-        commentArea.setWrapStyleWord(true);
+        AddCommentDialog dialog = new AddCommentDialog(
+                this,
+                currentCustomer,
+                appointment,
+                commentService,
+                () -> {
+                    JOptionPane.showMessageDialog(this, "Comment submitted successfully.");
+                    loadData();
+                    showTab("comments");
+                }
+        );
 
-        JScrollPane commentScrollPane = new JScrollPane(commentArea);
-
-        Object[] fields = {
-                "Rating (1-5):", ratingField,
-                "Comment:", commentScrollPane
-        };
-
-        while (true) {
-            int result = JOptionPane.showConfirmDialog(
-                    this,
-                    fields,
-                    "Submit Comment",
-                    JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.PLAIN_MESSAGE
-            );
-
-            if (result != JOptionPane.OK_OPTION) {
-                return;
-            }
-
-            try {
-                commentService.createComment(
-                        currentCustomer,
-                        appointment,
-                        ratingField.getText(),
-                        commentArea.getText()
-                );
-
-                JOptionPane.showMessageDialog(this, "Comment submitted successfully.");
-                loadData();
-                return;
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
+        dialog.setVisible(true);
     }
 
     private void handleViewComment() {
         Comment comment = getSelectedComment();
         if (comment == null) return;
 
-        JOptionPane.showMessageDialog(
+        new ViewCommentDialog(
                 this,
-                "Comment ID: " + comment.getCommentID() +
-                        "\nAppointment ID: " + comment.getAppointment().getAppointmentID() +
-                        "\nService: " + comment.getAppointment().getService().getName() +
-                        "\nRating: " + comment.getRating() +
-                        "\nComment: " + comment.getCommentText(),
-                "Comment Details",
-                JOptionPane.INFORMATION_MESSAGE
-        );
+                comment.getCommentID(),
+                comment.getCommentText(),
+                String.valueOf(comment.getRating()),
+                comment.getAppointment().getCustomer().getUsername(),
+                comment.getAppointment().getAppointmentID(),
+                comment.getAppointment().getService().getName()
+        ).setVisible(true);
     }
 }

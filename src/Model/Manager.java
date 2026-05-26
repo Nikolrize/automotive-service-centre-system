@@ -79,7 +79,7 @@ public class Manager extends User {
 
     @Override
     public boolean canviewComment() {
-        return true;
+        return false;
     }
 
     @Override

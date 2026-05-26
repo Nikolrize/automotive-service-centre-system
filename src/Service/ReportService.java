@@ -6,27 +6,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReportService {
-    //temporary file creation for reading only
+    private static final String USER_FILE ="users.txt";
+    private static final String VEHICLE_FILE = "vehicles.txt";
     private static final String APPOINTMENT_FILE = "appointments.txt";
     private static final String PAYMENT_FILE = "payments.txt";
-    private static final String FEEDBACK_FILE = "feedback.txt";
+    private static final String COMMENT_FILE = "comments.txt";
     private static final String REPORT_NOTE_FILE = "report_notes.txt";
 
     private static final String DEFAULT_REPORT_NOTES = """
             This report gives a simple summary for manager use.
-            It reads data from appointments, payments, feedback, and services files.
+            It reads data from appointments, payments, comments, and services files.
             The values update based on the current text-file records.
             """;
 
-    public int getTotalAppointments(){
-        return countValidLines(APPOINTMENT_FILE);
-    }
-
-    public int getCompletedAppointments() {
-        List<String> lines = FileHandler.readFile(APPOINTMENT_FILE);
+    public int getTotalUsers(){
         int count = 0;
 
-        for (String line: lines) {
+        for (String line : FileHandler.readFile(USER_FILE)) {
             if (line == null || line.trim().isEmpty()) {
                 continue;
             }
@@ -36,10 +32,41 @@ public class ReportService {
                 continue;
             }
 
-            if (Boolean.parseBoolean(data[5].trim())) {
+            if (Boolean.parseBoolean(data[7].trim())) {
                 count++;
             }
         }
+
+        return count;
+    }
+
+    public int getTotalVehicles() {
+        return countValidLines(VEHICLE_FILE);
+    }
+
+    public int getTotalAppointments() {
+        return countValidLines(APPOINTMENT_FILE);
+    }
+
+    public int getCompletedAppointments() {
+        List<String> lines = FileHandler.readFile(APPOINTMENT_FILE);
+        int count = 0;
+
+        for (String line : lines) {
+            if (line == null || line.trim().isEmpty()) {
+                continue;
+            }
+
+            String[] data = line.split(",");
+            if (data.length < 10) {
+                continue;
+            }
+
+            if (Boolean.parseBoolean(data[6].trim())) {
+                count++;
+            }
+        }
+
         return count;
     }
 
@@ -53,16 +80,17 @@ public class ReportService {
             }
 
             String[] data = line.split(",");
-            if (data.length < 4) {
+            if (data.length < 7) {
                 continue;
             }
 
             try {
-                total += Double.parseDouble(data[2].trim());
+                total += Double.parseDouble(data[3].trim());
             } catch (NumberFormatException e) {
-                //skip invalid payment lines
+                // skip invalid payment rows
             }
         }
+
         return total;
     }
 
@@ -70,13 +98,13 @@ public class ReportService {
         List<String> lines = FileHandler.readFile(APPOINTMENT_FILE);
         int count = 0;
 
-        for (String line: lines) {
+        for (String line : lines) {
             if (line == null || line.trim().isEmpty()) {
                 continue;
             }
 
             String[] data = line.split(",");
-            if (data.length < 9) {
+            if (data.length < 10) {
                 continue;
             }
 
@@ -100,7 +128,7 @@ public class ReportService {
             }
 
             String[] data = line.split(",");
-            if (data.length < 9) {
+            if (data.length < 10) {
                 continue;
             }
 
@@ -115,7 +143,7 @@ public class ReportService {
     }
 
     public double getAverageCustomerRating() {
-        List<String> lines = FileHandler.readFile(FEEDBACK_FILE);
+        List<String> lines = FileHandler.readFile(COMMENT_FILE);
 
         int totalRating = 0;
         int count = 0;
@@ -125,7 +153,7 @@ public class ReportService {
                 continue;
             }
 
-            String[] data = line.split(",");
+            String[] data = line.split(",", 7);
             if (data.length < 7) {
                 continue;
             }
@@ -134,7 +162,7 @@ public class ReportService {
                 totalRating += Integer.parseInt(data[5].trim());
                 count++;
             } catch (NumberFormatException e) {
-                //skip invalid rating lines
+                // Skip invalid rating rows
             }
         }
 
@@ -143,7 +171,6 @@ public class ReportService {
         }
 
         return (double) totalRating / count;
-
     }
 
     public String getReportNotes() {

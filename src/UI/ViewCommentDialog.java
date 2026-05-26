@@ -5,16 +5,22 @@ import java.awt.*;
 
 public class ViewCommentDialog extends JDialog {
 
+    // constructor for technician
     public ViewCommentDialog(Component parent, String commentID, String commentText,
                              String rating, String customer, String appointmentID) {
+        this(parent, commentID, commentText, rating, customer, appointmentID, "-"); //dash to replace the service
+    }
+
+    // constructor for customer / richer detail view
+    public ViewCommentDialog(Component parent, String commentID, String commentText,
+                             String rating, String customer, String appointmentID, String service) {
 
         super((Frame) SwingUtilities.getWindowAncestor(parent), "Comment Details", true);
-        setSize(580, 420);
+        setSize(580, 440);
         setLocationRelativeTo(parent);
         setResizable(false);
         setLayout(new BorderLayout());
 
-        // Header
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(new Color(135, 90, 224));
         header.setBorder(BorderFactory.createEmptyBorder(14, 18, 14, 18));
@@ -27,10 +33,9 @@ public class ViewCommentDialog extends JDialog {
         subtitleLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         subtitleLabel.setForeground(Color.WHITE);
 
-        header.add(titleLabel,    BorderLayout.NORTH);
+        header.add(titleLabel, BorderLayout.NORTH);
         header.add(subtitleLabel, BorderLayout.SOUTH);
 
-        // Body
         JPanel body = new JPanel(new BorderLayout());
         body.setBackground(Color.WHITE);
         body.setBorder(BorderFactory.createEmptyBorder(16, 18, 16, 18));
@@ -41,12 +46,13 @@ public class ViewCommentDialog extends JDialog {
 
         fieldsPanel.add(createField("Comment ID", commentID));
         fieldsPanel.add(Box.createVerticalStrut(8));
-        fieldsPanel.add(createField("Customer",   customer));
+        fieldsPanel.add(createField("Customer", customer));
         fieldsPanel.add(Box.createVerticalStrut(8));
-        fieldsPanel.add(createField("Rating",     rating));
+        fieldsPanel.add(createField("Service", service));
+        fieldsPanel.add(Box.createVerticalStrut(8));
+        fieldsPanel.add(createField("Rating", rating));
         fieldsPanel.add(Box.createVerticalStrut(12));
 
-        // Message section
         JPanel msgPanel = new JPanel(new BorderLayout());
         msgPanel.setBackground(Color.WHITE);
 
@@ -70,13 +76,12 @@ public class ViewCommentDialog extends JDialog {
         JScrollPane msgScroll = new JScrollPane(msgArea);
         msgScroll.setBorder(null);
 
-        msgPanel.add(msgLabel,  BorderLayout.NORTH);
+        msgPanel.add(msgLabel, BorderLayout.NORTH);
         msgPanel.add(msgScroll, BorderLayout.CENTER);
 
         body.add(fieldsPanel, BorderLayout.NORTH);
-        body.add(msgPanel,    BorderLayout.CENTER);
+        body.add(msgPanel, BorderLayout.CENTER);
 
-        // Footer
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         footer.setBackground(Color.WHITE);
         footer.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(220, 220, 220)));
@@ -93,7 +98,7 @@ public class ViewCommentDialog extends JDialog {
         footer.add(closeBtn);
 
         add(header, BorderLayout.NORTH);
-        add(body,   BorderLayout.CENTER);
+        add(body, BorderLayout.CENTER);
         add(footer, BorderLayout.SOUTH);
     }
 

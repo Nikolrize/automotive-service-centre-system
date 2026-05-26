@@ -3,12 +3,11 @@ package UI;
 import Enum.ButtonMode;
 import Model.Appointment;
 import Model.Customer;
-import Model.Technician;
+import Model.Feedback;
 import Service.AppointmentService;
 import Service.FeedbackService;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
@@ -24,7 +23,7 @@ public class CustomerFeedbackPanel extends JPanel {
     private final JTextField searchField = new JTextField();
     private TableRowSorter<DefaultTableModel> sorter;
 
-    public CustomerFeedbackPanel(Customer currentCustomer, AppointmentService appointmentService,FeedbackService feedbackService) {
+    public CustomerFeedbackPanel(Customer currentCustomer, AppointmentService appointmentService, FeedbackService feedbackService) {
         this.currentCustomer = currentCustomer;
         this.appointmentService = appointmentService;
         this.feedbackService = feedbackService;
@@ -37,9 +36,15 @@ public class CustomerFeedbackPanel extends JPanel {
     private void buildUI() {
         JPanel mainPanel = UIHelper.createSectionPanel("My Feedback");
 
-        String[] columns = {"Appointment ID", "Service", "Technician", "Date", "Feedback Status"};
+        String[] columns = {
+                "Appointment ID",
+                "Service",
+                "Technician",
+                "Date",
+                "Feedback Status"
+        };
 
-        model = new DefaultTableModel(columns,0) {
+        model = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -61,14 +66,10 @@ public class CustomerFeedbackPanel extends JPanel {
         buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JButton viewBtn = UIHelper.createStyledButton("View Feedback", ButtonMode.PRIMARY);
-        viewBtn.setPreferredSize(new Dimension(180,35));
+        viewBtn.setPreferredSize(new Dimension(180, 35));
         viewBtn.addActionListener(_ -> handleViewFeedback());
 
-        JButton refreshBtn = UIHelper.createStyledButton("Refresh", ButtonMode.CREATE);
-        refreshBtn.addActionListener(_ -> loadData());
-
         buttonPanel.add(viewBtn);
-        buttonPanel.add(refreshBtn);
 
         mainPanel.add(searchPanel);
         mainPanel.add(Box.createVerticalStrut(10));
@@ -86,12 +87,32 @@ public class CustomerFeedbackPanel extends JPanel {
 
         for (Appointment appointment : appointments) {
             String technicianName = appointment.getTechnician().getFirstName() + " " + appointment.getTechnician().getLastName();
-            boolean hasFeedback = feedbackService.hasFeedbackForAppointment(appointment.getAppointmentID());
+            boolean hasFeedback = hasFeedbackForAppointment(appointment.getAppointmentID());
 
             model.addRow(new Object[]{
-                    appointment.getAppointmentID(), appointment.getService().getName(), technicianName, appointment.getDate(), hasFeedback ? "Available" : "Not Available"
+                    appointment.getAppointmentID(),
+                    appointment.getService().getName(),
+                    technicianName,
+                    appointment.getDate(),
+                    hasFeedback ? "Available" : "Not Available"
             });
         }
+    }
+
+    private boolean hasFeedbackForAppointment(String appointmentID) {
+        try {
+            List<Feedback> feedbacks = feedbackService.getAllFeedbacks();
+
+            for (Feedback feedback : feedbacks) {
+                if (feedback.getAppointment().getAppointmentID().equals(appointmentID)) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
+        return false;
     }
 
     private void applyFilter() {
@@ -107,19 +128,34 @@ public class CustomerFeedbackPanel extends JPanel {
     private void handleViewFeedback() {
         int row = table.getSelectedRow();
 
-        if (row == -1 ) {
+        if (row == -1) {
             JOptionPane.showMessageDialog(this, "Please select an appointment first.");
             return;
         }
 
         String appointmentID = table.getValueAt(row, 0).toString();
-        String feedbackText = feedbackService.getFeedbackTextByAppointmentID(appointmentID);
 
-        if (feedbackText == null || feedbackText.isBlank()) {
+        try {
+            List<Feedback> feedbacks = feedbackService.getAllFeedbacks();
+
+            for (Feedback feedback : feedbacks) {
+                if (feedback.getAppointment().getAppointmentID().equals(appointmentID)) {
+                    new ViewFeedbackDialog(
+                            this,
+                            feedback.getFeedbackID(),
+                            feedback.getFeedbackText(),
+                            feedback.getTechnician().getUsername(),
+                            feedback.getAppointment().getCustomer().getUsername(),
+                            feedback.getDateTime().toString(),
+                            feedback.getAppointment().getAppointmentID()
+                    ).setVisible(true);
+                    return;
+                }
+            }
+
             JOptionPane.showMessageDialog(this, "No feedback is available for this appointment yet.");
-            return;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error loading feedback: " + e.getMessage());
         }
-
-        JOptionPane.showMessageDialog(this, "Appointment ID: " + appointmentID + "\nFeedback: " + feedbackText, "My Feedback", JOptionPane.INFORMATION_MESSAGE);
     }
 }

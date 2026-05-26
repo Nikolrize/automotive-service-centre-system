@@ -10,12 +10,14 @@ import Enum.*;
 public class ReportPanel extends JPanel {
     private final ReportService reportService;
 
+    private JLabel totalUsersLabel;
     private JLabel totalAppointmentsLabel;
     private JLabel completedAppointmentsLabel;
     private JLabel totalPaymentsLabel;
     private JLabel normalServicesLabel;
     private JLabel majorServicesLabel;
     private JLabel averageRatingLabel;
+    private JLabel totalVehiclesLabel;
 
     private JTextArea noteArea;
 
@@ -28,31 +30,34 @@ public class ReportPanel extends JPanel {
     }
 
     private void reportUI() {
-        JPanel mainPanel = UIHelper.createSectionPanel("View Report");
+        JPanel mainPanel = UIHelper.createSectionPanel("Report");
 
         JPanel summaryWrapperPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         summaryWrapperPanel.setBackground(Color.WHITE);
         summaryWrapperPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        //summary panel shows simple analyzed report values
-        JPanel summaryPanel = new JPanel(new GridLayout(3,2,20,20));
+        JPanel summaryPanel = new JPanel(new GridLayout(4, 2, 20, 20));
         summaryPanel.setBackground(Color.WHITE);
         summaryPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        summaryPanel.setPreferredSize(new Dimension(760, 240));
+        summaryPanel.setPreferredSize(new Dimension(760, 320));
 
+        totalUsersLabel = createSummaryLabel("Total Users: 0");
         totalAppointmentsLabel = createSummaryLabel("Total Appointments: 0");
         completedAppointmentsLabel = createSummaryLabel("Completed Appointments: 0");
         totalPaymentsLabel = createSummaryLabel("Total Payments Collected: RM 0.00");
         normalServicesLabel = createSummaryLabel("Normal Services: 0");
         majorServicesLabel = createSummaryLabel("Major Services: 0");
         averageRatingLabel = createSummaryLabel("Average Customer Rating: 0.00");
+        totalVehiclesLabel = createSummaryLabel("Total Vehicles: 0");
 
+        summaryPanel.add(totalUsersLabel);
         summaryPanel.add(totalAppointmentsLabel);
         summaryPanel.add(completedAppointmentsLabel);
         summaryPanel.add(totalPaymentsLabel);
         summaryPanel.add(normalServicesLabel);
         summaryPanel.add(majorServicesLabel);
         summaryPanel.add(averageRatingLabel);
+        summaryPanel.add(totalVehiclesLabel);
 
         summaryWrapperPanel.add(summaryPanel);
 
@@ -60,21 +65,17 @@ public class ReportPanel extends JPanel {
         buttonPanel.setBackground(Color.WHITE);
         buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JButton refreshBtn = UIHelper.createStyledButton("Refresh", ButtonMode.CREATE);
-        refreshBtn.addActionListener(_ -> loadData());
-
         JButton editNotesBtn = UIHelper.createStyledButton("Edit Notes", ButtonMode.PRIMARY);
         editNotesBtn.setPreferredSize(new Dimension(150, 35));
         editNotesBtn.addActionListener(_ -> handleEditNotes());
 
         buttonPanel.add(editNotesBtn);
-        buttonPanel.add(refreshBtn);
 
         noteArea = new JTextArea();
         noteArea.setEditable(false);
         noteArea.setLineWrap(true);
         noteArea.setWrapStyleWord(true);
-        noteArea.setBackground(new Color(248,248,248));
+        noteArea.setBackground(new Color(248, 248, 248));
         noteArea.setFont(new Font("SansSerif", Font.PLAIN, 13));
 
         JScrollPane noteScrollPane = new JScrollPane(noteArea);
@@ -103,12 +104,14 @@ public class ReportPanel extends JPanel {
     }
 
     public void loadData() {
+        totalUsersLabel.setText("Total Users: " + reportService.getTotalUsers());
         totalAppointmentsLabel.setText("Total Appointments: " + reportService.getTotalAppointments());
         completedAppointmentsLabel.setText("Completed Appointments: " + reportService.getCompletedAppointments());
         totalPaymentsLabel.setText(String.format("Total Payments Collected: RM %.2f", reportService.getTotalPaymentsCollected()));
         normalServicesLabel.setText("Normal Services: " + reportService.getNormalServiceCount());
         majorServicesLabel.setText("Major Services: " + reportService.getMajorServiceCount());
         averageRatingLabel.setText(String.format("Average Customer Rating: %.2f", reportService.getAverageCustomerRating()));
+        totalVehiclesLabel.setText("Total Vehicles: " + reportService.getTotalVehicles());
         noteArea.setText(reportService.getReportNotes());
     }
 
@@ -132,8 +135,8 @@ public class ReportPanel extends JPanel {
             try {
                 reportService.saveReportNotes(editArea.getText());
                 noteArea.setText(reportService.getReportNotes());
-                JOptionPane.showMessageDialog(this, "Report notes saved successfully. ");
-            } catch (Exception ex ) {
+                JOptionPane.showMessageDialog(this, "Report notes saved successfully.");
+            } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }

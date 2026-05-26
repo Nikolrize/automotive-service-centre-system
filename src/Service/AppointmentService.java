@@ -145,11 +145,20 @@ public class AppointmentService {
             throw new Exception("Selected technician is not available at this time.");
         }
 
-        String appointmentID = generateNewID();
+        Appointment appointment = new Appointment(
+                generateNewID(),
+                service,
+                customer,
+                staff,
+                technician,
+                vehicle,
+                false,
+                date,
+                startTime,
+                endTime
+        );
 
-        String data = String.join(",", appointmentID, service.getServiceID(), customer.getUserID(), staff.getUserID(), technician.getUserID(), vehicle.getVehicleID(), "false", date.toString(), startTime.toString(), endTime.toString());
-
-        FileHandler.appendToFile(FILE_NAME, data);
+        FileHandler.appendToFile(FILE_NAME, formatAppointment(appointment));
     }
 
     public void updateAppointment(Customer newCustomer, Vehicle newVehicle, Service newService, String appointmentID, LocalDate newDate, LocalTime newStartTime, Technician newTechnician) throws Exception {
@@ -168,15 +177,17 @@ public class AppointmentService {
                     throw new Exception("Technician is not available for new schedule.");
                 }
 
-                data[1] = newService.getServiceID();
-                data[2] = newCustomer.getUserID();
-                data[4] = newTechnician.getUserID();
-                data[5] = newVehicle.getVehicleID();
-                data[7] = newDate.toString();
-                data[8] = newStartTime.toString();
-                data[9] = newEndTime.toString();
+                Appointment appointment = getAppointmentByID(appointmentID);
 
-                lines.set(i, String.join(",", data));
+                appointment.setService(newService);
+                appointment.setCustomer(newCustomer);
+                appointment.setTechnician(newTechnician);
+                appointment.setVehicle(newVehicle);
+                appointment.setDate(newDate);
+                appointment.setStartTime(newStartTime);
+                appointment.setEndTime(newEndTime);
+
+                lines.set(i, formatAppointment(appointment));
                 updated = true;
                 break;
             }
@@ -217,13 +228,30 @@ public class AppointmentService {
                     throw new Exception("Not your appointment");
                 }
 
-                data[6] = "true";
-                lines.set(i, String.join(",", data));
+                Appointment appointment = getAppointmentByID(appointmentID);
+                appointment.setIsCompleted(true);
+
+                lines.set(i, formatAppointment(appointment));
                 break;
             }
         }
 
         FileHandler.writeFile(FILE_NAME, lines);
+    }
+
+    private String formatAppointment(Appointment appointment) {
+        return String.join(",",
+                appointment.getAppointmentID(),
+                appointment.getService().getServiceID(),
+                appointment.getCustomer().getUserID(),
+                appointment.getCounterStaff().getUserID(),
+                appointment.getTechnician().getUserID(),
+                appointment.getVehicle().getVehicleID(),
+                String.valueOf(appointment.getIsCompleted()),
+                appointment.getDate().toString(),
+                appointment.getStartTime().toString(),
+                appointment.getEndTime().toString()
+        );
     }
 
     public List<Appointment> getAppointmentsByCustomer(Customer customer) {

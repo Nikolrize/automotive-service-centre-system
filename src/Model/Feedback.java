@@ -1,5 +1,7 @@
 package Model;
 
+import Util.InputValidator;
+
 import java.time.LocalDateTime;
 
 public class Feedback {
@@ -22,7 +24,7 @@ public class Feedback {
     }
 
     public void setFeedbackID(String feedbackID) {
-        this.feedbackID = feedbackID;
+        this.feedbackID = InputValidator.validateID(feedbackID, "F");
     }
 
     public Appointment getAppointment() {
@@ -30,19 +32,21 @@ public class Feedback {
     }
 
     public void setAppointment(Appointment appointment) {
-        this.appointment = appointment;
+        this.appointment = InputValidator.validateObject(appointment, "Appointment");
     }
 
     public Technician getTechnician() { return technician; }
 
-    public void setTechnician(Technician technician) { this.technician = technician; }
+    public void setTechnician(Technician technician) {
+        this.technician = InputValidator.validateObject(technician, "Technician");
+    }
 
     public String getFeedbackText() {
         return feedbackText;
     }
 
     public void setFeedbackText(String feedbackText) {
-        this.feedbackText = feedbackText;
+        this.feedbackText = InputValidator.validateText(feedbackText, "Feedback");
     }
 
     public LocalDateTime getDateTime() {
@@ -50,6 +54,6 @@ public class Feedback {
     }
 
     public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
+        this.dateTime = InputValidator.validateDateTime(dateTime, "Date time");
     }
 }

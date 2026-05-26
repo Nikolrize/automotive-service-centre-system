@@ -1,5 +1,7 @@
 package Model;
 
+import Util.InputValidator;
+
 public class Service {
     private String serviceID;
     private String name;
@@ -20,15 +22,16 @@ public class Service {
     }
 
     public void setServiceID(String serviceID) {
-        this.serviceID = serviceID;
+        this.serviceID = InputValidator.validateID(serviceID, "SV");
     }
+
 
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = InputValidator.validateText(name, "Service name");
     }
 
     public String getType() {
@@ -36,7 +39,7 @@ public class Service {
     }
 
     public void setType(String type) {
-        this.type = type;
+        this.type = InputValidator.validateServiceType(type);
     }
 
     public double getPrice() {
@@ -44,7 +47,7 @@ public class Service {
     }
 
     public void setPrice(double price) {
-        this.price = price;
+        this.price = InputValidator.validateAmount(price);
     }
 
     public int getDuration() {
@@ -52,6 +55,6 @@ public class Service {
     }
 
     public void setDuration(int duration) {
-        this.duration = duration;
+        this.duration = InputValidator.validateDuration(duration);
     }
 }

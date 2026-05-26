@@ -18,8 +18,11 @@ public class ServiceManagementService {
         List<String> lines = FileHandler.readFile(FILE_NAME);
 
         if (lines.isEmpty()) {
-            FileHandler.appendToFile(FILE_NAME, "SV0001,Normal Service,Normal,100.00,1");
-            FileHandler.appendToFile(FILE_NAME, "SV0002,Major Service,Major,300.00,3");
+            Service normalService = new Service("SV0001", "Normal Service", "Normal", 100.00, 1);
+            Service majorService = new Service("SV0002", "Major Service", "Major", 300.00, 3);
+
+            FileHandler.appendToFile(FILE_NAME, formatService(normalService));
+            FileHandler.appendToFile(FILE_NAME, formatService(majorService));
         }
     }
 
@@ -70,8 +73,10 @@ public class ServiceManagementService {
             if (data.length < 5) continue;
 
             if (data[0].trim().equals(serviceID.trim())) {
-                data[3] = String.format("%.2f", newPrice);
-                lines.set(i,String.join(",", data));
+                Service service = getServiceByID(serviceID);
+                service.setPrice(newPrice);
+
+                lines.set(i, formatService(service));
                 updated = true;
                 break;
             }
@@ -99,10 +104,15 @@ public class ServiceManagementService {
             }
         }
 
-        String serviceID = generateNewServiceID();
-        String newLine = String.join(",", serviceID, name, type, String.format("%.2f",price),String.valueOf(duration));
+        Service service = new Service(
+                generateNewServiceID(),
+                name,
+                type,
+                price,
+                duration
+        );
 
-        FileHandler.appendToFile(FILE_NAME,newLine);
+        FileHandler.appendToFile(FILE_NAME, formatService(service));
     }
 
     private String generateNewServiceID() {
@@ -183,5 +193,15 @@ public class ServiceManagementService {
         } catch (NumberFormatException e) {
             throw new Exception("Duration must be a valid whole number.");
         }
+    }
+
+    private String formatService(Service service) {
+        return String.join(",",
+                service.getServiceID(),
+                service.getName(),
+                service.getType(),
+                String.format("%.2f", service.getPrice()),
+                String.valueOf(service.getDuration())
+        );
     }
 }

@@ -1,5 +1,7 @@
 package Model;
 
+import Util.InputValidator;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -27,7 +29,7 @@ public class Payment {
     }
 
     public void setPaymentID(String paymentID) {
-        this.paymentID = paymentID;
+        this.paymentID = InputValidator.validateID(paymentID, "P");
     }
 
     public Appointment getAppointment() {
@@ -35,7 +37,7 @@ public class Payment {
     }
 
     public void setAppointment(Appointment appointment) {
-        this.appointment = appointment;
+        this.appointment = InputValidator.validateObject(appointment, "Appointment");
     }
 
     public CounterStaff getCounterStaff() {
@@ -43,7 +45,7 @@ public class Payment {
     }
 
     public void setCounterStaff(CounterStaff counterStaff) {
-        this.counterStaff = counterStaff;
+        this.counterStaff = InputValidator.validateObject(counterStaff, "Counter Staff");
     }
 
     public double getAmount() {
@@ -51,7 +53,7 @@ public class Payment {
     }
 
     public void setAmount(double amount) {
-        this.amount = amount;
+        this.amount = InputValidator.validateAmount(amount);
     }
 
     public String getMethod() {
@@ -59,7 +61,7 @@ public class Payment {
     }
 
     public void setMethod(String method) {
-        this.method = method;
+        this.method = InputValidator.validateText(method, "Payment method");
     }
 
     public LocalDate getPaymentDate() {
@@ -67,7 +69,7 @@ public class Payment {
     }
 
     public void setPaymentDate(LocalDate paymentDate) {
-        this.paymentDate = paymentDate;
+        this.paymentDate = InputValidator.validateDate(paymentDate);
     }
 
     public LocalTime getPaymentTime() {
@@ -75,6 +77,6 @@ public class Payment {
     }
 
     public void setPaymentTime(LocalTime paymentTime) {
-        this.paymentTime = paymentTime;
+        this.paymentTime = InputValidator.validateTime(paymentTime, "Payment time");
     }
 }

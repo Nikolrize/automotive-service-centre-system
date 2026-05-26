@@ -1,5 +1,7 @@
 package Model;
 
+import Util.InputValidator;
+
 public class Vehicle {
     private String vehicleID;
     private Customer customer;
@@ -24,7 +26,7 @@ public class Vehicle {
     }
 
     public void setVehicleID(String vehicleID) {
-        this.vehicleID = vehicleID;
+        this.vehicleID = InputValidator.validateID(vehicleID, "V");
     }
 
     public Customer getCustomer() {
@@ -32,7 +34,7 @@ public class Vehicle {
     }
 
     public void setCustomer(Customer customer) {
-        this.customer = customer;
+        this.customer = InputValidator.validateObject(customer, "Customer");
     }
 
     public String getPlateNumber() {
@@ -40,7 +42,7 @@ public class Vehicle {
     }
 
     public void setPlateNumber(String plateNumber) {
-        this.plateNumber = plateNumber;
+        this.plateNumber = InputValidator.validatePlateNumber(plateNumber);
     }
 
     public String getBrand() {
@@ -48,16 +50,15 @@ public class Vehicle {
     }
 
     public void setBrand(String brand) {
-        this.brand = brand;
+        this.brand = InputValidator.validateText(brand, "Vehicle brand");
     }
-
 
     public String getModel() {
         return model;
     }
 
     public void setModel(String model) {
-        this.model = model;
+        this.model = InputValidator.validateText(model, "Vehicle model");
     }
 
     public int getYear() {
@@ -65,7 +66,7 @@ public class Vehicle {
     }
 
     public void setYear(int year) {
-        this.year = year;
+        this.year = InputValidator.validateVehicleYear(year);
     }
 
     public String getColor() {
@@ -73,6 +74,6 @@ public class Vehicle {
     }
 
     public void setColor(String color) {
-        this.color = color;
+        this.color = InputValidator.validateText(color, "Vehicle color");
     }
 }

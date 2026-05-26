@@ -1,5 +1,7 @@
 package Model;
 
+import Util.InputValidator;
+
 public class Comment {
     private String commentID;
     private Appointment appointment;
@@ -18,7 +20,7 @@ public class Comment {
     }
 
     public void setCommentID(String commentID) {
-        this.commentID = commentID;
+        this.commentID = InputValidator.validateID(commentID, "CM");
     }
 
     public Appointment getAppointment() {
@@ -34,7 +36,7 @@ public class Comment {
     }
 
     public void setCommentText(String commentText) {
-        this.commentText = commentText;
+        this.commentText = InputValidator.validateText(commentText, "Comment");
     }
 
     public int getRating() {
@@ -42,6 +44,6 @@ public class Comment {
     }
 
     public void setRating(int rating) {
-        this.rating = rating;
+        this.rating = InputValidator.validateRating(rating);
     }
 }

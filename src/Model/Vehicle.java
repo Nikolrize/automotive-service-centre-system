@@ -51,7 +51,6 @@ public class Vehicle {
         this.brand = brand;
     }
 
-
     public String getModel() {
         return model;
     }

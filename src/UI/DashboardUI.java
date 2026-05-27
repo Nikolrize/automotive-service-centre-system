@@ -1,6 +1,5 @@
 package UI;
 
-import Model.CounterStaff;
 import Model.Customer;
 import Model.Technician;
 import Service.*;
@@ -22,6 +21,7 @@ public class DashboardUI extends JFrame {
     private final PaymentService paymentService;
     private final CommentService commentService;
     private final FeedbackService feedbackService;
+    private final LoyaltyService loyaltyService;
     private JPanel leftPanel;
     private JPanel rightPanel;
     private CardLayout cardLayout;
@@ -36,6 +36,7 @@ public class DashboardUI extends JFrame {
         this.paymentService = new PaymentService(appointmentService, userService);
         this.commentService = new CommentService(appointmentService);
         this.feedbackService = new FeedbackService(userService, appointmentService);
+        this.loyaltyService = new LoyaltyService();
     }
 
     public void showDashboard() {
@@ -181,11 +182,12 @@ public class DashboardUI extends JFrame {
         if (currentUser.canViewFeedback()) {
             if (currentUser instanceof Customer customer) {
                 panels.put("View Feedback", new CustomerFeedbackPanel(customer, appointmentService, feedbackService));
-            } else if (currentUser instanceof Technician technician) {
-                panels.put("View Feedback", new TechnicianFeedbackPanel(technician, feedbackService));
-            } else {
-                panels.put("View Feedback", new ViewFeedbackPanel(feedbackService, commentService));
-            }
+            } else
+                if (currentUser instanceof Technician technician) {
+                    panels.put("View Feedback", new TechnicianFeedbackPanel(technician, feedbackService));
+                } else {
+                    panels.put("View Feedback", new ViewFeedbackPanel(feedbackService, commentService));
+                }
         }
 
         // Report
@@ -195,7 +197,7 @@ public class DashboardUI extends JFrame {
 
         // Appointment
         if (currentUser.canManageAppointment()) {
-            panels.put("Manage Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, feedbackService, commentService,currentUser, rightPanel, cardLayout));
+            panels.put("Manage Appointment", new AppointmentPanel(appointmentService, userService, serviceManagementService, vehicleService, feedbackService, commentService, currentUser, rightPanel, cardLayout));
         }
 
         if (currentUser.canUpdateAssignedAppointment()) {
@@ -222,6 +224,11 @@ public class DashboardUI extends JFrame {
 
         if (currentUser.canviewComment() && currentUser instanceof Model.Technician technician) {
             panels.put("View Comment", new ViewCommentPanel(technician, commentService));
+        }
+
+        // Loyalty
+        if (currentUser.canViewLoyalty() && currentUser instanceof Customer customer) {
+            panels.put("View Loyalty", new CustomerLoyaltyPanel(customer, loyaltyService));
         }
         return panels;
     }
@@ -305,6 +312,11 @@ public class DashboardUI extends JFrame {
 
         if (currentUser.canviewComment()) {
             addMenuButton("View Comment");
+        }
+
+        // Loyalty
+        if (currentUser.canViewLoyalty()) {
+            addMenuButton("View Loyalty");
         }
     }
 

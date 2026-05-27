@@ -13,6 +13,7 @@ public class PaymentService {
 
     private final AppointmentService appointmentService;
     private final UserService userService;
+    private final LoyaltyService loyaltyService = new LoyaltyService();
 
     public PaymentService(AppointmentService appointmentService, UserService userService) {
         this.appointmentService = appointmentService;
@@ -103,45 +104,68 @@ public class PaymentService {
             throw new Exception("Payment can only be collected for completed appointments.");
         }
 
+        double originalAmount = appointment.getService().getPrice();
+        double amount = loyaltyService.applyReward(appointment.getCustomer(), originalAmount);
+
         Payment payment = new Payment(
                 generateNewID(),
                 appointment,
                 (CounterStaff) currentUser,
-                appointment.getService().getPrice(),
+                amount,
                 method,
                 LocalDate.now(),
                 LocalTime.now()
         );
 
         FileHandler.appendToFile(FILE_NAME, formatPayment(payment));
+        loyaltyService.addPoints(appointment);
     }
 
     public String generateReceipt(Payment payment) {
         Appointment a = payment.getAppointment();
+        LoyaltyReward reward = loyaltyService.getLatestUsedReward(a.getCustomer());
+
+        double originalAmount = a.getService().getPrice();
+        double discountAmount = reward.getDiscountAmount();
+        double finalAmount = originalAmount - discountAmount;
+
+        int pointsEarned;
+        if (a.getService().getType().equalsIgnoreCase("Major")) {
+            pointsEarned = 50;
+        } else {
+            pointsEarned = 20;
+        }
+
+        int currentPoints = loyaltyService.getPoints(a.getCustomer());
 
         return """
-                =========================================
-                             SERVICE RECEIPT
-                =========================================
+            =========================================
+                         SERVICE RECEIPT
+            =========================================
 
-                Payment ID: %s
-                Appointment ID: %s
+            Payment ID: %s
+            Appointment ID: %s
 
-                Customer Username: %s
-                Vehicle: %s %s (%s)
-                Plate Number: %s
+            Customer Username: %s
+            Vehicle: %s %s (%s)
+            Plate Number: %s
 
-                Service: %s
-                Amount Paid: RM %.2f
-                Payment Method: %s
+            Service: %s
+            Original Amount: RM %.2f
+            Loyalty Discount: RM %.2f
+            Final Amount Paid: RM %.2f
+            Payment Method: %s
 
-                Paid On: %s %s
-                Collected By: %s
+            Points Earned: %d
+            Current Loyalty Points: %d
 
-                =========================================
-                Thank you for your payment!
-                =========================================
-                """.formatted(
+            Paid On: %s %s
+            Collected By: %s
+
+            =========================================
+            Thank you for your payment!
+            =========================================
+            """.formatted(
                 payment.getPaymentID(),
                 a.getAppointmentID(),
                 a.getCustomer().getUsername(),
@@ -150,8 +174,12 @@ public class PaymentService {
                 a.getVehicle().getYear(),
                 a.getVehicle().getPlateNumber(),
                 a.getService().getName(),
-                payment.getAmount(),
+                originalAmount,
+                discountAmount,
+                finalAmount,
                 payment.getMethod(),
+                pointsEarned,
+                currentPoints,
                 payment.getPaymentDate(),
                 payment.getPaymentTime(),
                 payment.getCounterStaff().getUsername()

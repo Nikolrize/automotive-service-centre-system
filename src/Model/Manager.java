@@ -106,4 +106,9 @@ public class Manager extends User {
     public boolean canViewVehicle() {
         return false;
     }
+
+    @Override
+    public boolean canViewLoyalty() {
+        return false;
+    }
 }

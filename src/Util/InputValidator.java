@@ -234,4 +234,29 @@ public class InputValidator {
 
         return year;
     }
+
+    public static String validateRewardStatus(String status) {
+        if (status == null || status.trim().isEmpty()) {
+            throw new IllegalArgumentException("Reward status cannot be empty.");
+        }
+
+        status = status.trim();
+
+        if (!status.equalsIgnoreCase("Available")
+                && !status.equalsIgnoreCase("In Use")
+                && !status.equalsIgnoreCase("Used")) {
+
+            throw new IllegalArgumentException(
+                    "Reward status must be Available, In Use, or Used."
+            );
+        }
+
+        if (status.equalsIgnoreCase("Available")) {
+            return "Available";
+        } else if (status.equalsIgnoreCase("In Use")) {
+            return "In Use";
+        } else {
+            return "Used";
+        }
+    }
 }

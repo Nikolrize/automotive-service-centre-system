@@ -126,7 +126,10 @@ public class PaymentService {
         LoyaltyReward reward = loyaltyService.getLatestUsedReward(a.getCustomer());
 
         double originalAmount = a.getService().getPrice();
-        double discountAmount = reward.getDiscountAmount();
+        double discountAmount = 0;
+        if (reward != null) {
+            discountAmount = reward.getDiscountAmount();
+        }
         double finalAmount = originalAmount - discountAmount;
 
         int pointsEarned;

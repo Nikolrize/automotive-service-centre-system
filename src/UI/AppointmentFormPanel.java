@@ -400,7 +400,7 @@ public class AppointmentFormPanel extends JPanel {
         }
 
         LocalTime endTime = dateTimePicker.getTime()
-                .plusMinutes(selectedService.getDuration());
+                .plusHours(selectedService.getDuration());
 
         endTimeLabel.setText("End Time: " + endTime);
     }

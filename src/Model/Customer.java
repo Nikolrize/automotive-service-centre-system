@@ -106,4 +106,9 @@ public class Customer extends User {
     public boolean canViewVehicle() {
         return true;
     }
+
+    @Override
+    public boolean canViewLoyalty() {
+        return true;
+    }
 }

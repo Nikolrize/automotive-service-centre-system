@@ -36,4 +36,7 @@ public interface RolePermission {
     // VEHICLE
     boolean canManageVehicle();
     boolean canViewVehicle();
+
+    // LOYALTY
+    boolean canViewLoyalty();
 }

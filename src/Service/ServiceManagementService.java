@@ -18,8 +18,8 @@ public class ServiceManagementService {
         List<String> lines = FileHandler.readFile(FILE_NAME);
 
         if (lines.isEmpty()) {
-            Service normalService = new Service("SV0001", "Normal Service", "Normal", 100.00, 1);
-            Service majorService = new Service("SV0002", "Major Service", "Major", 300.00, 3);
+            Service normalService = new Service("SV0001", "Oil Change", "Normal", 100.00, 1);
+            Service majorService = new Service("SV0002", "Full Vehicle Service", "Major", 300.00, 3);
 
             FileHandler.appendToFile(FILE_NAME, formatService(normalService));
             FileHandler.appendToFile(FILE_NAME, formatService(majorService));

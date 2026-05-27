@@ -220,7 +220,7 @@ public class DashboardUI extends JFrame {
             panels.put("Provide Comment", new CustomerCommentPanel(customer, appointmentService, commentService));
         }
 
-        if (currentUser.canviewComment() && currentUser instanceof Model.Technician technician) {
+        if (currentUser.canViewComment() && currentUser instanceof Model.Technician technician) {
             panels.put("View Comment", new ViewCommentPanel(technician, commentService));
         }
         return panels;
@@ -303,7 +303,7 @@ public class DashboardUI extends JFrame {
             addMenuButton("Provide Comment");
         }
 
-        if (currentUser.canviewComment()) {
+        if (currentUser.canViewComment()) {
             addMenuButton("View Comment");
         }
     }

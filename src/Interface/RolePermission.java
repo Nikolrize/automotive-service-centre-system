@@ -25,7 +25,7 @@ public interface RolePermission {
 
     // COMMENT
     boolean canCreateComment();
-    boolean canviewComment();
+    boolean canViewComment();
 
     // REPORT
     boolean canViewReports();

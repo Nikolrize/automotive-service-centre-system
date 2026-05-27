@@ -78,7 +78,7 @@ public class Technician extends User {
     }
 
     @Override
-    public boolean canviewComment() {
+    public boolean canViewComment() {
         return true;
     }
 

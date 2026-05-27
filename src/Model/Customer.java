@@ -78,7 +78,7 @@ public class Customer extends User {
     }
 
     @Override
-    public boolean canviewComment() {
+    public boolean canViewComment() {
         return false;
     }
 

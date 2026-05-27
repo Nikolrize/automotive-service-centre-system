@@ -2,7 +2,6 @@ package UI;
 
 import Model.Comment;
 import Model.Technician;
-import Service.AppointmentService;
 import Service.CommentService;
 
 import javax.swing.*;
@@ -39,7 +38,7 @@ public class ViewCommentPanel extends JPanel {
     private void buildUI() {
         JPanel mainPanel = UIHelper.createSectionPanel("View Appointment Comments");
 
-        String[] columns = {"Comment ID", "Comment", "Rating", "Customer", "Appointment ID"};
+        String[] columns = {"Comment ID", "Comment", "Rating", "Customer", "Appointment ID","Service"};
 
         model = new DefaultTableModel(columns, 0) {
             @Override
@@ -88,7 +87,8 @@ public class ViewCommentPanel extends JPanel {
                         comment.getCommentText(),
                         comment.getRating() + " / 5",
                         comment.getAppointment().getCustomer().getUsername(),
-                        comment.getAppointment().getAppointmentID()
+                        comment.getAppointment().getAppointmentID(),
+                        comment.getAppointment().getService().getName()
                 });
             }
         } catch (Exception e) {
@@ -120,8 +120,9 @@ public class ViewCommentPanel extends JPanel {
         String rating        = table.getValueAt(row, 2).toString();
         String customer      = table.getValueAt(row, 3).toString();
         String appointmentID = table.getValueAt(row, 4).toString();
+        String service       = table.getValueAt(row, 5).toString();
 
-        new ViewCommentDialog(this, commentID, commentText, rating, customer, appointmentID)
+        new ViewCommentDialog(this, commentID, commentText, rating, customer, appointmentID, service)
                 .setVisible(true);
     }
 }

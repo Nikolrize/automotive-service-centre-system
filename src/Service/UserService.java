@@ -289,20 +289,6 @@ public class UserService {
                 .toList();
     }
 
-    //returns inactive users only for the selected role
-    public List<User> getInactiveUsersByRole(UserRole role) {
-        return getInactiveUsers()
-                .stream()
-                .filter(user -> switch (role) {
-                    case MANAGER -> user instanceof Manager;
-                    case COUNTER_STAFF -> user instanceof CounterStaff;
-                    case TECHNICIAN -> user instanceof Technician;
-                    case CUSTOMER -> user instanceof Customer;
-                    default -> false;
-                })
-                .toList();
-    }
-
     public List<Customer> getAllCustomers() {
         return getActiveUsers()
                 .stream()

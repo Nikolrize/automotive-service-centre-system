@@ -34,7 +34,7 @@ public class FeedbackService {
                 continue;
             }
 
-            String[] data = line.split(",", 5); // split the lines to 5 oarts
+            String[] data = line.split(",", 5); // split the lines to 5 parts
 
             //Format:
             // feedbackID, appointmentID, technicianID, comment, dateTime
@@ -96,26 +96,6 @@ public class FeedbackService {
         }
 
         return list;
-    }
-
-    public boolean hasFeedbackForAppointment(String appointmentID) {
-        for (String[] record : getAllFeedbackRecords()) {
-            if (record[1].trim().equals(appointmentID)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public String getFeedbackTextByAppointmentID(String appointmentID) {
-        for (String[] record : getAllFeedbackRecords()) {
-            if (record[1].trim().equals(appointmentID)) {
-                return record[3].trim();
-            }
-        }
-
-        return null;
     }
 
     public int getTotalFeedbackCount() {

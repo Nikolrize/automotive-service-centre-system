@@ -8,7 +8,7 @@ public class ViewCommentDialog extends JDialog {
     // constructor for technician
     public ViewCommentDialog(Component parent, String commentID, String commentText,
                              String rating, String customer, String appointmentID) {
-        this(parent, commentID, commentText, rating, customer, appointmentID, "-"); //dash to replace the service
+        this(parent, commentID, commentText, rating, customer, appointmentID, "-");
     }
 
     // constructor for customer / richer detail view

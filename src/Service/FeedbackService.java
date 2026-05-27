@@ -19,7 +19,7 @@ public class FeedbackService {
     private Runnable onFeedbackChangedCallback;
     
     public FeedbackService(UserService userService, AppointmentService appointmentService) {
-        FileHandler.readFile(FILE_NAME); // ensure file exists even if no feedback
+        FileHandler.readFile(FILE_NAME);
 
         this.userService = userService;
         this.appointmentService = appointmentService;
@@ -34,7 +34,7 @@ public class FeedbackService {
                 continue;
             }
 
-            String[] data = line.split(",", 5); // split the lines to 5 parts
+            String[] data = line.split(",", 5);
 
             //Format:
             // feedbackID, appointmentID, technicianID, comment, dateTime

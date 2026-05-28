@@ -16,7 +16,7 @@ public class AddFeedbackDialog extends JDialog {
 
         super((Frame) SwingUtilities.getWindowAncestor(parent), true);
         setTitle("Add Feedback");
-        setSize(550, 420);
+        setSize(550, 450);
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout());
         setResizable(false);
@@ -66,12 +66,14 @@ public class AddFeedbackDialog extends JDialog {
                 BorderFactory.createLineBorder(new Color(189, 195, 199)),
                 BorderFactory.createEmptyBorder(6, 8, 6, 8)
         ));
+
+        final int MAX_CHARS = 500;
         commentArea.setDocument(new PlainDocument() {
             @Override
             public void insertString(int offs, String str, AttributeSet a)
                     throws BadLocationException {
                 if (str == null) return;
-                if ((getLength() + str.length()) <= 500) {
+                if ((getLength() + str.length()) <= MAX_CHARS) {
                     super.insertString(offs, str, a);
                 }
             }
@@ -81,9 +83,35 @@ public class AddFeedbackDialog extends JDialog {
         scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         scrollPane.setBorder(null);
 
+        // Character counter
+        JLabel charCountLabel = new JLabel("0 / " + MAX_CHARS + " characters");
+        charCountLabel.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        charCountLabel.setForeground(new Color(150, 150, 150));
+        charCountLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        commentArea.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            private void update() {
+                int len = commentArea.getText().length();
+                charCountLabel.setText(len + " / " + MAX_CHARS + " characters");
+                charCountLabel.setForeground(len >= MAX_CHARS
+                        ? new Color(231, 76, 60)
+                        : new Color(150, 150, 150));
+                // Reset border to normal while user is typing
+                commentArea.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(189, 195, 199)),
+                        BorderFactory.createEmptyBorder(6, 8, 6, 8)
+                ));
+            }
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { update(); }
+            public void removeUpdate(javax.swing.event.DocumentEvent e) { update(); }
+            public void changedUpdate(javax.swing.event.DocumentEvent e) { update(); }
+        });
+
         body.add(label);
         body.add(Box.createVerticalStrut(8));
         body.add(scrollPane);
+        body.add(Box.createVerticalStrut(4));
+        body.add(charCountLabel);
 
         // Dialog's Footer
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
@@ -110,13 +138,41 @@ public class AddFeedbackDialog extends JDialog {
         submitButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         submitButton.addActionListener(_ -> {
             String comment = commentArea.getText().trim();
+
+            // Validate: empty
             if (comment.isEmpty()) {
                 commentArea.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(255, 255, 255, 97), 2),
+                        BorderFactory.createLineBorder(new Color(231, 76, 60), 2),
                         BorderFactory.createEmptyBorder(6, 8, 6, 8)
                 ));
+                JOptionPane.showMessageDialog(this,
+                        "Feedback message cannot be empty.",
+                        "Validation Error",
+                        JOptionPane.WARNING_MESSAGE);
+                commentArea.requestFocus();
                 return;
             }
+
+            // Validate: exceeds max length (safety net beyond the Document filter)
+            if (comment.length() > MAX_CHARS) {
+                commentArea.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(231, 76, 60), 2),
+                        BorderFactory.createEmptyBorder(6, 8, 6, 8)
+                ));
+                JOptionPane.showMessageDialog(this,
+                        "Feedback message cannot exceed " + MAX_CHARS + " characters.\n"
+                                + "Current length: " + comment.length() + " characters.",
+                        "Validation Error",
+                        JOptionPane.WARNING_MESSAGE);
+                commentArea.requestFocus();
+                return;
+            }
+
+            // Reset border on valid submission
+            commentArea.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(189, 195, 199)),
+                    BorderFactory.createEmptyBorder(6, 8, 6, 8)
+            ));
 
             try {
                 feedbackService.addFeedback(appt, technician, comment);

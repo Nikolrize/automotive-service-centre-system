@@ -52,14 +52,6 @@ public class InputValidator {
         return time;
     }
 
-    public static void validateTimeRange(LocalTime start, LocalTime end) {
-        if (!start.isBefore(end)) {
-            throw new IllegalArgumentException(
-                    "Start time must be before end time."
-            );
-        }
-    }
-
     public static int validateRating(int rating) {
         if (rating < 1 || rating > 5) {
             throw new IllegalArgumentException(

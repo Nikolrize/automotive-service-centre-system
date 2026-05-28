@@ -351,13 +351,29 @@ public class ViewFeedbackPanel extends JPanel {
         String rating = commentTable.getValueAt(row, 5).toString();
         String commentText = commentTable.getValueAt(row, 6).toString();
 
+        for (Comment comment : commentService.getAllComments()) {
+            if (comment.getCommentID().equals(commentID)) {
+                new ViewCommentDialog(
+                        this,
+                        comment.getCommentID(),
+                        comment.getCommentText(),
+                        String.valueOf(comment.getRating()),
+                        comment.getAppointment().getCustomer().getUsername(),
+                        comment.getAppointment().getAppointmentID(),
+                        comment.getAppointment().getService().getName()
+                ).setVisible(true);
+                return;
+            }
+        }
+
         new ViewCommentDialog(
                 this,
                 commentID,
                 commentText,
                 rating,
                 customerID,
-                appointmentID
+                appointmentID,
+                "-"
         ).setVisible(true);
     }
 

@@ -8,6 +8,7 @@ import java.util.List;
 
 public class ServiceManagementService {
     private static final String FILE_NAME  = "services.txt";
+    private static final String APPOINTMENT_FILE_NAME = "appointments.txt";
 
     public ServiceManagementService() {
         initializeDefaultServices();
@@ -87,6 +88,32 @@ public class ServiceManagementService {
         }
 
         FileHandler.writeFile(FILE_NAME,lines);
+    }
+
+    public void deleteService(String serviceID) throws Exception {
+        if (serviceID == null || serviceID.trim().isEmpty()) {
+            throw new Exception("Please select a service first.");
+        }
+
+        if (getAllServices().size() <= 1) {
+            throw new Exception("At least one service must remain.");
+        }
+
+        if (isServiceUsedInAppointments(serviceID)) {
+            throw new Exception("This service is used by existing appointments and cannot be deleted.");
+        }
+
+        List<String> lines = FileHandler.readFile(FILE_NAME);
+        boolean removed = lines.removeIf(line -> {
+            String[] data = line.split(",");
+            return data.length >= 1 && data[0].trim().equals(serviceID.trim());
+        });
+
+        if (!removed) {
+            throw new Exception("Service not found.");
+        }
+
+        FileHandler.writeFile(FILE_NAME, lines);
     }
 
     //creating new service
@@ -193,6 +220,21 @@ public class ServiceManagementService {
         } catch (NumberFormatException e) {
             throw new Exception("Duration must be a valid whole number.");
         }
+    }
+
+    private boolean isServiceUsedInAppointments(String serviceID) {
+        for (String line : FileHandler.readFile(APPOINTMENT_FILE_NAME)) {
+            if (line == null || line.trim().isEmpty()) {
+                continue;
+            }
+
+            String[] data = line.split(",");
+            if (data.length >= 2 && data[1].trim().equals(serviceID.trim())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private String formatService(Service service) {

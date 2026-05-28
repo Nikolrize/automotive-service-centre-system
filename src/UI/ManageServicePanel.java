@@ -63,8 +63,13 @@ public class ManageServicePanel extends JPanel {
         updatePriceBtn.setPreferredSize(new Dimension(150, 35));
         updatePriceBtn.addActionListener(_ -> handleUpdatePrice());
 
+        JButton deleteBtn = UIHelper.createStyledButton("Delete Service", ButtonMode.DESTRUCTIVE);
+        deleteBtn.setPreferredSize(new Dimension(150, 35));
+        deleteBtn.addActionListener(_ -> handleDeleteService());
+
         buttonPanel.add(createBtn);
         buttonPanel.add(updatePriceBtn);
+        buttonPanel.add(deleteBtn);
 
         mainPanel.add(searchPanel);
         mainPanel.add(Box.createVerticalStrut(10));
@@ -178,6 +183,40 @@ public class ManageServicePanel extends JPanel {
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
+        }
+    }
+
+    private void handleDeleteService() {
+        int row = table.getSelectedRow();
+
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a service first!");
+            return;
+        }
+
+        String serviceID = table.getValueAt(row, 0).toString();
+        String serviceName = table.getValueAt(row, 1).toString();
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to delete this service?\n\n"
+                        + "Service ID: " + serviceID + "\n"
+                        + "Service Name: " + serviceName,
+                "Delete Service",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+        );
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        try {
+            serviceManagementService.deleteService(serviceID);
+            JOptionPane.showMessageDialog(this, "Service deleted successfully.");
+            loadData();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

@@ -178,7 +178,7 @@ public class DashboardUI extends JFrame {
             panels.put("Manage Service", new ManageServicePanel());
         }
 
-        // Feedback (checks if its customer, if not it will go to manager feedback, later need to add/change when adding technician feedback)
+        // Feedback (checks if its customer, if not it will go to manager feedback, or technician feedback)
         if (currentUser.canViewFeedback()) {
             if (currentUser instanceof Customer customer) {
                 panels.put("View Feedback", new CustomerFeedbackPanel(customer, appointmentService, feedbackService));

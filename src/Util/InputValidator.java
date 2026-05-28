@@ -182,7 +182,7 @@ public class InputValidator {
 
         contact = contact.trim();
 
-        if (!contact.matches("01\\d{8,9}")) {
+        if (!contact.matches("01\\d{8}")) {
             throw new IllegalArgumentException(
                     "Invalid contact number format. Correct format example: 0123456789"
             );

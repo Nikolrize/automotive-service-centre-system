@@ -22,7 +22,9 @@ public class ReportPanel extends JPanel {
     private JLabel totalVehiclesLabel;
 
     private JTextArea noteArea;
-    private JComboBox<User> employeeComboBox;
+
+    private User selectedEmployee;
+    private JTextField selectedEmployeeField;
 
     public ReportPanel() {
         this.reportService = new ReportService();
@@ -68,28 +70,18 @@ public class ReportPanel extends JPanel {
         JLabel employeeLabel = new JLabel("Employee Workload:");
         employeeLabel.setFont(new Font("SansSerif", Font.BOLD, 13));
 
-        employeeComboBox = new JComboBox<>();
-        employeeComboBox.setPreferredSize(new Dimension(320, 35));
-        employeeComboBox.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        employeeComboBox.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                          boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+        selectedEmployeeField = new JTextField("No employee selected");
+        selectedEmployeeField.setEditable(false);
+        selectedEmployeeField.setPreferredSize(new Dimension(360, 35));
+        selectedEmployeeField.setFont(new Font("SansSerif", Font.PLAIN, 13));
 
-                if (value instanceof User user) {
-                    setText(user.getFirstName() + " " + user.getLastName()
-                            + " (" + user.getRoleName() + ") - " + user.getUsername());
-                } else {
-                    setText("Select Employee");
-                }
-
-                return this;
-            }
-        });
+        JButton selectEmployeeBtn = UIHelper.createStyledButton("Select Employee", ButtonMode.PRIMARY);
+        selectEmployeeBtn.setPreferredSize(new Dimension(170, 35));
+        selectEmployeeBtn.addActionListener(e -> handleSelectEmployee());
 
         employeePanel.add(employeeLabel);
-        employeePanel.add(employeeComboBox);
+        employeePanel.add(selectedEmployeeField);
+        employeePanel.add(selectEmployeeBtn);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         buttonPanel.setBackground(Color.WHITE);
@@ -183,19 +175,41 @@ public class ReportPanel extends JPanel {
         setSummaryLabel(totalVehiclesLabel, "Total Vehicles", String.valueOf(reportService.getTotalVehicles()));
 
         noteArea.setText(reportService.getReportNotes());
-        populateEmployeeComboBox();
     }
 
-    private void populateEmployeeComboBox() {
-        DefaultComboBoxModel<User> model = new DefaultComboBoxModel<>();
-        model.addElement(null);
-
+    private void handleSelectEmployee() {
         List<User> employees = reportService.getReportEmployees();
-        for (User employee : employees) {
-            model.addElement(employee);
+
+        if (employees.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No employees available for workload report.");
+            return;
         }
 
-        employeeComboBox.setModel(model);
+        SelectionDialog<User> dialog = new SelectionDialog<>(
+                (JFrame) SwingUtilities.getWindowAncestor(this),
+                "Select Employee",
+                employees,
+                new String[]{"User ID", "Role", "Username", "First Name", "Last Name"},
+                user -> new Object[]{
+                        user.getUserID(),
+                        user.getRoleName(),
+                        user.getUsername(),
+                        user.getFirstName(),
+                        user.getLastName()
+                }
+        );
+
+        dialog.setVisible(true);
+
+        User user = dialog.getSelectedItem();
+
+        if (user != null) {
+            selectedEmployee = user;
+            selectedEmployeeField.setText(
+                    user.getFirstName() + " " + user.getLastName()
+                            + " (" + user.getRoleName() + ") - " + user.getUsername()
+            );
+        }
     }
 
     private void handleViewOverallReport() {
@@ -208,7 +222,6 @@ public class ReportPanel extends JPanel {
 
     private void handleViewEmployeeReport() {
         try {
-            User selectedEmployee = (User) employeeComboBox.getSelectedItem();
             String report = reportService.generateEmployeeWorkloadReport(selectedEmployee);
             showReportDialog("Employee Workload Report", report);
         } catch (Exception ex) {
@@ -226,7 +239,6 @@ public class ReportPanel extends JPanel {
 
     private void handleExportEmployeePdf() {
         try {
-            User selectedEmployee = (User) employeeComboBox.getSelectedItem();
             String report = reportService.generateEmployeeWorkloadReport(selectedEmployee);
 
             String fileName = "employee_report";

@@ -151,7 +151,7 @@ public class ManageUserPanel extends JPanel {
             usernameDisplay += " (You)";
         }
 
-        model.addRow(new Object[]{u.getUserID(), u.getRoleID(), usernameDisplay,u.getUsername(), u.getFirstName(), u.getLastName(), u.getEmail(), u.getContact()});
+        model.addRow(new Object[]{u.getUserID(), u.getRoleID(), usernameDisplay, u.getFirstName(), u.getLastName(), u.getEmail(), u.getContact()});
     }
 
     private void handleCreate() {

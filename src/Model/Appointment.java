@@ -100,12 +100,7 @@ public class Appointment {
 
     public void setStartTime(LocalTime startTime) {
         this.startTime = InputValidator.validateTime(startTime, "Start time");
-
-        if (this.endTime != null) {
-            InputValidator.validateTimeRange(this.startTime, this.endTime);
-        }
     }
-
 
     public LocalTime getEndTime() {
         return endTime;
@@ -113,9 +108,5 @@ public class Appointment {
 
     public void setEndTime(LocalTime endTime) {
         this.endTime = InputValidator.validateTime(endTime, "End time");
-
-        if (this.startTime != null) {
-            InputValidator.validateTimeRange(this.startTime, this.endTime);
-        }
     }
 }
